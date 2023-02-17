@@ -20,11 +20,11 @@ echo "  setup IAM roles ......"
 echo "==============================================="
 
 # create S3 bucket for application
-#if [ $AWS_REGION=="us-east-1" ]; then
-#  aws s3api create-bucket --bucket $S3TEST_BUCKET --region $AWS_REGION
-#else
-#  aws s3api create-bucket --bucket $S3TEST_BUCKET --region $AWS_REGION --create-bucket-configuration LocationConstraint=$AWS_REGION
-#fi
+if [ $AWS_REGION=="us-east-1" ]; then
+  aws s3api create-bucket --bucket $S3TEST_BUCKET --region $AWS_REGION 
+else
+  aws s3api create-bucket --bucket $S3TEST_BUCKET --region $AWS_REGION --create-bucket-configuration LocationConstraint=$AWS_REGION
+fi
 # Create a job execution role (https://docs.aws.amazon.com/emr/latest/EMR-on-EKS-DevelopmentGuide/creating-job-execution-role.html)
 cat >/tmp/job-execution-policy.json <<EOL
 {
@@ -104,7 +104,7 @@ managedNodeGroups:
       - "sleep 5;sudo mkfs.xfs /dev/nvme1n1;sudo mkdir -p /local1;sudo echo /dev/nvme1n1 /local1 xfs defaults,noatime 1 2 >> /etc/fstab"
       - "sudo mount -a"
       - "sudo chown ec2-user:ec2-user /local1"
-    instanceType: c5d.9xlarge
+    instanceType: c6gd.12xlarge
     # ebs optimization is enabled by default
     volumeSize: 20
     volumeType: gp2
