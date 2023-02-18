@@ -4,7 +4,7 @@ version := "1.0"
 
 scalaVersion := "2.12.10"
 
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
 unmanagedBase <<= baseDirectory { base => base / "libs" }
 
