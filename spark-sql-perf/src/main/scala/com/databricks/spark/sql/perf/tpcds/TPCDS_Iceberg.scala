@@ -30,11 +30,11 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
   extends Benchmark(sqlContext, catalog, database)
   with ImpalaKitQueries
   with SimpleQueries
-  with Tpcds_1_4_Queries_Iceberg
-  with Tpcds_2_4_Queries_Iceberg
+  with Tpcds_1_4_Queries_for_Iceberg
+  with Tpcds_2_4_Queries
   with Serializable {
 
-  def this() = this(SparkSession.builder.getOrCreate().sqlContext, catalog, database)
+  def this() = this(SparkSession.builder.getOrCreate().sqlContext, "", "")
 
   /*
   def setupBroadcast(skipTables: Seq[String] = Seq("store_sales", "customer")) = {
