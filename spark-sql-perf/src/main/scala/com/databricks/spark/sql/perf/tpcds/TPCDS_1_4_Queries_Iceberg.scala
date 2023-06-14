@@ -33,15 +33,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
 
   // Queries the TPCDS 1.4 queries using the qualifcations values in the templates.
   val tpcds1_4Queries = Seq(
-    ("q1", String.format("""
+    ("q1", s"""
             | WITH customer_total_return AS
             |   (SELECT sr_customer_sk AS ctr_customer_sk, sr_store_sk AS ctr_store_sk,
             |           sum(sr_return_amt) AS ctr_total_return
-            |    FROM %s.%s.store_returns, %s.%s.date_dim
+            |    FROM ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.date_dim
             |    WHERE sr_returned_date_sk = d_date_sk AND d_year = 2000
             |    GROUP BY sr_customer_sk, sr_store_sk)
             | SELECT c_customer_id
-            |   FROM customer_total_return ctr1, %s.%s.store, %s.%s.customer
+            |   FROM customer_total_return ctr1, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.customer
             |   WHERE ctr1.ctr_total_return >
             |    (SELECT avg(ctr_total_return)*1.2
             |      FROM customer_total_return ctr2
@@ -50,15 +50,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   AND s_state = 'TN'
             |   AND ctr1.ctr_customer_sk = c_customer_sk
             |   ORDER BY c_customer_id LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q2", String.format("""
+            """.stripMargin),
+    ("q2", s"""
             | WITH wscs as
             | (SELECT sold_date_sk, sales_price
             |  FROM (SELECT ws_sold_date_sk sold_date_sk, ws_ext_sales_price sales_price
-            |        FROM %s.%s.web_sales) x
+            |        FROM ${icebergCatalog}.${icebergDatabase}.web_sales) x
             |        UNION ALL
             |       (SELECT cs_sold_date_sk sold_date_sk, cs_ext_sales_price sales_price
-            |        FROM %s.%s.catalog_sales)),
+            |        FROM ${icebergCatalog}.${icebergDatabase}.catalog_sales)),
             | wswscs AS
             | (SELECT d_week_seq,
             |        sum(case when (d_day_name='Sunday') then sales_price else null end) sun_sales,
@@ -68,7 +68,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        sum(case when (d_day_name='Thursday') then sales_price else null end) thu_sales,
             |        sum(case when (d_day_name='Friday') then sales_price else null end) fri_sales,
             |        sum(case when (d_day_name='Saturday') then sales_price else null end) sat_sales
-            | FROM wscs, %s.%s.date_dim
+            | FROM wscs, ${icebergCatalog}.${icebergDatabase}.date_dim
             | WHERE d_date_sk = sold_date_sk
             | GROUP BY d_week_seq)
             | SELECT d_week_seq1
@@ -88,7 +88,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        ,thu_sales thu_sales1
             |        ,fri_sales fri_sales1
             |        ,sat_sales sat_sales1
-            |  FROM wswscs,%s.%s.date_dim
+            |  FROM wswscs,${icebergCatalog}.${icebergDatabase}.date_dim
             |  WHERE date_dim.d_week_seq = wswscs.d_week_seq AND d_year = 2001) y,
             | (SELECT wswscs.d_week_seq d_week_seq2
             |        ,sun_sales sun_sales2
@@ -98,23 +98,23 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        ,thu_sales thu_sales2
             |        ,fri_sales fri_sales2
             |        ,sat_sales sat_sales2
-            |  FROM wswscs, %s.%s.date_dim
+            |  FROM wswscs, ${icebergCatalog}.${icebergDatabase}.date_dim
             |  WHERE date_dim.d_week_seq = wswscs.d_week_seq AND d_year = 2001 + 1) z
             | WHERE d_week_seq1=d_week_seq2-53
             | ORDER BY d_week_seq1
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q3",String.format("""
+            """.stripMargin),
+    ("q3","""
             | SELECT dt.d_year, item.i_brand_id brand_id, item.i_brand brand,SUM(ss_ext_sales_price) sum_agg
-            | FROM  date_dim dt, %s.%s.store_sales, %s.%s.item
-            | WHERE dt.d_date_sk = %s.%s.store_sales.ss_sold_date_sk
-            |   AND %s.%s.store_sales.ss_item_sk = item.i_item_sk
+            | FROM  date_dim dt, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item
+            | WHERE dt.d_date_sk = ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk
+            |   AND ${icebergCatalog}.${icebergDatabase}.store_sales.ss_item_sk = item.i_item_sk
             |   AND item.i_manufact_id = 128
             |   AND dt.d_moy=11
             | GROUP BY dt.d_year, item.i_brand, item.i_brand_id
             | ORDER BY dt.d_year, sum_agg desc, brand_id
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q4",String.format("""
+            """.stripMargin),
+    ("q4","""
             |WITH year_total AS (
             | SELECT c_customer_id customer_id,
             |        c_first_name customer_first_name,
@@ -126,7 +126,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        d_year dyear,
             |        sum(((ss_ext_list_price-ss_ext_wholesale_cost-ss_ext_discount_amt)+ss_ext_sales_price)/2) year_total,
             |        's' sale_type
-            | FROM %s.%s.customer, %s.%s.store_sales, %s.%s.date_dim
+            | FROM ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | WHERE c_customer_sk = ss_customer_sk AND ss_sold_date_sk = d_date_sk
             | GROUP BY c_customer_id,
             |          c_first_name,
@@ -147,7 +147,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        d_year dyear,
             |        sum((((cs_ext_list_price-cs_ext_wholesale_cost-cs_ext_discount_amt)+cs_ext_sales_price)/2) ) year_total,
             |        'c' sale_type
-            | FROM %s.%s.customer, %s.%s.catalog_sales, %s.%s.date_dim
+            | FROM ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | WHERE c_customer_sk = cs_bill_customer_sk AND cs_sold_date_sk = d_date_sk
             | GROUP BY c_customer_id,
             |          c_first_name,
@@ -168,7 +168,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       ,d_year dyear
             |       ,sum((((ws_ext_list_price-ws_ext_wholesale_cost-ws_ext_discount_amt)+ws_ext_sales_price)/2) ) year_total
             |       ,'w' sale_type
-            | FROM %s.%s.customer, %s.%s.web_sales, %s.%s.date_dim
+            | FROM ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | WHERE c_customer_sk = ws_bill_customer_sk AND ws_sold_date_sk = d_date_sk
             | GROUP BY c_customer_id,
             |          c_first_name,
@@ -221,10 +221,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   t_s_secyear.customer_login,
             |   t_s_secyear.customer_email_address
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
     // Modifications: "||" -> concat
-    ("q5",String.format("""
+    ("q5","""
             | WITH ssr AS
             |  (SELECT s_store_id,
             |          sum(sales_price) as sales,
@@ -238,7 +238,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            ss_net_profit as profit,
             |            cast(0 as decimal(7,2)) as return_amt,
             |            cast(0 as decimal(7,2)) as net_loss
-            |    FROM %s.%s.store_sales
+            |    FROM ${icebergCatalog}.${icebergDatabase}.store_sales
             |    UNION ALL
             |    SELECT sr_store_sk as store_sk,
             |           sr_returned_date_sk as date_sk,
@@ -246,8 +246,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |           cast(0 as decimal(7,2)) as profit,
             |           sr_return_amt as return_amt,
             |           sr_net_loss as net_loss
-            |    FROM %s.%s.store_returns)
-            |    salesreturns, date_dim, %s.%s.store
+            |    FROM ${icebergCatalog}.${icebergDatabase}.store_returns)
+            |    salesreturns, date_dim, ${icebergCatalog}.${icebergDatabase}.store
             |  WHERE date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and ((cast('2000-08-23' as date) + interval 14 days))
@@ -266,7 +266,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |           cs_net_profit as profit,
             |           cast(0 as decimal(7,2)) as return_amt,
             |           cast(0 as decimal(7,2)) as net_loss
-            |    FROM %s.%s.catalog_sales
+            |    FROM ${icebergCatalog}.${icebergDatabase}.catalog_sales
             |    UNION ALL
             |    SELECT cr_catalog_page_sk as page_sk,
             |           cr_returned_date_sk as date_sk,
@@ -274,8 +274,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |           cast(0 as decimal(7,2)) as profit,
             |           cr_return_amount as return_amt,
             |           cr_net_loss as net_loss
-            |    from %s.%s.catalog_returns
-            |   ) salesreturns, %s.%s.date_dim, %s.%s.catalog_page
+            |    from ${icebergCatalog}.${icebergDatabase}.catalog_returns
+            |   ) salesreturns, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.catalog_page
             | WHERE date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and ((cast('2000-08-23' as date) + interval 14 days))
@@ -295,7 +295,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            ws_net_profit as profit,
             |            cast(0 as decimal(7,2)) as return_amt,
             |            cast(0 as decimal(7,2)) as net_loss
-            |    from %s.%s.web_sales
+            |    from ${icebergCatalog}.${icebergDatabase}.web_sales
             |    union all
             |    select ws_web_site_sk as wsr_web_site_sk,
             |           wr_returned_date_sk as date_sk,
@@ -303,10 +303,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |           cast(0 as decimal(7,2)) as profit,
             |           wr_return_amt as return_amt,
             |           wr_net_loss as net_loss
-            |    FROM %s.%s.web_site LEFT  OUTER JOIN %s.%s.web_sales on
+            |    FROM ${icebergCatalog}.${icebergDatabase}.web_site LEFT  OUTER JOIN ${icebergCatalog}.${icebergDatabase}.web_sales on
             |         ( wr_item_sk = ws_item_sk
             |           and wr_order_number = ws_order_number)
-            |   ) salesreturns, %s.%s.date_dim, %s.%s.web_site
+            |   ) salesreturns, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.web_site
             | WHERE date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and ((cast('2000-08-23' as date) + interval 14 days))
@@ -342,11 +342,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | GROUP BY ROLLUP (channel, id)
             | ORDER BY channel, id
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q6", String.format("""
+            """.stripMargin),
+    ("q6", s"""
             | SELECT a.ca_state state, count(*) cnt
             | FROM
-            |    %s.%s.customer_address a, %s.%s.customer c, %s.%s.store_sales s, %s.%s.date_dim d, %s.%s.item i
+            |    ${icebergCatalog}.${icebergDatabase}.customer_address a, ${icebergCatalog}.${icebergDatabase}.customer c, ${icebergCatalog}.${icebergDatabase}.store_sales s, ${icebergCatalog}.${icebergDatabase}.date_dim d, ${icebergCatalog}.${icebergDatabase}.item i
             | WHERE a.ca_address_sk = c.c_current_addr_sk
             | 	AND c.c_customer_sk = s.ss_customer_sk
             | 	AND s.ss_sold_date_sk = d.d_date_sk
@@ -360,14 +360,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | GROUP BY a.ca_state
             | HAVING count(*) >= 10
             | ORDER BY cnt LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q7", String.format("""
+            """.stripMargin),
+    ("q7", s"""
             | SELECT i_item_id,
             |        avg(ss_quantity) agg1,
             |        avg(ss_list_price) agg2,
             |        avg(ss_coupon_amt) agg3,
             |        avg(ss_sales_price) agg4
-            | FROM %s.%s.store_sales, %s.%s.customer_demographics, %s.%s.date_dim, %s.%s.item, %s.%s.promotion
+            | FROM ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.customer_demographics, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.promotion
             | WHERE ss_sold_date_sk = d_date_sk AND
             |       ss_item_sk = i_item_sk AND
             |       ss_cdemo_sk = cd_demo_sk AND
@@ -379,13 +379,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       d_year = 2000
             | GROUP BY i_item_id
             | ORDER BY i_item_id LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q8", String.format("""
+            """.stripMargin),
+    ("q8", s"""
             | select s_store_name, sum(ss_net_profit)
-            | from %s.%s.store_sales, date_dim, %s.%s.store,
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.store,
             |     (SELECT ca_zip
             |       from (
-            |       (SELECT substr(ca_zip,1,5) ca_zip FROM %s.%s.customer_address
+            |       (SELECT substr(ca_zip,1,5) ca_zip FROM ${icebergCatalog}.${icebergDatabase}.customer_address
             |          WHERE substr(ca_zip,1,5) IN (
             |               '24128','76232','65084','87816','83926','77556','20548',
             |               '26231','43848','15126','91137','61265','98294','25782',
@@ -449,7 +449,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       (select ca_zip
             |          FROM
             |            (SELECT substr(ca_zip,1,5) ca_zip,count(*) cnt
-            |              FROM %s.%s.customer_address, %s.%s.customer
+            |              FROM ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.customer
             |              WHERE ca_address_sk = c_current_addr_sk and
             |                    c_preferred_cust_flag='Y'
             |              group by ca_zip
@@ -462,65 +462,65 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  and (substr(s_zip,1,2) = substr(V1.ca_zip,1,2))
             | group by s_store_name
             | order by s_store_name LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q9", String.format(s"""
-            |select case when (select count(*) from %s.%s.store_sales
+            """.stripMargin),
+    ("q9", s"""
+            |select case when (select count(*) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 1 and 20) > ${rc(0)}
-            |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
+            |            then (select avg(ss_ext_discount_amt) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 1 and 20)
-            |            else (select avg(ss_net_paid) from %s.%s.store_sales
+            |            else (select avg(ss_net_paid) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 1 and 20) end bucket1 ,
-            |       case when (select count(*) from %s.%s.store_sales
+            |       case when (select count(*) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 21 and 40) > ${rc(1)}
-            |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
+            |            then (select avg(ss_ext_discount_amt) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 21 and 40)
-            |            else (select avg(ss_net_paid) from %s.%s.store_sales
+            |            else (select avg(ss_net_paid) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 21 and 40) end bucket2,
-            |       case when (select count(*) from %s.%s.store_sales
+            |       case when (select count(*) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 41 and 60) > ${rc(2)}
-            |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
+            |            then (select avg(ss_ext_discount_amt) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 41 and 60)
-            |            else (select avg(ss_net_paid) from %s.%s.store_sales
+            |            else (select avg(ss_net_paid) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 41 and 60) end bucket3,
-            |       case when (select count(*) from %s.%s.store_sales
+            |       case when (select count(*) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 61 and 80) > ${rc(3)}
-            |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
+            |            then (select avg(ss_ext_discount_amt) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 61 and 80)
-            |            else (select avg(ss_net_paid) from %s.%s.store_sales
+            |            else (select avg(ss_net_paid) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 61 and 80) end bucket4,
-            |       case when (select count(*) from %s.%s.store_sales
+            |       case when (select count(*) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 81 and 100) > ${rc(4)}
-            |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
+            |            then (select avg(ss_ext_discount_amt) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 81 and 100)
-            |            else (select avg(ss_net_paid) from %s.%s.store_sales
+            |            else (select avg(ss_net_paid) from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                  where ss_quantity between 81 and 100) end bucket5
-            |from %s.%s.reason
+            |from ${icebergCatalog}.${icebergDatabase}.reason
             |where r_reason_sk = 1
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q10", String.format("""
+            """.stripMargin),
+    ("q10", s"""
             | select
             |  cd_gender, cd_marital_status, cd_education_status, count(*) cnt1,
             |  cd_purchase_estimate, count(*) cnt2, cd_credit_rating, count(*) cnt3,
             |  cd_dep_count, count(*) cnt4, cd_dep_employed_count,  count(*) cnt5,
             |  cd_dep_college_count, count(*) cnt6
             | from
-            |  %s.%s.customer c, %s.%s.customer_address ca, %s.%s.customer_demographics
+            |  ${icebergCatalog}.${icebergDatabase}.customer c, ${icebergCatalog}.${icebergDatabase}.customer_address ca, ${icebergCatalog}.${icebergDatabase}.customer_demographics
             | where
             |  c.c_current_addr_sk = ca.ca_address_sk and
             |  ca_county in ('Rush County','Toole County','Jefferson County',
             |                'Dona Ana County','La Porte County') and
             |  cd_demo_sk = c.c_current_cdemo_sk AND
-            |  exists (select * from %s.%s.store_sales, %s.%s.date_dim
+            |  exists (select * from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |          where c.c_customer_sk = ss_customer_sk AND
             |                ss_sold_date_sk = d_date_sk AND
             |                d_year = 2002 AND
             |                d_moy between 1 AND 1+3) AND
-            |   (exists (select * from %s.%s.web_sales, %s.%s.date_dim
+            |   (exists (select * from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |            where c.c_customer_sk = ws_bill_customer_sk AND
             |                  ws_sold_date_sk = d_date_sk AND
             |                  d_year = 2002 AND
             |                  d_moy between 1 AND 1+3) or
-            |    exists (select * from %s.%s.catalog_sales, %s.%s.date_dim
+            |    exists (select * from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |            where c.c_customer_sk = cs_ship_customer_sk AND
             |                  cs_sold_date_sk = d_date_sk AND
             |                  d_year = 2002 AND
@@ -542,8 +542,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          cd_dep_employed_count,
             |          cd_dep_college_count
             |LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q11", String.format("""
+            """.stripMargin),
+    ("q11", s"""
             | with year_total as (
             | select c_customer_id customer_id
             |       ,c_first_name customer_first_name
@@ -555,7 +555,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       ,d_year dyear
             |       ,sum(ss_ext_list_price-ss_ext_discount_amt) year_total
             |       ,'s' sale_type
-            | from %s.%s.customer, %s.%s.store_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where c_customer_sk = ss_customer_sk
             |   and ss_sold_date_sk = d_date_sk
             | group by c_customer_id
@@ -578,7 +578,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       ,d_year dyear
             |       ,sum(ws_ext_list_price-ws_ext_discount_amt) year_total
             |       ,'w' sale_type
-            | from %s.%s.customer, %s.%s.web_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where c_customer_sk = ws_bill_customer_sk
             |   and ws_sold_date_sk = d_date_sk
             | group by
@@ -607,16 +607,16 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |             > case when t_s_firstyear.year_total > 0 then t_s_secyear.year_total / t_s_firstyear.year_total else null end
             | order by t_s_secyear.customer_preferred_cust_flag
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q12", String.format("""
+    ("q12", s"""
             | select
             |  i_item_desc, i_category, i_class, i_current_price,
             |  sum(ws_ext_sales_price) as itemrevenue,
             |  sum(ws_ext_sales_price)*100/sum(sum(ws_ext_sales_price)) over
             |          (partition by i_class) as revenueratio
             | from
-            |	%s.%s.web_sales, %s.%s.item, %s.%s.date_dim
+            |	${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where
             |	ws_item_sk = i_item_sk
             |  	and i_category in ('Sports', 'Books', 'Home')
@@ -628,18 +628,18 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by
             |	i_category, i_class, i_item_id, i_item_desc, revenueratio
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q13", String.format("""
+            """.stripMargin),
+    ("q13", s"""
             | select avg(ss_quantity)
             |       ,avg(ss_ext_sales_price)
             |       ,avg(ss_ext_wholesale_cost)
             |       ,sum(ss_ext_wholesale_cost)
-            | from %s.%s.store_sales
-            |     ,%s.%s.store
-            |     ,%s.%s.customer_demographics
-            |     ,%s.%s.household_demographics
-            |     ,%s.%s.customer_address
-            |     ,%s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales
+            |     ,${icebergCatalog}.${icebergDatabase}.store
+            |     ,${icebergCatalog}.${icebergDatabase}.customer_demographics
+            |     ,${icebergCatalog}.${icebergDatabase}.household_demographics
+            |     ,${icebergCatalog}.${icebergDatabase}.customer_address
+            |     ,${icebergCatalog}.${icebergDatabase}.date_dim
             | where s_store_sk = ss_store_sk
             | and  ss_sold_date_sk = d_date_sk and d_year = 2001
             | and((ss_hdemo_sk=hd_demo_sk
@@ -678,25 +678,25 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  and ca_state in ('VA', 'TX', 'MS')
             |  and ss_net_profit between 50 and 250
             |     ))
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q14a", String.format("""
+            """.stripMargin),
+    ("q14a", s"""
             |with cross_items as
             | (select i_item_sk ss_item_sk
             | from item,
             |    (select iss.i_brand_id brand_id, iss.i_class_id class_id, iss.i_category_id category_id
-            |     from %s.%s.store_sales, %s.%s.item iss, %s.%s.date_dim d1
+            |     from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item iss, ${icebergCatalog}.${icebergDatabase}.date_dim d1
             |     where ss_item_sk = iss.i_item_sk
                     and ss_sold_date_sk = d1.d_date_sk
             |       and d1.d_year between 1999 AND 1999 + 2
             |   intersect
             |     select ics.i_brand_id, ics.i_class_id, ics.i_category_id
-            |     from %s.%s.catalog_sales, %s.%s.item ics, %s.%s.date_dim d2
+            |     from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item ics, ${icebergCatalog}.${icebergDatabase}.date_dim d2
             |     where cs_item_sk = ics.i_item_sk
             |       and cs_sold_date_sk = d2.d_date_sk
             |       and d2.d_year between 1999 AND 1999 + 2
             |   intersect
             |     select iws.i_brand_id, iws.i_class_id, iws.i_category_id
-            |     from %s.%s.web_sales, %s.%s.item iws, %s.%s.date_dim d3
+            |     from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item iws, ${icebergCatalog}.${icebergDatabase}.date_dim d3
             |     where ws_item_sk = iws.i_item_sk
             |       and ws_sold_date_sk = d3.d_date_sk
             |       and d3.d_year between 1999 AND 1999 + 2) x
@@ -708,7 +708,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | (select avg(quantity*list_price) average_sales
             |  from (
             |     select ss_quantity quantity, ss_list_price list_price
-            |     from %s.%s.store_sales, date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim
             |     where ss_sold_date_sk = d_date_sk
             |       and d_year between 1999 and 2001
             |   union all
@@ -718,7 +718,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       and d_year between 1999 and 1999 + 2
             |   union all
             |     select ws_quantity quantity, ws_list_price list_price
-            |     from %s.%s.web_sales, %s.%s.date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |     where ws_sold_date_sk = d_date_sk
             |       and d_year between 1999 and 1999 + 2) x)
             | select channel, i_brand_id,i_class_id,i_category_id,sum(sales), sum(number_sales)
@@ -726,7 +726,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     select 'store' channel, i_brand_id,i_class_id
             |             ,i_category_id,sum(ss_quantity*ss_list_price) sales
             |             , count(*) number_sales
-            |     from %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |     where ss_item_sk in (select ss_item_sk from cross_items)
             |       and ss_item_sk = i_item_sk
             |       and ss_sold_date_sk = d_date_sk
@@ -736,7 +736,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales)
             |   union all
             |     select 'catalog' channel, i_brand_id,i_class_id,i_category_id, sum(cs_quantity*cs_list_price) sales, count(*) number_sales
-            |     from %s.%s.catalog_sales, %s.%s.item, %s.%s.date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |     where cs_item_sk in (select ss_item_sk from cross_items)
             |       and cs_item_sk = i_item_sk
             |       and cs_sold_date_sk = d_date_sk
@@ -746,7 +746,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     having sum(cs_quantity*cs_list_price) > (select average_sales from avg_sales)
             |   union all
             |     select 'web' channel, i_brand_id,i_class_id,i_category_id, sum(ws_quantity*ws_list_price) sales , count(*) number_sales
-            |     from %s.%s.web_sales, %s.%s.item, %s.%s.date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |     where ws_item_sk in (select ss_item_sk from cross_items)
             |       and ws_item_sk = i_item_sk
             |       and ws_sold_date_sk = d_date_sk
@@ -758,25 +758,25 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by rollup (channel, i_brand_id,i_class_id,i_category_id)
             | order by channel,i_brand_id,i_class_id,i_category_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q14b", String.format("""
+            """.stripMargin),
+    ("q14b", s"""
             | with  cross_items as
             | (select i_item_sk ss_item_sk
             |  from item,
             |     (select iss.i_brand_id brand_id, iss.i_class_id class_id, iss.i_category_id category_id
-            |      from %s.%s.store_sales, %s.%s.item iss, %s.%s.date_dim d1
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item iss, ${icebergCatalog}.${icebergDatabase}.date_dim d1
             |      where ss_item_sk = iss.i_item_sk
             |         and ss_sold_date_sk = d1.d_date_sk
             |         and d1.d_year between 1999 AND 1999 + 2
             |     intersect
             |       select ics.i_brand_id, ics.i_class_id, ics.i_category_id
-            |       from %s.%s.catalog_sales, %s.%s.item ics, %s.%s.date_dim d2
+            |       from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item ics, ${icebergCatalog}.${icebergDatabase}.date_dim d2
             |       where cs_item_sk = ics.i_item_sk
             |         and cs_sold_date_sk = d2.d_date_sk
             |         and d2.d_year between 1999 AND 1999 + 2
             |     intersect
             |       select iws.i_brand_id, iws.i_class_id, iws.i_category_id
-            |       from %s.%s.web_sales, %s.%s.item iws, %s.%s.date_dim d3
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item iws, ${icebergCatalog}.${icebergDatabase}.date_dim d3
             |       where ws_item_sk = iws.i_item_sk
             |         and ws_sold_date_sk = d3.d_date_sk
             |         and d3.d_year between 1999 AND 1999 + 2) x
@@ -787,20 +787,20 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | avg_sales as
             | (select avg(quantity*list_price) average_sales
             |  from (select ss_quantity quantity, ss_list_price list_price
-            |         from %s.%s.store_sales, %s.%s.date_dim
+            |         from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |         where ss_sold_date_sk = d_date_sk and d_year between 1999 and 1999 + 2
             |       union all
             |         select cs_quantity quantity, cs_list_price list_price
-            |         from %s.%s.catalog_sales, %s.%s.date_dim
+            |         from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |         where cs_sold_date_sk = d_date_sk and d_year between 1999 and 1999 + 2
             |       union all
             |         select ws_quantity quantity, ws_list_price list_price
-            |         from %s.%s.web_sales, %s.%s.date_dim
+            |         from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |         where ws_sold_date_sk = d_date_sk and d_year between 1999 and 1999 + 2) x)
             | select * from
             | (select 'store' channel, i_brand_id,i_class_id,i_category_id
             |        ,sum(ss_quantity*ss_list_price) sales, count(*) number_sales
-            |  from %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |  where ss_item_sk in (select ss_item_sk from cross_items)
             |    and ss_item_sk = i_item_sk
             |    and ss_sold_date_sk = d_date_sk
@@ -810,7 +810,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  having sum(ss_quantity*ss_list_price) > (select average_sales from avg_sales)) this_year,
             | (select 'store' channel, i_brand_id,i_class_id
             |        ,i_category_id, sum(ss_quantity*ss_list_price) sales, count(*) number_sales
-            | from %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where ss_item_sk in (select ss_item_sk from cross_items)
             |   and ss_item_sk = i_item_sk
             |   and ss_sold_date_sk = d_date_sk
@@ -823,10 +823,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and this_year.i_category_id = last_year.i_category_id
             | order by this_year.channel, this_year.i_brand_id, this_year.i_class_id, this_year.i_category_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q15", String.format("""
+            """.stripMargin),
+    ("q15", s"""
             | select ca_zip, sum(cs_sales_price)
-            | from catalog_sales, %s.%s.customer, %s.%s.customer_address, %s.%s.date_dim
+            | from catalog_sales, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cs_bill_customer_sk = c_customer_sk
             | 	and c_current_addr_sk = ca_address_sk
             | 	and ( substr(ca_zip,1,5) in ('85669', '86197','88274','83405','86475',
@@ -838,15 +838,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by ca_zip
             | order by ca_zip
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: " -> `
-    ("q16", String.format("""
+    ("q16", s"""
             | select
             |   count(distinct cs_order_number) as `order count`,
             |   sum(cs_ext_ship_cost) as `total shipping cost`,
             |   sum(cs_net_profit) as `total net profit`
             | from
-            |   %s.%s.catalog_sales cs1, %s.%s.date_dim, %s.%s.customer_address, %s.%s.call_center
+            |   ${icebergCatalog}.${icebergDatabase}.catalog_sales cs1, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.call_center
             | where
             |   d_date between '2002-02-01' and (cast('2002-02-01' as date) + interval 60 days)
             | and cs1.cs_ship_date_sk = d_date_sk
@@ -859,12 +859,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            where cs1.cs_order_number = cs2.cs_order_number
             |              and cs1.cs_warehouse_sk <> cs2.cs_warehouse_sk)
             | and not exists(select *
-            |               from %s.%s.catalog_returns cr1
+            |               from ${icebergCatalog}.${icebergDatabase}.catalog_returns cr1
             |               where cs1.cs_order_number = cr1.cr_order_number)
             | order by count(distinct cs_order_number)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q17", String.format("""
+            """.stripMargin),
+    ("q17", s"""
             | select i_item_id
             |       ,i_item_desc
             |       ,s_state
@@ -879,7 +879,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       ,count(cs_quantity) as catalog_sales_quantitycount ,avg(cs_quantity) as catalog_sales_quantityave
             |       ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitystdev
             |       ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitycov
-            | from %s.%s.store_sales, %s.%s.store_returns, %s.%s.catalog_sales, %s.%s.date_dim d1, %s.%s.date_dim d2, %s.%s.date_dim d3, %s.%s.store, %s.%s.item
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.date_dim d2, ${icebergCatalog}.${icebergDatabase}.date_dim d3, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item
             | where d1.d_quarter_name = '2001Q1'
             |   and d1.d_date_sk = ss_sold_date_sk
             |   and i_item_sk = ss_item_sk
@@ -896,9 +896,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id, i_item_desc, s_state
             | order by i_item_id, i_item_desc, s_state
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "numeric" -> "decimal"
-    ("q18", String.format("""
+    ("q18", s"""
             | select i_item_id,
             |        ca_country,
             |        ca_state,
@@ -910,8 +910,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        avg( cast(cs_net_profit as decimal(12,2))) agg5,
             |        avg( cast(c_birth_year as decimal(12,2))) agg6,
             |        avg( cast(cd1.cd_dep_count as decimal(12,2))) agg7
-            | from %s.%s.catalog_sales, %s.%s.customer_demographics cd1,
-            |      %s.%s.customer_demographics cd2, %s.%s.customer, %s.%s.customer_address, %s.%s.date_dim, %s.%s.item
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.customer_demographics cd1,
+            |      ${icebergCatalog}.${icebergDatabase}.customer_demographics cd2, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.item
             | where cs_sold_date_sk = d_date_sk and
             |       cs_item_sk = i_item_sk and
             |       cs_bill_cdemo_sk = cd1.cd_demo_sk and
@@ -926,11 +926,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by rollup (i_item_id, ca_country, ca_state, ca_county)
             | order by ca_country, ca_state, ca_county, i_item_id
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q19", String.format("""
+            """.stripMargin),
+    ("q19", s"""
             | select i_brand_id brand_id, i_brand brand, i_manufact_id, i_manufact,
             | 	sum(ss_ext_sales_price) ext_price
-            | from %s.%s.date_dim, %s.%s.store_sales, %s.%s.item, %s.%s.customer, %s.%s.customer_address, %s.%s.store
+            | from ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.store
             | where d_date_sk = ss_sold_date_sk
             |   and ss_item_sk = i_item_sk
             |   and i_manager_id = 8
@@ -943,8 +943,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_brand, i_brand_id, i_manufact_id, i_manufact
             | order by ext_price desc, brand, brand_id, i_manufact_id, i_manufact
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q20", String.format("""
+            """.stripMargin),
+    ("q20", s"""
             |select i_item_desc
             |       ,i_category
             |       ,i_class
@@ -952,7 +952,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       ,sum(cs_ext_sales_price) as itemrevenue
             |       ,sum(cs_ext_sales_price)*100/sum(sum(cs_ext_sales_price)) over
             |           (partition by i_class) as revenueratio
-            | from %s.%s.catalog_sales, %s.%s.item, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cs_item_sk = i_item_sk
             |   and i_category in ('Sports', 'Books', 'Home')
             |   and cs_sold_date_sk = d_date_sk
@@ -961,9 +961,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id, i_item_desc, i_category, i_class, i_current_price
             | order by i_category, i_class, i_item_id, i_item_desc, revenueratio
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q21", String.format("""
+    ("q21", s"""
             | select * from(
             |   select w_warehouse_name, i_item_id,
             |          sum(case when (cast(d_date as date) < cast ('2000-03-11' as date))
@@ -972,7 +972,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          sum(case when (cast(d_date as date) >= cast ('2000-03-11' as date))
             |                   then inv_quantity_on_hand
             |                   else 0 end) as inv_after
-            |   from %s.%s.inventory, %s.%s.warehouse, %s.%s.item, %s.%s.date_dim
+            |   from ${icebergCatalog}.${icebergDatabase}.inventory, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |   where i_current_price between 0.99 and 1.49
             |     and i_item_sk          = inv_item_sk
             |     and inv_warehouse_sk   = w_warehouse_sk
@@ -986,10 +986,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |             end) between 2.0/3.0 and 3.0/2.0
             | order by w_warehouse_name, i_item_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q22", String.format("""
+            """.stripMargin),
+    ("q22", s"""
             | select i_product_name, i_brand, i_class, i_category, avg(inv_quantity_on_hand) qoh
-            |       from %s.%s.inventory, date_dim, item, %s.%s.warehouse
+            |       from ${icebergCatalog}.${icebergDatabase}.inventory, date_dim, item, ${icebergCatalog}.${icebergDatabase}.warehouse
             |       where inv_date_sk=d_date_sk
             |              and inv_item_sk=i_item_sk
             |              and inv_warehouse_sk = w_warehouse_sk
@@ -997,11 +997,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       group by rollup(i_product_name, i_brand, i_class, i_category)
             | order by qoh, i_product_name, i_brand, i_class, i_category
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q23a", String.format("""
+            """.stripMargin),
+    ("q23a", s"""
             | with frequent_ss_items as
             | (select substr(i_item_desc,1,30) itemdesc,i_item_sk item_sk,d_date solddate,count(*) cnt
-            |  from %s.%s.store_sales, date_dim, item
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim, item
             |  where ss_sold_date_sk = d_date_sk
             |    and ss_item_sk = i_item_sk
             |    and d_year in (2000, 2000+1, 2000+2,2000+3)
@@ -1010,14 +1010,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | max_store_sales as
             | (select max(csales) tpcds_cmax
             |  from (select c_customer_sk,sum(ss_quantity*ss_sales_price) csales
-            |        from %s.%s.store_sales, %s.%s.customer, %s.%s.date_dim
+            |        from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.date_dim
             |        where ss_customer_sk = c_customer_sk
             |         and ss_sold_date_sk = d_date_sk
             |         and d_year in (2000, 2000+1, 2000+2,2000+3)
             |        group by c_customer_sk) x),
             | best_ss_customer as
             | (select c_customer_sk,sum(ss_quantity*ss_sales_price) ssales
-            |  from %s.%s.store_sales, %s.%s.customer
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.customer
             |  where ss_customer_sk = c_customer_sk
             |  group by c_customer_sk
             |  having sum(ss_quantity*ss_sales_price) > (50/100.0) *
@@ -1032,19 +1032,19 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |         and cs_bill_customer_sk in (select c_customer_sk from best_ss_customer))
             |      union all
             |      (select ws_quantity*ws_list_price sales
-            |       from %s.%s.web_sales, date_dim
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, date_dim
             |       where d_year = 2000
             |         and d_moy = 2
             |         and ws_sold_date_sk = d_date_sk
             |         and ws_item_sk in (select item_sk from frequent_ss_items)
             |         and ws_bill_customer_sk in (select c_customer_sk from best_ss_customer))) y
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q23b", String.format("""
+            """.stripMargin),
+    ("q23b", s"""
             |
             | with frequent_ss_items as
             | (select substr(i_item_desc,1,30) itemdesc,i_item_sk item_sk,d_date solddate,count(*) cnt
-            |  from %s.%s.store_sales, %s.%s.date_dim,%s.%s.item
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim,${icebergCatalog}.${icebergDatabase}.item
             |  where ss_sold_date_sk = d_date_sk
             |    and ss_item_sk = i_item_sk
             |    and d_year in (2000, 2000+1, 2000+2,2000+3)
@@ -1053,14 +1053,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | max_store_sales as
             | (select max(csales) tpcds_cmax
             |  from (select c_customer_sk,sum(ss_quantity*ss_sales_price) csales
-            |        from %s.%s.store_sales, %s.%s.customer, date_dim
+            |        from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.customer, date_dim
             |        where ss_customer_sk = c_customer_sk
             |         and ss_sold_date_sk = d_date_sk
             |         and d_year in (2000, 2000+1, 2000+2,2000+3)
             |        group by c_customer_sk) x),
             | best_ss_customer as
             | (select c_customer_sk,sum(ss_quantity*ss_sales_price) ssales
-            |  from %s.%s.store_sales
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      ,customer
             |  where ss_customer_sk = c_customer_sk
             |  group by c_customer_sk
@@ -1068,7 +1068,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    (select * from max_store_sales))
             | select c_last_name,c_first_name,sales
             | from ((select c_last_name,c_first_name,sum(cs_quantity*cs_list_price) sales
-            |        from %s.%s.catalog_sales, %s.%s.customer, %s.%s.date_dim
+            |        from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.date_dim
             |        where d_year = 2000
             |         and d_moy = 2
             |         and cs_sold_date_sk = d_date_sk
@@ -1078,7 +1078,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       group by c_last_name,c_first_name)
             |      union all
             |      (select c_last_name,c_first_name,sum(ws_quantity*ws_list_price) sales
-            |       from %s.%s.web_sales, %s.%s.customer, date_dim
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.customer, date_dim
             |       where d_year = 2000
             |         and d_moy = 2
             |         and ws_sold_date_sk = d_date_sk
@@ -1088,12 +1088,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       group by c_last_name,c_first_name)) y
             |     order by c_last_name,c_first_name,sales
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q24a", String.format("""
+            """.stripMargin),
+    ("q24a", s"""
             | with ssales as
             | (select c_last_name, c_first_name, s_store_name, ca_state, s_state, i_color,
             |        i_current_price, i_manager_id, i_units, i_size, sum(ss_net_paid) netpaid
-            | from %s.%s.store_sales, %s.%s.store_returns, %s.%s.store, %s.%s.item, %s.%s.customer, %s.%s.customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address
             | where ss_ticket_number = sr_ticket_number
             |   and ss_item_sk = sr_item_sk
             |   and ss_customer_sk = c_customer_sk
@@ -1109,12 +1109,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where i_color = 'pale'
             | group by c_last_name, c_first_name, s_store_name
             | having sum(netpaid) > (select 0.05*avg(netpaid) from ssales)
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q24b", String.format("""
+            """.stripMargin),
+    ("q24b", s"""
             | with ssales as
             | (select c_last_name, c_first_name, s_store_name, ca_state, s_state, i_color,
             |         i_current_price, i_manager_id, i_units, i_size, sum(ss_net_paid) netpaid
-            | from %s.%s.store_sales, %s.%s.store_returns, %s.%s.store, %s.%s.item, %s.%s.customer, %s.%s.customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address
             | where ss_ticket_number = sr_ticket_number
             |   and ss_item_sk = sr_item_sk
             |   and ss_customer_sk = c_customer_sk
@@ -1130,15 +1130,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where i_color = 'chiffon'
             | group by c_last_name, c_first_name, s_store_name
             | having sum(netpaid) > (select 0.05*avg(netpaid) from ssales)
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q25", String.format("""
+            """.stripMargin),
+    ("q25", s"""
             | select i_item_id, i_item_desc, s_store_id, s_store_name,
             |    sum(ss_net_profit) as store_sales_profit,
             |    sum(sr_net_loss) as store_returns_loss,
             |    sum(cs_net_profit) as catalog_sales_profit
             | from
-            |    %s.%s.store_sales, %s.%s.store_returns, %s.%s.catalog_sales, %s.%s.date_dim d1, %s.%s.date_dim d2, %s.%s.date_dim d3,
-            |    %s.%s.store, %s.%s.item
+            |    ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.date_dim d2, ${icebergCatalog}.${icebergDatabase}.date_dim d3,
+            |    ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item
             | where
             |    d1.d_moy = 4
             |    and d1.d_year = 2001
@@ -1161,14 +1161,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by
             |    i_item_id, i_item_desc, s_store_id, s_store_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q26", String.format("""
+            """.stripMargin),
+    ("q26", s"""
             | select i_item_id,
             |        avg(cs_quantity) agg1,
             |        avg(cs_list_price) agg2,
             |        avg(cs_coupon_amt) agg3,
             |        avg(cs_sales_price) agg4
-            | from %s.%s.catalog_sales, %s.%s.customer_demographics, %s.%s.date_dim, %s.%s.item, %s.%s.promotion
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.customer_demographics, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.promotion
             | where cs_sold_date_sk = d_date_sk and
             |       cs_item_sk = i_item_sk and
             |       cs_bill_cdemo_sk = cd_demo_sk and
@@ -1181,15 +1181,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id
             | order by i_item_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q27", String.format("""
+            """.stripMargin),
+    ("q27", s"""
             | select i_item_id,
             |        s_state, grouping(s_state) g_state,
             |        avg(ss_quantity) agg1,
             |        avg(ss_list_price) agg2,
             |        avg(ss_coupon_amt) agg3,
             |        avg(ss_sales_price) agg4
-            | from %s.%s.store_sales, %s.%s.customer_demographics, %s.%s.date_dim, %s.%s.store, %s.%s.item
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.customer_demographics, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item
             | where ss_sold_date_sk = d_date_sk and
             |       ss_item_sk = i_item_sk and
             |       ss_store_sk = s_store_sk and
@@ -1202,13 +1202,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by rollup (i_item_id, s_state)
             | order by i_item_id, s_state
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q28", String.format("""
+            """.stripMargin),
+    ("q28", s"""
             | select *
             | from (select avg(ss_list_price) B1_LP
             |            ,count(ss_list_price) B1_CNT
             |            ,count(distinct ss_list_price) B1_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 0 and 5
             |        and (ss_list_price between 8 and 8+10
             |             or ss_coupon_amt between 459 and 459+1000
@@ -1216,7 +1216,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     (select avg(ss_list_price) B2_LP
             |            ,count(ss_list_price) B2_CNT
             |            ,count(distinct ss_list_price) B2_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 6 and 10
             |        and (ss_list_price between 90 and 90+10
             |             or ss_coupon_amt between 2323 and 2323+1000
@@ -1224,7 +1224,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     (select avg(ss_list_price) B3_LP
             |            ,count(ss_list_price) B3_CNT
             |            ,count(distinct ss_list_price) B3_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 11 and 15
             |        and (ss_list_price between 142 and 142+10
             |             or ss_coupon_amt between 12214 and 12214+1000
@@ -1232,7 +1232,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     (select avg(ss_list_price) B4_LP
             |            ,count(ss_list_price) B4_CNT
             |            ,count(distinct ss_list_price) B4_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 16 and 20
             |        and (ss_list_price between 135 and 135+10
             |             or ss_coupon_amt between 6071 and 6071+1000
@@ -1240,7 +1240,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     (select avg(ss_list_price) B5_LP
             |            ,count(ss_list_price) B5_CNT
             |            ,count(distinct ss_list_price) B5_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 21 and 25
             |        and (ss_list_price between 122 and 122+10
             |             or ss_coupon_amt between 836 and 836+1000
@@ -1248,14 +1248,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     (select avg(ss_list_price) B6_LP
             |            ,count(ss_list_price) B6_CNT
             |            ,count(distinct ss_list_price) B6_CNTD
-            |      from %s.%s.store_sales
+            |      from ${icebergCatalog}.${icebergDatabase}.store_sales
             |      where ss_quantity between 26 and 30
             |        and (ss_list_price between 154 and 154+10
             |             or ss_coupon_amt between 7326 and 7326+1000
             |             or ss_wholesale_cost between 7 and 7+20)) B6
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q29", String.format("""
+            """.stripMargin),
+    ("q29", s"""
             | select
             |     i_item_id
             |    ,i_item_desc
@@ -1265,8 +1265,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    ,sum(sr_return_quantity) as store_returns_quantity
             |    ,sum(cs_quantity)        as catalog_sales_quantity
             | from
-            |    %s.%s.store_sales, %s.%s.store_returns, %s.%s.catalog_sales, %s.%s.date_dim d1, %s.%s.date_dim d2,
-            |    %s.%s.date_dim d3, %s.%s.store, %s.%s.item
+            |    ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.date_dim d2,
+            |    ${icebergCatalog}.${icebergDatabase}.date_dim d3, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item
             | where
             |     d1.d_moy               = 9
             | and d1.d_year              = 1999
@@ -1288,13 +1288,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by
             |    i_item_id, i_item_desc, s_store_id, s_store_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q30", String.format("""
+            """.stripMargin),
+    ("q30", s"""
             | with customer_total_return as
             | (select wr_returning_customer_sk as ctr_customer_sk
             |        ,ca_state as ctr_state,
             | 	sum(wr_return_amt) as ctr_total_return
-            | from %s.%s.web_site, %s.%s.date_dim, %s.%s.customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address
             | where wr_returned_date_sk = d_date_sk
             |   and d_year = 2002
             |   and wr_returning_addr_sk = ca_address_sk
@@ -1302,7 +1302,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | select c_customer_id,c_salutation,c_first_name,c_last_name,c_preferred_cust_flag
             |       ,c_birth_day,c_birth_month,c_birth_year,c_birth_country,c_login,c_email_address
             |       ,c_last_review_date,ctr_total_return
-            | from customer_total_return ctr1, %s.%s.customer_address, %s.%s.customer
+            | from customer_total_return ctr1, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.customer
             | where ctr1.ctr_total_return > (select avg(ctr_total_return)*1.2
             | 			  from customer_total_return ctr2
             |                  	  where ctr1.ctr_state = ctr2.ctr_state)
@@ -1313,17 +1313,17 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                  ,c_birth_day,c_birth_month,c_birth_year,c_birth_country,c_login,c_email_address
             |                  ,c_last_review_date,ctr_total_return
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q31", String.format("""
+            """.stripMargin),
+    ("q31", s"""
             | with ss as
             | (select ca_county,d_qoy, d_year,sum(ss_ext_sales_price) as store_sales
-            | from %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address
             | where ss_sold_date_sk = d_date_sk
             |  and ss_addr_sk=ca_address_sk
             | group by ca_county,d_qoy, d_year),
             | ws as
             | (select ca_county,d_qoy, d_year,sum(ws_ext_sales_price) as web_sales
-            | from %s.%s.web_sales,date_dim,customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales,date_dim,customer_address
             | where ws_sold_date_sk = d_date_sk
             |  and ws_bill_addr_sk=ca_address_sk
             | group by ca_county,d_qoy, d_year)
@@ -1359,12 +1359,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    and case when ws2.web_sales > 0 then ws3.web_sales/ws2.web_sales else null end
             |       > case when ss2.store_sales > 0 then ss3.store_sales/ss2.store_sales else null end
             | order by ss1.ca_county
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: " -> `
-    ("q32", String.format("""
+    ("q32", s"""
             | select sum(cs_ext_discount_amt) as `excess discount amount`
             | from
-            |    %s.%s.catalog_sales, %s.%s.item, %s.%s.date_dim
+            |    ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where
             |   i_manufact_id = 977
             |   and i_item_sk = cs_item_sk
@@ -1377,13 +1377,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |           and d_date between '2000-01-27]' and (cast('2000-01-27' as date) + interval 90 days)
             |           and d_date_sk = cs_sold_date_sk)
             |limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q33", String.format("""
+            """.stripMargin),
+    ("q33", s"""
             | with ss as (
             |    select
             |        i_manufact_id,sum(ss_ext_sales_price) total_sales
             |    from
-            | 	      %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer_address, %s.%s.item
+            | 	      ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |    where
             |        i_manufact_id in (select i_manufact_id
             |                          from item
@@ -1396,7 +1396,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                            and ca_gmt_offset = -5
             |                          group by i_manufact_id), cs as
             |         (select i_manufact_id, sum(cs_ext_sales_price) total_sales
-            |          from catalog_sales, date_dim, %s.%s.customer_address, item
+            |          from catalog_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, item
             |          where
             |            i_manufact_id in (
             |                select i_manufact_id from item
@@ -1412,7 +1412,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | ws as (
             | select i_manufact_id,sum(ws_ext_sales_price) total_sales
             | from
-            | 	  %s.%s.web_sales, date_dim, %s.%s.customer_address, item
+            | 	  ${icebergCatalog}.${icebergDatabase}.web_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, item
             | where
             |    i_manufact_id in (select i_manufact_id from item
             |                      where i_category in ('Electronics'))
@@ -1432,33 +1432,33 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_manufact_id
             | order by total_sales
             |limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q34", String.format("""
+            """.stripMargin),
+    ("q34", s"""
             | select c_last_name, c_first_name, c_salutation, c_preferred_cust_flag, ss_ticket_number,
             |        cnt
             | FROM
             |   (select ss_ticket_number, ss_customer_sk, count(*) cnt
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.household_demographics
-            |    where %s.%s.store_sales.ss_sold_date_sk = date_dim.d_date_sk
-            |    and %s.%s.store_sales.ss_store_sk = %s.%s.store.s_store_sk
-            |    and %s.%s.store_sales.ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.household_demographics
+            |    where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = date_dim.d_date_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_store_sk = ${icebergCatalog}.${icebergDatabase}.store.s_store_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |    and (date_dim.d_dom between 1 and 3 or date_dim.d_dom between 25 and 28)
             |    and (household_demographics.hd_buy_potential = '>10000' or
-            |         %s.%s.household_demographics.hd_buy_potential = 'unknown')
-            |    and %s.%s.household_demographics.hd_vehicle_count > 0
-            |    and (case when %s.%s.household_demographics.hd_vehicle_count > 0
-            |	then %s.%s.household_demographics.hd_dep_count/ %s.%s.household_demographics.hd_vehicle_count
+            |         ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_buy_potential = 'unknown')
+            |    and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count > 0
+            |    and (case when ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count > 0
+            |	then ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count/ ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count
             |	else null
             |	end)  > 1.2
-            |    and %s.%s.date_dim.d_year in (1999, 1999+1, 1999+2)
-            |    and %s.%s.store.s_county in ('Williamson County','Williamson County','Williamson County','Williamson County',
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_year in (1999, 1999+1, 1999+2)
+            |    and ${icebergCatalog}.${icebergDatabase}.store.s_county in ('Williamson County','Williamson County','Williamson County','Williamson County',
             |                           'Williamson County','Williamson County','Williamson County','Williamson County')
             |    group by ss_ticket_number,ss_customer_sk) dn,customer
             |    where ss_customer_sk = c_customer_sk
             |      and cnt between 15 and 20
             |    order by c_last_name,c_first_name,c_salutation,c_preferred_cust_flag desc
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q35", String.format("""
+            """.stripMargin),
+    ("q35", s"""
             | select
             |  ca_state,
             |  cd_gender,
@@ -1478,16 +1478,16 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  max(cd_dep_college_count),
             |  avg(cd_dep_college_count)
             | from
-            |  %s.%s.customer c, %s.%s.customer_address ca, %s.%s.customer_demographics
+            |  ${icebergCatalog}.${icebergDatabase}.customer c, ${icebergCatalog}.${icebergDatabase}.customer_address ca, ${icebergCatalog}.${icebergDatabase}.customer_demographics
             | where
             |  c.c_current_addr_sk = ca.ca_address_sk and
             |  cd_demo_sk = c.c_current_cdemo_sk and
-            |  exists (select * from %s.%s.store_sales, date_dim
+            |  exists (select * from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim
             |          where c.c_customer_sk = ss_customer_sk and
             |                ss_sold_date_sk = d_date_sk and
             |                d_year = 2002 and
             |                d_qoy < 4) and
-            |   (exists (select * from %s.%s.web_sales, date_dim
+            |   (exists (select * from ${icebergCatalog}.${icebergDatabase}.web_sales, date_dim
             |            where c.c_customer_sk = ws_bill_customer_sk and
             |                  ws_sold_date_sk = d_date_sk and
             |                  d_year = 2002 and
@@ -1502,8 +1502,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by ca_state, cd_gender, cd_marital_status, cd_dep_count,
             |          cd_dep_employed_count, cd_dep_college_count
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q36", String.format("""
+            """.stripMargin),
+    ("q36", s"""
             | select
             |    sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
             |   ,i_category
@@ -1514,7 +1514,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 	case when grouping(i_class) = 0 then i_category end
             | 	order by sum(ss_net_profit)/sum(ss_ext_sales_price) asc) as rank_within_parent
             | from
-            |    %s.%s.store_sales, %s.%s.date_dim d1, %s.%s.item, %s.%s.store
+            |    ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.store
             | where
             |    d1.d_year = 2001
             |    and d1.d_date_sk = ss_sold_date_sk
@@ -1527,11 +1527,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  ,case when lochierarchy = 0 then i_category end
             |  ,rank_within_parent
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q37", String.format("""
+    ("q37", s"""
             | select i_item_id, i_item_desc, i_current_price
-            | from %s.%s.item, %s.%s.inventory, %s.%s.date_dim, %s.%s.catalog_sales
+            | from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.inventory, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.catalog_sales
             | where i_current_price between 68 and 68 + 30
             |   and inv_item_sk = i_item_sk
             |   and d_date_sk=inv_date_sk
@@ -1542,36 +1542,36 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id,i_item_desc,i_current_price
             | order by i_item_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q38", String.format("""
+            """.stripMargin),
+    ("q38", s"""
             | select count(*) from (
             |    select distinct c_last_name, c_first_name, d_date
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer
-            |          where %s.%s.store_sales.ss_sold_date_sk = date_dim.d_date_sk
-            |      and %s.%s.store_sales.ss_customer_sk = %s.%s.customer.c_customer_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
+            |          where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = date_dim.d_date_sk
+            |      and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |      and d_month_seq between 1200 and  1200 + 11
             |  intersect
             |    select distinct c_last_name, c_first_name, d_date
-            |    from %s.%s.catalog_sales, %s.%s.date_dim, %s.%s.customer
+            |    from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
             |          where catalog_sales.cs_sold_date_sk = date_dim.d_date_sk
-            |      and catalog_sales.cs_bill_customer_sk = %s.%s.customer.c_customer_sk
+            |      and catalog_sales.cs_bill_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |      and d_month_seq between  1200 and  1200 + 11
             |  intersect
             |    select distinct c_last_name, c_first_name, d_date
-            |    from %s.%s.web_sales, %s.%s.date_dim, %s.%s.customer
-            |          where %s.%s.web_sales.ws_sold_date_sk = date_dim.d_date_sk
-            |      and %s.%s.web_sales.ws_bill_customer_sk = %s.%s.customer.c_customer_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
+            |          where ${icebergCatalog}.${icebergDatabase}.web_sales.ws_sold_date_sk = date_dim.d_date_sk
+            |      and ${icebergCatalog}.${icebergDatabase}.web_sales.ws_bill_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |      and d_month_seq between  1200 and  1200 + 11
             | ) hot_cust
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q39a", String.format("""
+            """.stripMargin),
+    ("q39a", s"""
             | with inv as
             | (select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
             |        ,stdev,mean, case mean when 0 then null else stdev/mean end cov
             |  from(select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
             |             ,stddev_samp(inv_quantity_on_hand) stdev,avg(inv_quantity_on_hand) mean
-            |       from %s.%s.inventory, %s.%s.item, %s.%s.warehouse, %s.%s.date_dim
+            |       from ${icebergCatalog}.${icebergDatabase}.inventory, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.date_dim
             |       where inv_item_sk = i_item_sk
             |         and inv_warehouse_sk = w_warehouse_sk
             |         and inv_date_sk = d_date_sk
@@ -1587,14 +1587,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and inv2.d_moy=1+1
             | order by inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean,inv1.cov
             |         ,inv2.d_moy,inv2.mean, inv2.cov
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q39b", String.format("""
+            """.stripMargin),
+    ("q39b", s"""
             | with inv as
             | (select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
             |        , stdev, mean, case mean when 0 then null else stdev/mean end cov
             |  from(select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
             |             ,stddev_samp(inv_quantity_on_hand) stdev,avg(inv_quantity_on_hand) mean
-            |       from %s.%s.inventory, %s.%s.item, %s.%s.warehouse, %s.%s.date_dim
+            |       from ${icebergCatalog}.${icebergDatabase}.inventory, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.date_dim
             |       where inv_item_sk = i_item_sk
             |         and inv_warehouse_sk = w_warehouse_sk
             |         and inv_date_sk = d_date_sk
@@ -1611,9 +1611,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and inv1.cov > 1.5
             | order by inv1.w_warehouse_sk,inv1.i_item_sk,inv1.d_moy,inv1.mean,inv1.cov
             |         ,inv2.d_moy,inv2.mean, inv2.cov
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q40", String.format("""
+    ("q40", s"""
             | select
             |   w_state
             |  ,i_item_id
@@ -1622,10 +1622,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  ,sum(case when (cast(d_date as date) >= cast('2000-03-11' as date))
             | 		then cs_sales_price - coalesce(cr_refunded_cash,0) else 0 end) as sales_after
             | from
-            |   catalog_sales left outer join %s.%s.catalog_returns on
+            |   catalog_sales left outer join ${icebergCatalog}.${icebergDatabase}.catalog_returns on
             |       (cs_order_number = cr_order_number
             |        and cs_item_sk = cr_item_sk)
-            |  , %s.%s.warehouse, %s.%s.item, %s.%s.date_dim
+            |  , ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where
             |     i_current_price between 0.99 and 1.49
             | and i_item_sk          = cs_item_sk
@@ -1636,13 +1636,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by w_state,i_item_id
             | order by w_state,i_item_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q41", String.format("""
+            """.stripMargin),
+    ("q41", s"""
             | select distinct(i_product_name)
-            | from %s.%s.item i1
+            | from ${icebergCatalog}.${icebergDatabase}.item i1
             | where i_manufact_id between 738 and 738+40
             |   and (select count(*) as item_cnt
-            |        from %s.%s.item
+            |        from ${icebergCatalog}.${icebergDatabase}.item
             |        where (i_manufact = i1.i_manufact and
             |        ((i_category = 'Women' and
             |        (i_color = 'powder' or i_color = 'khaki') and
@@ -1687,13 +1687,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        )))) > 0
             | order by i_product_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q42", String.format("""
-            | select dt.d_year, %s.%s.item.i_category_id, %s.%s.item.i_category, sum(ss_ext_sales_price)
-            | from 	%s.%s.date_dim dt, %s.%s.store_sales, %s.%s.item
-            | where dt.d_date_sk = %s.%s.store_sales.ss_sold_date_sk
-            | 	and %s.%s.store_sales.ss_item_sk = %s.%s.item.i_item_sk
-            | 	and %s.%s.item.i_manager_id = 1
+            """.stripMargin),
+    ("q42", s"""
+            | select dt.d_year, ${icebergCatalog}.${icebergDatabase}.item.i_category_id, ${icebergCatalog}.${icebergDatabase}.item.i_category, sum(ss_ext_sales_price)
+            | from 	${icebergCatalog}.${icebergDatabase}.date_dim dt, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item
+            | where dt.d_date_sk = ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk
+            | 	and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_item_sk = ${icebergCatalog}.${icebergDatabase}.item.i_item_sk
+            | 	and ${icebergCatalog}.${icebergDatabase}.item.i_manager_id = 1
             | 	and dt.d_moy=11
             | 	and dt.d_year=2000
             | group by 	dt.d_year
@@ -1703,8 +1703,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 		,item.i_category_id
             | 		,item.i_category
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q43", String.format("""
+            """.stripMargin),
+    ("q43", s"""
             | select s_store_name, s_store_id,
             |        sum(case when (d_day_name='Sunday') then ss_sales_price else null end) sun_sales,
             |        sum(case when (d_day_name='Monday') then ss_sales_price else null end) mon_sales,
@@ -1713,7 +1713,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        sum(case when (d_day_name='Thursday') then ss_sales_price else null end) thu_sales,
             |        sum(case when (d_day_name='Friday') then ss_sales_price else null end) fri_sales,
             |        sum(case when (d_day_name='Saturday') then ss_sales_price else null end) sat_sales
-            | from %s.%s.date_dim, %s.%s.store_sales, %s.%s.store
+            | from ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store
             | where d_date_sk = ss_sold_date_sk and
             |       s_store_sk = ss_store_sk and
             |       s_gmt_offset = -5 and
@@ -1722,17 +1722,17 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by s_store_name, s_store_id,sun_sales,mon_sales,tue_sales,wed_sales,
             |          thu_sales,fri_sales,sat_sales
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q44", String.format("""
+            """.stripMargin),
+    ("q44", s"""
             | select asceding.rnk, i1.i_product_name best_performing, i2.i_product_name worst_performing
             | from(select *
             |     from (select item_sk,rank() over (order by rank_col asc) rnk
             |           from (select ss_item_sk item_sk,avg(ss_net_profit) rank_col
-            |                 from %s.%s.store_sales ss1
+            |                 from ${icebergCatalog}.${icebergDatabase}.store_sales ss1
             |                 where ss_store_sk = 4
             |                 group by ss_item_sk
             |                 having avg(ss_net_profit) > 0.9*(select avg(ss_net_profit) rank_col
-            |                                                  from %s.%s.store_sales
+            |                                                  from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                                                  where ss_store_sk = 4
             |                                                    and ss_addr_sk is null
             |                                                  group by ss_store_sk))V1)V11
@@ -1740,32 +1740,32 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    (select *
             |     from (select item_sk,rank() over (order by rank_col desc) rnk
             |           from (select ss_item_sk item_sk,avg(ss_net_profit) rank_col
-            |                 from %s.%s.store_sales ss1
+            |                 from ${icebergCatalog}.${icebergDatabase}.store_sales ss1
             |                 where ss_store_sk = 4
             |                 group by ss_item_sk
             |                 having avg(ss_net_profit) > 0.9*(select avg(ss_net_profit) rank_col
-            |                                                  from %s.%s.store_sales
+            |                                                  from ${icebergCatalog}.${icebergDatabase}.store_sales
             |                                                  where ss_store_sk = 4
             |                                                    and ss_addr_sk is null
             |                                                  group by ss_store_sk))V2)V21
             |     where rnk  < 11) descending,
-            | %s.%s.item i1, %s.%s.item i2
+            | ${icebergCatalog}.${icebergDatabase}.item i1, ${icebergCatalog}.${icebergDatabase}.item i2
             | where asceding.rnk = descending.rnk
             |   and i1.i_item_sk=asceding.item_sk
             |   and i2.i_item_sk=descending.item_sk
             | order by asceding.rnk
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q45", String.format("""
+            """.stripMargin),
+    ("q45", s"""
             | select ca_zip, ca_city, sum(ws_sales_price)
-            | from %s.%s.web_sales, %s.%s.customer, %s.%s.customer_address, %s.%s.date_dim, %s.%s.item
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.item
             | where ws_bill_customer_sk = c_customer_sk
             | 	and c_current_addr_sk = ca_address_sk
             | 	and ws_item_sk = i_item_sk
             | 	and ( substr(ca_zip,1,5) in ('85669', '86197','88274','83405','86475', '85392', '85460', '80348', '81792')
             | 	      or
             | 	      i_item_id in (select i_item_id
-            |                             from %s.%s.item
+            |                             from ${icebergCatalog}.${icebergDatabase}.item
             |                             where i_item_sk in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29)
             |                             )
             | 	    )
@@ -1774,8 +1774,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by ca_zip, ca_city
             | order by ca_zip, ca_city
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q46", String.format("""
+            """.stripMargin),
+    ("q46", s"""
             | select c_last_name, c_first_name, ca_city, bought_city, ss_ticket_number, amt,profit
             | from
             |   (select ss_ticket_number
@@ -1783,24 +1783,24 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          ,ca_city bought_city
             |          ,sum(ss_coupon_amt) amt
             |          ,sum(ss_net_profit) profit
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.household_demographics, %s.%s.customer_address
-            |    where %s.%s.store_sales.ss_sold_date_sk = date_dim.d_date_sk
-            |    and %s.%s.store_sales.ss_store_sk = %s.%s.store.s_store_sk
-            |    and %s.%s.store_sales.ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |    and %s.%s.store_sales.ss_addr_sk = %s.%s.customer_address.ca_address_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.household_demographics, ${icebergCatalog}.${icebergDatabase}.customer_address
+            |    where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = date_dim.d_date_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_store_sk = ${icebergCatalog}.${icebergDatabase}.store.s_store_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_addr_sk = ${icebergCatalog}.${icebergDatabase}.customer_address.ca_address_sk
             |    and (household_demographics.hd_dep_count = 4 or
-            |         %s.%s.household_demographics.hd_vehicle_count= 3)
-            |    and %s.%s.date_dim.d_dow in (6,0)
-            |    and %s.%s.date_dim.d_year in (1999,1999+1,1999+2)
-            |    and %s.%s.store.s_city in ('Fairview','Midway','Fairview','Fairview','Fairview')
+            |         ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count= 3)
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_dow in (6,0)
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_year in (1999,1999+1,1999+2)
+            |    and ${icebergCatalog}.${icebergDatabase}.store.s_city in ('Fairview','Midway','Fairview','Fairview','Fairview')
             |    group by ss_ticket_number,ss_customer_sk,ss_addr_sk,ca_city) dn,customer,customer_address current_addr
             |    where ss_customer_sk = c_customer_sk
-            |      and %s.%s.customer.c_current_addr_sk = current_addr.ca_address_sk
+            |      and ${icebergCatalog}.${icebergDatabase}.customer.c_current_addr_sk = current_addr.ca_address_sk
             |      and current_addr.ca_city <> bought_city
             |  order by c_last_name, c_first_name, ca_city, bought_city, ss_ticket_number
             |  limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q47", String.format("""
+            """.stripMargin),
+    ("q47", s"""
             | with v1 as(
             | select i_category, i_brand,
             |        s_store_name, s_company_name,
@@ -1814,7 +1814,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          (partition by i_category, i_brand,
             |                     s_store_name, s_company_name
             |           order by d_year, d_moy) rn
-            | from %s.%s.item, %s.%s.store_sales, %s.%s.date_dim, %s.%s.store
+            | from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store
             | where ss_item_sk = i_item_sk and
             |       ss_sold_date_sk = d_date_sk and
             |       ss_store_sk = s_store_sk and
@@ -1847,10 +1847,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        case when avg_monthly_sales > 0 then abs(sum_sales - avg_monthly_sales) / avg_monthly_sales else null end > 0.1
             | order by sum_sales - avg_monthly_sales, 3
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q48", String.format("""
+            """.stripMargin),
+    ("q48", s"""
             | select sum (ss_quantity)
-            | from %s.%s.store_sales, %s.%s.store, %s.%s.customer_demographics, %s.%s.customer_address, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.customer_demographics, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where s_store_sk = ss_store_sk
             | and  ss_sold_date_sk = d_date_sk and d_year = 2001
             | and
@@ -1912,9 +1912,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  and ss_net_profit between 50 and 25000
             |  )
             | )
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "dec" -> "decimal"
-    ("q49", String.format("""
+    ("q49", s"""
             | select 'web' as channel, web.item, web.return_ratio, web.return_rank, web.currency_rank
             | from (
             | 	select
@@ -1928,7 +1928,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 		,(cast(sum(coalesce(wr.wr_return_amt,0)) as decimal(15,4))/
             | 		cast(sum(coalesce(ws.ws_net_paid,0)) as decimal(15,4) )) as currency_ratio
             | 		from
-            | 		 %s.%s.web_sales ws left outer join %s.%s.web_site wr
+            | 		 ${icebergCatalog}.${icebergDatabase}.web_sales ws left outer join ${icebergCatalog}.${icebergDatabase}.web_site wr
             | 			on (ws.ws_order_number = wr.wr_order_number and
             | 			ws.ws_item_sk = wr.wr_item_sk)
             |        ,date_dim
@@ -1961,7 +1961,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 		,(cast(sum(coalesce(cr.cr_return_amount,0)) as decimal(15,4))/
             | 		cast(sum(coalesce(cs.cs_net_paid,0)) as decimal(15,4) )) as currency_ratio
             | 		from
-            | 		catalog_sales cs left outer join %s.%s.catalog_returns cr
+            | 		catalog_sales cs left outer join ${icebergCatalog}.${icebergDatabase}.catalog_returns cr
             | 			on (cs.cs_order_number = cr.cr_order_number and
             | 			cs.cs_item_sk = cr.cr_item_sk)
             |                ,date_dim
@@ -1979,8 +1979,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where (catalog.return_rank <= 10 or catalog.currency_rank <=10)
             | union
             | select
-            |    'store' as channel, %s.%s.store.item, %s.%s.store.return_ratio,
-            |    %s.%s.store.return_rank, %s.%s.store.currency_rank
+            |    'store' as channel, ${icebergCatalog}.${icebergDatabase}.store.item, ${icebergCatalog}.${icebergDatabase}.store.return_ratio,
+            |    ${icebergCatalog}.${icebergDatabase}.store.return_rank, ${icebergCatalog}.${icebergDatabase}.store.currency_rank
             | from (
             | 	select
             |      item, return_ratio, currency_ratio,
@@ -1993,7 +1993,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 		,(cast(sum(coalesce(sr.sr_return_amt,0)) as decimal(15,4))/
             |               cast(sum(coalesce(sts.ss_net_paid,0)) as decimal(15,4) )) as currency_ratio
             | 		from
-            | 		store_sales sts left outer join %s.%s.store_returns sr
+            | 		store_sales sts left outer join ${icebergCatalog}.${icebergDatabase}.store_returns sr
             | 			on (sts.ss_ticket_number = sr.sr_ticket_number and sts.ss_item_sk = sr.sr_item_sk)
             |                ,date_dim
             | 		where
@@ -2010,9 +2010,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where (store.return_rank <= 10 or store.currency_rank <= 10)
             | order by 1,4,5
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: " -> `
-    ("q50", String.format("""
+    ("q50", s"""
             | select
             |    s_store_name, s_company_id, s_street_number, s_street_name, s_street_type,
             |    s_suite_number, s_city, s_county, s_state, s_zip
@@ -2025,7 +2025,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                  (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
             |   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
             | from
-            |    %s.%s.store_sales, %s.%s.store_returns, %s.%s.store, %s.%s.date_dim d1, %s.%s.date_dim d2
+            |    ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.date_dim d2
             | where
             |     d2.d_year = 2001
             | and d2.d_moy  = 8
@@ -2042,14 +2042,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     s_store_name, s_company_id, s_street_number, s_street_name, s_street_type,
             |     s_suite_number, s_city, s_county, s_state, s_zip
             |  limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q51", String.format("""
+            """.stripMargin),
+    ("q51", s"""
             | WITH web_v1 as (
             | select
             |   ws_item_sk item_sk, d_date,
             |   sum(sum(ws_sales_price))
             |       over (partition by ws_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
-            | from %s.%s.web_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where ws_sold_date_sk=d_date_sk
             |   and d_month_seq between 1200 and 1200+11
             |   and ws_item_sk is not NULL
@@ -2059,7 +2059,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   ss_item_sk item_sk, d_date,
             |   sum(sum(ss_sales_price))
             |       over (partition by ss_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
-            | from %s.%s.store_sales, date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim
             | where ss_sold_date_sk=d_date_sk
             |   and d_month_seq between 1200 and 1200+11
             |   and ss_item_sk is not NULL
@@ -2080,28 +2080,28 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where web_cumulative > store_cumulative
             | order by item_sk, d_date
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q52", String.format("""
+            """.stripMargin),
+    ("q52", s"""
             | select dt.d_year
             | 	,item.i_brand_id brand_id
             | 	,item.i_brand brand
             | 	,sum(ss_ext_sales_price) ext_price
-            | from %s.%s.date_dim dt, %s.%s.store_sales, %s.%s.item
-            | where dt.d_date_sk = %s.%s.store_sales.ss_sold_date_sk
-            |    and %s.%s.store_sales.ss_item_sk = %s.%s.item.i_item_sk
-            |    and %s.%s.item.i_manager_id = 1
+            | from ${icebergCatalog}.${icebergDatabase}.date_dim dt, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item
+            | where dt.d_date_sk = ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_item_sk = ${icebergCatalog}.${icebergDatabase}.item.i_item_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.item.i_manager_id = 1
             |    and dt.d_moy=11
             |    and dt.d_year=2000
-            | group by dt.d_year, %s.%s.item.i_brand, %s.%s.item.i_brand_id
+            | group by dt.d_year, ${icebergCatalog}.${icebergDatabase}.item.i_brand, ${icebergCatalog}.${icebergDatabase}.item.i_brand_id
             | order by dt.d_year, ext_price desc, brand_id
             |limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q53", String.format("""
+            """.stripMargin),
+    ("q53", s"""
             | select * from
             |   (select i_manufact_id,
             |           sum(ss_sales_price) sum_sales,
             |           avg(sum(ss_sales_price)) over (partition by i_manufact_id) avg_quarterly_sales
-            |     from %s.%s.item, %s.%s.store_sales, %s.%s.date_dim, %s.%s.store
+            |     from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store
             |     where ss_item_sk = i_item_sk and
             |           ss_sold_date_sk = d_date_sk and
             |           ss_store_sk = s_store_sk and
@@ -2124,8 +2124,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  	 sum_sales,
             | 	 i_manufact_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q54", String.format("""
+            """.stripMargin),
+    ("q54", s"""
             | with my_customers as (
             | select distinct c_customer_sk
             |        , c_current_addr_sk
@@ -2133,16 +2133,16 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        ( select cs_sold_date_sk sold_date_sk,
             |                 cs_bill_customer_sk customer_sk,
             |                 cs_item_sk item_sk
-            |          from %s.%s.catalog_sales
+            |          from ${icebergCatalog}.${icebergDatabase}.catalog_sales
             |          union all
             |          select ws_sold_date_sk sold_date_sk,
             |                 ws_bill_customer_sk customer_sk,
             |                 ws_item_sk item_sk
-            |          from %s.%s.web_sales
+            |          from ${icebergCatalog}.${icebergDatabase}.web_sales
             |         ) cs_or_ws_sales,
-            |         %s.%s.item,
-            |         %s.%s.date_dim,
-            |         %s.%s.customer
+            |         ${icebergCatalog}.${icebergDatabase}.item,
+            |         ${icebergCatalog}.${icebergDatabase}.date_dim,
+            |         ${icebergCatalog}.${icebergDatabase}.customer
             | where   sold_date_sk = d_date_sk
             |         and item_sk = i_item_sk
             |         and i_category = 'Women'
@@ -2155,9 +2155,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | select c_customer_sk,
             |        sum(ss_ext_sales_price) as revenue
             | from   my_customers,
-            |        %s.%s.store_sales,
-            |        %s.%s.customer_address,
-            |        %s.%s.store,
+            |        ${icebergCatalog}.${icebergDatabase}.store_sales,
+            |        ${icebergCatalog}.${icebergDatabase}.customer_address,
+            |        ${icebergCatalog}.${icebergDatabase}.store,
             |        date_dim
             | where  c_current_addr_sk = ca_address_sk
             |        and ca_county = s_county
@@ -2177,11 +2177,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by segment
             | order by segment, num_customers
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q55", String.format("""
+            """.stripMargin),
+    ("q55", s"""
             |select i_brand_id brand_id, i_brand brand,
             | 	sum(ss_ext_sales_price) ext_price
-            | from %s.%s.date_dim, %s.%s.store_sales, %s.%s.item
+            | from ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item
             | where d_date_sk = ss_sold_date_sk
             | 	and ss_item_sk = i_item_sk
             | 	and i_manager_id=28
@@ -2190,14 +2190,14 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_brand, i_brand_id
             | order by ext_price desc, brand_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q56", String.format("""
+            """.stripMargin),
+    ("q56", s"""
             | with ss as (
             | select i_item_id,sum(ss_ext_sales_price) total_sales
             | from
-            | 	  %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer_address, %s.%s.item
+            | 	  ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             | where
-            |    i_item_id in (select i_item_id from %s.%s.item where i_color in ('slate','blanched','burnished'))
+            |    i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_color in ('slate','blanched','burnished'))
             | and     ss_item_sk              = i_item_sk
             | and     ss_sold_date_sk         = d_date_sk
             | and     d_year                  = 2001
@@ -2208,9 +2208,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | cs as (
             | select i_item_id,sum(cs_ext_sales_price) total_sales
             | from
-            | 	  catalog_sales, date_dim, %s.%s.customer_address, %s.%s.item
+            | 	  catalog_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             | where
-            |    i_item_id in (select i_item_id from %s.%s.item where i_color in ('slate','blanched','burnished'))
+            |    i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_color in ('slate','blanched','burnished'))
             | and     cs_item_sk              = i_item_sk
             | and     cs_sold_date_sk         = d_date_sk
             | and     d_year                  = 2001
@@ -2221,9 +2221,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | ws as (
             | select i_item_id,sum(ws_ext_sales_price) total_sales
             | from
-            | 	  %s.%s.web_sales, %s.%s.date_dim, %s.%s.customer_address, %s.%s.item
+            | 	  ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             | where
-            |    i_item_id in (select i_item_id from %s.%s.item where i_color in ('slate','blanched','burnished'))
+            |    i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_color in ('slate','blanched','burnished'))
             | and     ws_item_sk              = i_item_sk
             | and     ws_sold_date_sk         = d_date_sk
             | and     d_year                  = 2001
@@ -2240,8 +2240,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id
             | order by total_sales
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q57", String.format("""
+            """.stripMargin),
+    ("q57", s"""
             | with v1 as(
             | select i_category, i_brand,
             |        cc_name,
@@ -2253,7 +2253,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        rank() over
             |          (partition by i_category, i_brand, cc_name
             |           order by d_year, d_moy) rn
-            | from %s.%s.item, %s.%s.catalog_sales, %s.%s.date_dim, %s.%s.call_center
+            | from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.call_center
             | where cs_item_sk = i_item_sk and
             |       cs_sold_date_sk = d_date_sk and
             |       cc_call_center_sk= cs_call_center_sk and
@@ -2283,11 +2283,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        case when avg_monthly_sales > 0 then abs(sum_sales - avg_monthly_sales) / avg_monthly_sales else null end > 0.1
             | order by sum_sales - avg_monthly_sales, 3
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q58", String.format("""
+            """.stripMargin),
+    ("q58", s"""
             | with ss_items as
             | (select i_item_id item_id, sum(ss_ext_sales_price) ss_item_rev
-            | from %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where ss_item_sk = i_item_sk
             |   and d_date in (select d_date
             |                  from date_dim
@@ -2299,7 +2299,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | cs_items as
             | (select i_item_id item_id
             |        ,sum(cs_ext_sales_price) cs_item_rev
-            |  from %s.%s.catalog_sales, %s.%s.item, %s.%s.date_dim
+            |  from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cs_item_sk = i_item_sk
             |  and  d_date in (select d_date
             |                  from date_dim
@@ -2310,7 +2310,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id),
             | ws_items as
             | (select i_item_id item_id, sum(ws_ext_sales_price) ws_item_rev
-            |  from %s.%s.web_sales, %s.%s.item, date_dim
+            |  from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item, date_dim
             | where ws_item_sk = i_item_sk
             |  and  d_date in (select d_date
             |                  from date_dim
@@ -2338,8 +2338,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and ws_item_rev between 0.9 * cs_item_rev and 1.1 * cs_item_rev
             | order by item_id, ss_item_rev
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q59", String.format("""
+            """.stripMargin),
+    ("q59", s"""
             | with wss as
             | (select d_week_seq,
             |        ss_store_sk,
@@ -2350,7 +2350,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        sum(case when (d_day_name='Thursday') then ss_sales_price else null end) thu_sales,
             |        sum(case when (d_day_name='Friday') then ss_sales_price else null end) fri_sales,
             |        sum(case when (d_day_name='Saturday') then ss_sales_price else null end) sat_sales
-            | from %s.%s.store_sales,date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales,date_dim
             | where d_date_sk = ss_sold_date_sk
             | group by d_week_seq,ss_store_sk
             | )
@@ -2381,13 +2381,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and d_week_seq1=d_week_seq2-52
             | order by s_store_name1,s_store_id1,d_week_seq1
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q60", String.format("""
+            """.stripMargin),
+    ("q60", s"""
             | with ss as (
             |    select i_item_id,sum(ss_ext_sales_price) total_sales
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer_address, %s.%s.item
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |    where
-            |        i_item_id in (select i_item_id from %s.%s.item where i_category in ('Music'))
+            |        i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_category in ('Music'))
             |    and     ss_item_sk              = i_item_sk
             |    and     ss_sold_date_sk         = d_date_sk
             |    and     d_year                  = 1998
@@ -2397,9 +2397,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    group by i_item_id),
             |  cs as (
             |    select i_item_id,sum(cs_ext_sales_price) total_sales
-            |    from catalog_sales, date_dim, %s.%s.customer_address, %s.%s.item
+            |    from catalog_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |    where
-            |        i_item_id in (select i_item_id from %s.%s.item where i_category in ('Music'))
+            |        i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_category in ('Music'))
             |    and     cs_item_sk              = i_item_sk
             |    and     cs_sold_date_sk         = d_date_sk
             |    and     d_year                  = 1998
@@ -2409,9 +2409,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    group by i_item_id),
             |  ws as (
             |    select i_item_id,sum(ws_ext_sales_price) total_sales
-            |    from %s.%s.web_sales, date_dim, %s.%s.customer_address, %s.%s.item
+            |    from ${icebergCatalog}.${icebergDatabase}.web_sales, date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |    where
-            |        i_item_id in (select i_item_id from %s.%s.item where i_category in ('Music'))
+            |        i_item_id in (select i_item_id from ${icebergCatalog}.${icebergDatabase}.item where i_category in ('Music'))
             |    and     ws_item_sk              = i_item_sk
             |    and     ws_sold_date_sk         = d_date_sk
             |    and     d_year                  = 1998
@@ -2428,12 +2428,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id
             | order by i_item_id, total_sales
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     ("q61", s"""
             | select promotions,total,cast(promotions as decimal(15,4))/cast(total as decimal(15,4))*100
             | from
             |   (select sum(ss_ext_sales_price) promotions
-            |     from  %s.%s.store_sales, %s.%s.store, %s.%s.promotion, %s.%s.date_dim, %s.%s.customer, %s.%s.customer_address, %s.%s.item
+            |     from  ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.promotion, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |     where ss_sold_date_sk = d_date_sk
             |     and   ss_store_sk = s_store_sk
             |     and   ss_promo_sk = p_promo_sk
@@ -2447,7 +2447,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     and   d_year = 1998
             |     and   d_moy  = 11) promotional_sales,
             |   (select sum(ss_ext_sales_price) total
-            |     from  %s.%s.store_sales, %s.%s.store, %s.%s.date_dim, %s.%s.customer, %s.%s.customer_address, %s.%s.item
+            |     from  ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.item
             |     where ss_sold_date_sk = d_date_sk
             |     and   ss_store_sk = s_store_sk
             |     and   ss_customer_sk= c_customer_sk
@@ -2460,9 +2460,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     and   d_moy  = 11) all_sales
             | order by promotions, total
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: " -> `
-    ("q62", String.format("""
+    ("q62", s"""
             | select
             |   substr(w_warehouse_name,1,20)
             |  ,sm_type
@@ -2476,7 +2476,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                 (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
             |  ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
             | from
-            |    %s.%s.web_sales, %s.%s.warehouse, %s.%s.ship_mode, %s.%s.web_site, %s.%s.date_dim
+            |    ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.ship_mode, ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where
             |     d_month_seq between 1200 and 1200 + 11
             | and ws_ship_date_sk   = d_date_sk
@@ -2488,16 +2488,16 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by
             |    substr(w_warehouse_name,1,20), sm_type, web_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q63", String.format("""
+            """.stripMargin),
+    ("q63", s"""
             | select *
             | from (select i_manager_id
             |              ,sum(ss_sales_price) sum_sales
             |              ,avg(sum(ss_sales_price)) over (partition by i_manager_id) avg_monthly_sales
-            |       from %s.%s.item
-            |           ,%s.%s.store_sales
-            |           ,%s.%s.date_dim
-            |           ,%s.%s.store
+            |       from ${icebergCatalog}.${icebergDatabase}.item
+            |           ,${icebergCatalog}.${icebergDatabase}.store_sales
+            |           ,${icebergCatalog}.${icebergDatabase}.date_dim
+            |           ,${icebergCatalog}.${icebergDatabase}.store
             |       where ss_item_sk = i_item_sk
             |         and ss_sold_date_sk = d_date_sk
             |         and ss_store_sk = s_store_sk
@@ -2517,13 +2517,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |         ,avg_monthly_sales
             |         ,sum_sales
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q64", String.format("""
+            """.stripMargin),
+    ("q64", s"""
             | with cs_ui as
             |  (select cs_item_sk
             |         ,sum(cs_ext_list_price) as sale,sum(cr_refunded_cash+cr_reversed_charge+cr_store_credit) as refund
-            |   from %s.%s.catalog_sales
-            |       ,%s.%s.catalog_returns
+            |   from ${icebergCatalog}.${icebergDatabase}.catalog_sales
+            |       ,${icebergCatalog}.${icebergDatabase}.catalog_returns
             |   where cs_item_sk = cr_item_sk
             |     and cs_order_number = cr_order_number
             |   group by cs_item_sk
@@ -2534,10 +2534,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          ad1.ca_zip b_zip, ad2.ca_street_number c_street_number, ad2.ca_street_name c_street_name,
             |          ad2.ca_city c_city, ad2.ca_zip c_zip, d1.d_year as syear, d2.d_year as fsyear, d3.d_year s2year,
             |          count(*) cnt, sum(ss_wholesale_cost) s1, sum(ss_list_price) s2, sum(ss_coupon_amt) s3
-            |   FROM %s.%s.store_sales, %s.%s.store_returns, cs_ui, %s.%s.date_dim d1, %s.%s.date_dim d2, %s.%s.date_dim d3,
-            |        %s.%s.store, %s.%s.customer, %s.%s.customer_demographics cd1, %s.%s.customer_demographics cd2,
-            |        %s.%s.promotion, %s.%s.household_demographics hd1, %s.%s.household_demographics hd2,
-            |        %s.%s.customer_address ad1, %s.%s.customer_address ad2, %s.%s.income_band ib1, %s.%s.income_band ib2, %s.%s.item
+            |   FROM ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store_returns, cs_ui, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.date_dim d2, ${icebergCatalog}.${icebergDatabase}.date_dim d3,
+            |        ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_demographics cd1, ${icebergCatalog}.${icebergDatabase}.customer_demographics cd2,
+            |        ${icebergCatalog}.${icebergDatabase}.promotion, ${icebergCatalog}.${icebergDatabase}.household_demographics hd1, ${icebergCatalog}.${icebergDatabase}.household_demographics hd2,
+            |        ${icebergCatalog}.${icebergDatabase}.customer_address ad1, ${icebergCatalog}.${icebergDatabase}.customer_address ad2, ${icebergCatalog}.${icebergDatabase}.income_band ib1, ${icebergCatalog}.${icebergDatabase}.income_band ib2, ${icebergCatalog}.${icebergDatabase}.item
             |   WHERE  ss_store_sk = s_store_sk AND
             |          ss_sold_date_sk = d1.d_date_sk AND
             |          ss_customer_sk = c_customer_sk AND
@@ -2576,21 +2576,21 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |      cs1.store_name = cs2.store_name and
             |      cs1.store_zip = cs2.store_zip
             | order by cs1.product_name, cs1.store_name, cs2.cnt
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q65", String.format("""
+            """.stripMargin),
+    ("q65", s"""
             | select
             |	  s_store_name, i_item_desc, sc.revenue, i_current_price, i_wholesale_cost, i_brand
-            | from %s.%s.store, %s.%s.item,
+            | from ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item,
             |     (select ss_store_sk, avg(revenue) as ave
             | 	from
             | 	    (select  ss_store_sk, ss_item_sk,
             | 		     sum(ss_sales_price) as revenue
-            | 		from %s.%s.store_sales, %s.%s.date_dim
+            | 		from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | 		where ss_sold_date_sk = d_date_sk and d_month_seq between 1176 and 1176+11
             | 		group by ss_store_sk, ss_item_sk) sa
             | 	group by ss_store_sk) sb,
             |     (select  ss_store_sk, ss_item_sk, sum(ss_sales_price) as revenue
-            | 	from %s.%s.store_sales, date_dim
+            | 	from ${icebergCatalog}.${icebergDatabase}.store_sales, date_dim
             | 	where ss_sold_date_sk = d_date_sk and d_month_seq between 1176 and 1176+11
             | 	group by ss_store_sk, ss_item_sk) sc
             | where sb.ss_store_sk = sc.ss_store_sk and
@@ -2599,9 +2599,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       i_item_sk = sc.ss_item_sk
             | order by s_store_name, i_item_desc
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "||" -> concat
-    ("q66", String.format("""
+    ("q66", s"""
             | select w_warehouse_name, w_warehouse_sq_ft, w_city, w_county, w_state, w_country,
             |    ship_carriers, year
             | 	  ,sum(jan_sales) as jan_sales
@@ -2670,7 +2670,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 	    ,sum(case when d_moy = 11 then ws_net_paid * ws_quantity else 0 end) as nov_net
             | 	    ,sum(case when d_moy = 12 then ws_net_paid * ws_quantity else 0 end) as dec_net
             |    from
-            |      %s.%s.web_sales, %s.%s.warehouse, %s.%s.date_dim, %s.%s.time_dim, %s.%s.ship_mode
+            |      ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.ship_mode
             |    where
             |      ws_warehouse_sk =  w_warehouse_sk
             |      and ws_sold_date_sk = d_date_sk
@@ -2710,7 +2710,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 	    ,sum(case when d_moy = 11 then cs_net_paid_inc_tax * cs_quantity else 0 end) as nov_net
             | 	    ,sum(case when d_moy = 12 then cs_net_paid_inc_tax * cs_quantity else 0 end) as dec_net
             |     from
-            |        %s.%s.catalog_sales, %s.%s.warehouse, %s.%s.date_dim, %s.%s.time_dim, %s.%s.ship_mode
+            |        ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.ship_mode
             |     where
             |        cs_warehouse_sk =  w_warehouse_sk
             |        and cs_sold_date_sk = d_date_sk
@@ -2728,15 +2728,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    ship_carriers, year
             | order by w_warehouse_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q67", String.format("""
+            """.stripMargin),
+    ("q67", s"""
             | select * from
             |     (select i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy, s_store_id,
             |             sumsales, rank() over (partition by i_category order by sumsales desc) rk
             |      from
             |         (select i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,
             |                 s_store_id, sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
-            |          from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.item
+            |          from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item
             |        where  ss_sold_date_sk=d_date_sk
             |           and ss_item_sk=i_item_sk
             |           and ss_store_sk = s_store_sk
@@ -2748,8 +2748,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   i_category, i_class, i_brand, i_product_name, d_year,
             |   d_qoy, d_moy, s_store_id, sumsales, rk
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q68", String.format("""
+            """.stripMargin),
+    ("q68", s"""
             | select
             |    c_last_name, c_first_name, ca_city, bought_city, ss_ticket_number, extended_price,
             |    extended_tax, list_price
@@ -2758,46 +2758,46 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        sum(ss_ext_sales_price) extended_price,
             |        sum(ss_ext_list_price) list_price,
             |        sum(ss_ext_tax) extended_tax
-            |     from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.household_demographics, %s.%s.customer_address
-            |     where %s.%s.store_sales.ss_sold_date_sk = date_dim.d_date_sk
-            |        and %s.%s.store_sales.ss_store_sk = %s.%s.store.s_store_sk
-            |        and %s.%s.store_sales.ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |        and %s.%s.store_sales.ss_addr_sk = %s.%s.customer_address.ca_address_sk
+            |     from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.household_demographics, ${icebergCatalog}.${icebergDatabase}.customer_address
+            |     where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = date_dim.d_date_sk
+            |        and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_store_sk = ${icebergCatalog}.${icebergDatabase}.store.s_store_sk
+            |        and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |        and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_addr_sk = ${icebergCatalog}.${icebergDatabase}.customer_address.ca_address_sk
             |        and date_dim.d_dom between 1 and 2
             |        and (household_demographics.hd_dep_count = 4 or
-            |             %s.%s.household_demographics.hd_vehicle_count = 3)
+            |             ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count = 3)
             |        and date_dim.d_year in (1999,1999+1,1999+2)
-            |        and %s.%s.store.s_city in ('Midway','Fairview')
+            |        and ${icebergCatalog}.${icebergDatabase}.store.s_city in ('Midway','Fairview')
             |     group by ss_ticket_number, ss_customer_sk, ss_addr_sk,ca_city) dn,
-            |    %s.%s.customer,
-            |    %s.%s.customer_address current_addr
+            |    ${icebergCatalog}.${icebergDatabase}.customer,
+            |    ${icebergCatalog}.${icebergDatabase}.customer_address current_addr
             | where ss_customer_sk = c_customer_sk
-            |   and %s.%s.customer.c_current_addr_sk = current_addr.ca_address_sk
+            |   and ${icebergCatalog}.${icebergDatabase}.customer.c_current_addr_sk = current_addr.ca_address_sk
             |   and current_addr.ca_city <> bought_city
             | order by c_last_name, ss_ticket_number
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q69", String.format("""
+            """.stripMargin),
+    ("q69", s"""
             | select
             |    cd_gender, cd_marital_status, cd_education_status, count(*) cnt1,
             |    cd_purchase_estimate, count(*) cnt2, cd_credit_rating, count(*) cnt3
             | from
-            |    %s.%s.customer c, %s.%s.customer_address ca, %s.%s.customer_demographics
+            |    ${icebergCatalog}.${icebergDatabase}.customer c, ${icebergCatalog}.${icebergDatabase}.customer_address ca, ${icebergCatalog}.${icebergDatabase}.customer_demographics
             | where
             |    c.c_current_addr_sk = ca.ca_address_sk and
             |    ca_state in ('KY', 'GA', 'NM') and
             |    cd_demo_sk = c.c_current_cdemo_sk and
-            |    exists (select * from %s.%s.store_sales, %s.%s.date_dim
+            |    exists (select * from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |            where c.c_customer_sk = ss_customer_sk and
             |                ss_sold_date_sk = d_date_sk and
             |                d_year = 2001 and
             |                d_moy between 4 and 4+2) and
-            |   (not exists (select * from %s.%s.web_sales, %s.%s.date_dim
+            |   (not exists (select * from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |                where c.c_customer_sk = ws_bill_customer_sk and
             |                    ws_sold_date_sk = d_date_sk and
             |                    d_year = 2001 and
             |                    d_moy between 4 and 4+2) and
-            |    not exists (select * from %s.%s.catalog_sales, %s.%s.date_dim
+            |    not exists (select * from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |                where c.c_customer_sk = cs_ship_customer_sk and
             |                    cs_sold_date_sk = d_date_sk and
             |                    d_year = 2001 and
@@ -2807,8 +2807,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | order by cd_gender, cd_marital_status, cd_education_status,
             |          cd_purchase_estimate, cd_credit_rating
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q70", String.format("""
+            """.stripMargin),
+    ("q70", s"""
             | select
             |    sum(ss_net_profit) as total_sum, s_state, s_county
             |   ,grouping(s_state)+grouping(s_county) as lochierarchy
@@ -2817,7 +2817,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 	    case when grouping(s_county) = 0 then s_state end
             | 	    order by sum(ss_net_profit) desc) as rank_within_parent
             | from
-            |    %s.%s.store_sales, %s.%s.date_dim d1, %s.%s.store
+            |    ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.store
             | where
             |    d1.d_month_seq between 1200 and 1200+11
             | and d1.d_date_sk = ss_sold_date_sk
@@ -2826,7 +2826,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    (select s_state from
             |        (select s_state as s_state,
             | 			      rank() over ( partition by s_state order by sum(ss_net_profit) desc) as ranking
-            |         from %s.%s.store_sales, %s.%s.store, %s.%s.date_dim
+            |         from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.date_dim
             |         where  d_month_seq between 1200 and 1200+11
             | 			   and d_date_sk = ss_sold_date_sk
             | 			   and s_store_sk  = ss_store_sk
@@ -2838,17 +2838,17 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  ,case when lochierarchy = 0 then s_state end
             |  ,rank_within_parent
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q71", String.format("""
+            """.stripMargin),
+    ("q71", s"""
             | select i_brand_id brand_id, i_brand brand,t_hour,t_minute,
             | 	  sum(ext_price) ext_price
-            | from %s.%s.item,
+            | from ${icebergCatalog}.${icebergDatabase}.item,
             |    (select
             |        ws_ext_sales_price as ext_price,
             |        ws_sold_date_sk as sold_date_sk,
             |        ws_item_sk as sold_item_sk,
             |        ws_sold_time_sk as time_sk
-            |     from %s.%s.web_sales, date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.web_sales, date_dim
             |     where d_date_sk = ws_sold_date_sk
             |        and d_moy=11
             |        and d_year=1999
@@ -2868,11 +2868,11 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        ss_sold_date_sk as sold_date_sk,
             |        ss_item_sk as sold_item_sk,
             |        ss_sold_time_sk as time_sk
-            |     from %s.%s.store_sales,date_dim
+            |     from ${icebergCatalog}.${icebergDatabase}.store_sales,date_dim
             |     where d_date_sk = ss_sold_date_sk
             |        and d_moy=11
             |        and d_year=1999
-            |     ) as tmp, %s.%s.time_dim
+            |     ) as tmp, ${icebergCatalog}.${icebergDatabase}.time_dim
             | where
             |   sold_item_sk = i_item_sk
             |   and i_manager_id=1
@@ -2880,26 +2880,26 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and (t_meal_time = 'breakfast' or t_meal_time = 'dinner')
             | group by i_brand, i_brand_id,t_hour,t_minute
             | order by ext_price desc, brand_id
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q72", String.format("""
+    ("q72", s"""
             | select i_item_desc
             |       ,w_warehouse_name
             |       ,d1.d_week_seq
             |       ,count(case when p_promo_sk is null then 1 else 0 end) no_promo
             |       ,count(case when p_promo_sk is not null then 1 else 0 end) promo
             |       ,count(*) total_cnt
-            | from %s.%s.catalog_sales
-            | join %s.%s.inventory on (cs_item_sk = inv_item_sk)
-            | join %s.%s.warehouse on (w_warehouse_sk=inv_warehouse_sk)
-            | join %s.%s.item on (i_item_sk = cs_item_sk)
-            | join %s.%s.customer_demographics on (cs_bill_cdemo_sk = cd_demo_sk)
-            | join %s.%s.household_demographics on (cs_bill_hdemo_sk = hd_demo_sk)
-            | join %s.%s.date_dim d1 on (cs_sold_date_sk = d1.d_date_sk)
-            | join %s.%s.date_dim d2 on (inv_date_sk = d2.d_date_sk)
-            | join %s.%s.date_dim d3 on (cs_ship_date_sk = d3.d_date_sk)
-            | left outer join %s.%s.promotion on (cs_promo_sk=p_promo_sk)
-            | left outer join %s.%s.catalog_returns on (cr_item_sk = cs_item_sk and cr_order_number = cs_order_number)
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales
+            | join ${icebergCatalog}.${icebergDatabase}.inventory on (cs_item_sk = inv_item_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.warehouse on (w_warehouse_sk=inv_warehouse_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.item on (i_item_sk = cs_item_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.customer_demographics on (cs_bill_cdemo_sk = cd_demo_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.household_demographics on (cs_bill_hdemo_sk = hd_demo_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.date_dim d1 on (cs_sold_date_sk = d1.d_date_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.date_dim d2 on (inv_date_sk = d2.d_date_sk)
+            | join ${icebergCatalog}.${icebergDatabase}.date_dim d3 on (cs_ship_date_sk = d3.d_date_sk)
+            | left outer join ${icebergCatalog}.${icebergDatabase}.promotion on (cs_promo_sk=p_promo_sk)
+            | left outer join ${icebergCatalog}.${icebergDatabase}.catalog_returns on (cr_item_sk = cs_item_sk and cr_order_number = cs_order_number)
             | where d1.d_week_seq = d2.d_week_seq
             |   and inv_quantity_on_hand < cs_quantity
             |   and d3.d_date > (cast(d1.d_date AS DATE) + interval 5 days)
@@ -2911,37 +2911,37 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_desc,w_warehouse_name,d1.d_week_seq
             | order by total_cnt desc, i_item_desc, w_warehouse_name, d_week_seq
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q73", String.format("""
+            """.stripMargin),
+    ("q73", s"""
             | select
             |    c_last_name, c_first_name, c_salutation, c_preferred_cust_flag,
             |    ss_ticket_number, cnt from
             |   (select ss_ticket_number, ss_customer_sk, count(*) cnt
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.household_demographics
-            |    where %s.%s.store_sales.ss_sold_date_sk = %s.%s.date_dim.d_date_sk
-            |    and %s.%s.store_sales.ss_store_sk = %s.%s.store.s_store_sk
-            |    and %s.%s.store_sales.ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |    and %s.%s.date_dim.d_dom between 1 and 2
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.household_demographics
+            |    where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = ${icebergCatalog}.${icebergDatabase}.date_dim.d_date_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_store_sk = ${icebergCatalog}.${icebergDatabase}.store.s_store_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_dom between 1 and 2
             |    and (household_demographics.hd_buy_potential = '>10000' or
-            |         %s.%s.household_demographics.hd_buy_potential = 'unknown')
-            |    and %s.%s.household_demographics.hd_vehicle_count > 0
-            |    and case when %s.%s.household_demographics.hd_vehicle_count > 0 then
-            |             %s.%s.household_demographics.hd_dep_count/ %s.%s.household_demographics.hd_vehicle_count else null end > 1
-            |    and %s.%s.date_dim.d_year in (1999,1999+1,1999+2)
-            |    and %s.%s.store.s_county in ('Williamson County','Franklin Parish','Bronx County','Orange County')
+            |         ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_buy_potential = 'unknown')
+            |    and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count > 0
+            |    and case when ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count > 0 then
+            |             ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count/ ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count else null end > 1
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_year in (1999,1999+1,1999+2)
+            |    and ${icebergCatalog}.${icebergDatabase}.store.s_county in ('Williamson County','Franklin Parish','Bronx County','Orange County')
             |    group by ss_ticket_number,ss_customer_sk) dj,customer
             |    where ss_customer_sk = c_customer_sk
             |      and cnt between 1 and 5
             |    order by cnt desc
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q74", String.format("""
+            """.stripMargin),
+    ("q74", s"""
             | with year_total as (
             | select
             |    c_customer_id customer_id, c_first_name customer_first_name,
             |    c_last_name customer_last_name, d_year as year,
             |    sum(ss_net_paid) year_total, 's' sale_type
             | from
-            |    %s.%s.customer, %s.%s.store_sales, %s.%s.date_dim
+            |    ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where c_customer_sk = ss_customer_sk
             |    and ss_sold_date_sk = d_date_sk
             |    and d_year in (2001,2001+1)
@@ -2953,7 +2953,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    c_last_name customer_last_name, d_year as year,
             |    sum(ws_net_paid) year_total, 'w' sale_type
             | from
-            |    %s.%s.customer, %s.%s.web_sales, %s.%s.date_dim
+            |    ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where c_customer_sk = ws_bill_customer_sk
             |    and ws_sold_date_sk = d_date_sk
             |    and d_year in (2001,2001+1)
@@ -2981,8 +2981,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |      > case when t_s_firstyear.year_total > 0 then t_s_secyear.year_total / t_s_firstyear.year_total else null end
             | order by 1, 1, 1
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q75", String.format("""
+            """.stripMargin),
+    ("q75", s"""
             | WITH all_sales AS (
             |    SELECT
             |        d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
@@ -2992,10 +2992,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
             |            cs_quantity - COALESCE(cr_return_quantity,0) AS sales_cnt,
             |            cs_ext_sales_price - COALESCE(cr_return_amount,0.0) AS sales_amt
-            |        FROM %s.%s.catalog_sales
-            |        JOIN %s.%s.item ON i_item_sk=cs_item_sk
-            |        JOIN %s.%s.date_dim ON d_date_sk=cs_sold_date_sk
-            |        LEFT JOIN %s.%s.catalog_returns ON (cs_order_number=cr_order_number
+            |        FROM ${icebergCatalog}.${icebergDatabase}.catalog_sales
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.item ON i_item_sk=cs_item_sk
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.date_dim ON d_date_sk=cs_sold_date_sk
+            |        LEFT JOIN ${icebergCatalog}.${icebergDatabase}.catalog_returns ON (cs_order_number=cr_order_number
             |                                      AND cs_item_sk=cr_item_sk)
             |        WHERE i_category='Books'
             |        UNION
@@ -3003,10 +3003,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
             |             ss_quantity - COALESCE(sr_return_quantity,0) AS sales_cnt,
             |             ss_ext_sales_price - COALESCE(sr_return_amt,0.0) AS sales_amt
-            |        FROM %s.%s.store_sales
-            |        JOIN %s.%s.item ON i_item_sk=ss_item_sk
-            |        JOIN %s.%s.date_dim ON d_date_sk=ss_sold_date_sk
-            |        LEFT JOIN %s.%s.store_returns ON (ss_ticket_number=sr_ticket_number
+            |        FROM ${icebergCatalog}.${icebergDatabase}.store_sales
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.item ON i_item_sk=ss_item_sk
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.date_dim ON d_date_sk=ss_sold_date_sk
+            |        LEFT JOIN ${icebergCatalog}.${icebergDatabase}.store_returns ON (ss_ticket_number=sr_ticket_number
             |                                    AND ss_item_sk=sr_item_sk)
             |        WHERE i_category='Books'
             |        UNION
@@ -3014,10 +3014,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |            d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
             |            ws_quantity - COALESCE(wr_return_quantity,0) AS sales_cnt,
             |            ws_ext_sales_price - COALESCE(wr_return_amt,0.0) AS sales_amt
-            |        FROM %s.%s.web_sales
-            |        JOIN %s.%s.item ON i_item_sk=ws_item_sk
-            |        JOIN %s.%s.date_dim ON d_date_sk=ws_sold_date_sk
-            |        LEFT JOIN %s.%s.web_site ON (ws_order_number=wr_order_number
+            |        FROM ${icebergCatalog}.${icebergDatabase}.web_sales
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.item ON i_item_sk=ws_item_sk
+            |        JOIN ${icebergCatalog}.${icebergDatabase}.date_dim ON d_date_sk=ws_sold_date_sk
+            |        LEFT JOIN ${icebergCatalog}.${icebergDatabase}.web_site ON (ws_order_number=wr_order_number
             |                                  AND ws_item_sk=wr_item_sk)
             |        WHERE i_category='Books') sales_detail
             |    GROUP BY d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id)
@@ -3037,8 +3037,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   AND CAST(curr_yr.sales_cnt AS DECIMAL(17,2))/CAST(prev_yr.sales_cnt AS DECIMAL(17,2))<0.9
             | ORDER BY sales_cnt_diff
             | LIMIT 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q76", String.format("""
+            """.stripMargin),
+    ("q76", s"""
             | SELECT
             |    channel, col_name, d_year, d_qoy, i_category, COUNT(*) sales_cnt,
             |    SUM(ext_sales_price) sales_amt
@@ -3046,7 +3046,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    SELECT
             |        'store' as channel, ss_store_sk col_name, d_year, d_qoy, i_category,
             |        ss_ext_sales_price ext_sales_price
-            |    FROM %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            |    FROM ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |    WHERE ss_store_sk IS NULL
             |      AND ss_sold_date_sk=d_date_sk
             |      AND ss_item_sk=i_item_sk
@@ -3054,7 +3054,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    SELECT
             |        'web' as channel, ws_ship_customer_sk col_name, d_year, d_qoy, i_category,
             |        ws_ext_sales_price ext_sales_price
-            |    FROM %s.%s.web_sales, %s.%s.item, %s.%s.date_dim
+            |    FROM ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |    WHERE ws_ship_customer_sk IS NULL
             |      AND ws_sold_date_sk=d_date_sk
             |      AND ws_item_sk=i_item_sk
@@ -3062,19 +3062,19 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    SELECT
             |        'catalog' as channel, cs_ship_addr_sk col_name, d_year, d_qoy, i_category,
             |        cs_ext_sales_price ext_sales_price
-            |    FROM catalog_sales, %s.%s.item, %s.%s.date_dim
+            |    FROM catalog_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |    WHERE cs_ship_addr_sk IS NULL
             |      AND cs_sold_date_sk=d_date_sk
             |      AND cs_item_sk=i_item_sk) foo
             | GROUP BY channel, col_name, d_year, d_qoy, i_category
             | ORDER BY channel, col_name, d_year, d_qoy, i_category
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q77", String.format("""
+    ("q77", s"""
             | with ss as
             | (select s_store_sk, sum(ss_ext_sales_price) as sales, sum(ss_net_profit) as profit
-            |  from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store
             |  where ss_sold_date_sk = d_date_sk
             |    and d_date between cast('2000-08-03' as date) and
             |                       (cast('2000-08-03' as date) + interval 30 days)
@@ -3082,7 +3082,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |  group by s_store_sk),
             | sr as
             | (select s_store_sk, sum(sr_return_amt) as returns, sum(sr_net_loss) as profit_loss
-            | from %s.%s.store_returns, %s.%s.date_dim, %s.%s.store
+            | from ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store
             | where sr_returned_date_sk = d_date_sk
             |    and d_date between cast('2000-08-03' as date) and
             |                       (cast('2000-08-03' as date) + interval 30 days)
@@ -3090,20 +3090,20 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by s_store_sk),
             | cs as
             | (select cs_call_center_sk, sum(cs_ext_sales_price) as sales, sum(cs_net_profit) as profit
-            | from %s.%s.catalog_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cs_sold_date_sk = d_date_sk
             |    and d_date between cast('2000-08-03' as date) and
             |                       (cast('2000-08-03' as date) + interval 30 days)
             | group by cs_call_center_sk),
             | cr as
             | (select sum(cr_return_amount) as returns, sum(cr_net_loss) as profit_loss
-            | from %s.%s.catalog_returns, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_returns, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cr_returned_date_sk = d_date_sk
             |    and d_date between cast('2000-08-03]' as date) and
             |                       (cast('2000-08-03' as date) + interval 30 day)),
             | ws as
             | (select wp_web_page_sk, sum(ws_ext_sales_price) as sales, sum(ws_net_profit) as profit
-            | from %s.%s.web_sales, %s.%s.date_dim, %s.%s.web_page
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.web_page
             | where ws_sold_date_sk = d_date_sk
             |    and d_date between cast('2000-08-03' as date) and
             |                       (cast('2000-08-03' as date) + interval 30 days)
@@ -3111,7 +3111,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by wp_web_page_sk),
             | wr as
             | (select wp_web_page_sk, sum(wr_return_amt) as returns, sum(wr_net_loss) as profit_loss
-            | from %s.%s.web_site, %s.%s.date_dim, %s.%s.web_page
+            | from ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.web_page
             | where wr_returned_date_sk = d_date_sk
             |       and d_date between cast('2000-08-03' as date) and
             |                          (cast('2000-08-03' as date) + interval 30 days)
@@ -3139,17 +3139,17 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by rollup(channel, id)
             | order by channel, id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q78", String.format("""
+            """.stripMargin),
+    ("q78", s"""
             | with ws as
             |   (select d_year AS ws_sold_year, ws_item_sk,
             |     ws_bill_customer_sk ws_customer_sk,
             |     sum(ws_quantity) ws_qty,
             |     sum(ws_wholesale_cost) ws_wc,
             |     sum(ws_sales_price) ws_sp
-            |    from %s.%s.web_sales
-            |    left join %s.%s.web_site on wr_order_number=ws_order_number and ws_item_sk=wr_item_sk
-            |    join %s.%s.date_dim on ws_sold_date_sk = d_date_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.web_sales
+            |    left join ${icebergCatalog}.${icebergDatabase}.web_site on wr_order_number=ws_order_number and ws_item_sk=wr_item_sk
+            |    join ${icebergCatalog}.${icebergDatabase}.date_dim on ws_sold_date_sk = d_date_sk
             |    where wr_order_number is null
             |    group by d_year, ws_item_sk, ws_bill_customer_sk
             |    ),
@@ -3159,9 +3159,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     sum(cs_quantity) cs_qty,
             |     sum(cs_wholesale_cost) cs_wc,
             |     sum(cs_sales_price) cs_sp
-            |    from %s.%s.catalog_sales
-            |    left join %s.%s.catalog_returns on cr_order_number=cs_order_number and cs_item_sk=cr_item_sk
-            |    join %s.%s.date_dim on cs_sold_date_sk = d_date_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.catalog_sales
+            |    left join ${icebergCatalog}.${icebergDatabase}.catalog_returns on cr_order_number=cs_order_number and cs_item_sk=cr_item_sk
+            |    join ${icebergCatalog}.${icebergDatabase}.date_dim on cs_sold_date_sk = d_date_sk
             |    where cr_order_number is null
             |    group by d_year, cs_item_sk, cs_bill_customer_sk
             |    ),
@@ -3171,9 +3171,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |     sum(ss_quantity) ss_qty,
             |     sum(ss_wholesale_cost) ss_wc,
             |     sum(ss_sales_price) ss_sp
-            |    from %s.%s.store_sales
-            |    left join %s.%s.store_returns on sr_ticket_number=ss_ticket_number and ss_item_sk=sr_item_sk
-            |    join %s.%s.date_dim on ss_sold_date_sk = d_date_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales
+            |    left join ${icebergCatalog}.${icebergDatabase}.store_returns on sr_ticket_number=ss_ticket_number and ss_item_sk=sr_item_sk
+            |    join ${icebergCatalog}.${icebergDatabase}.date_dim on ss_sold_date_sk = d_date_sk
             |    where sr_ticket_number is null
             |    group by d_year, ss_item_sk, ss_customer_sk
             |    )
@@ -3195,8 +3195,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   other_chan_sales_price,
             |   round(ss_qty/(coalesce(ws_qty+cs_qty,1)),2)
             |  limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q79", String.format("""
+            """.stripMargin),
+    ("q79", s"""
             | select
             |  c_last_name,c_first_name,substr(s_city,1,30),ss_ticket_number,amt,profit
             |  from
@@ -3205,31 +3205,31 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          ,store.s_city
             |          ,sum(ss_coupon_amt) amt
             |          ,sum(ss_net_profit) profit
-            |    from %s.%s.store_sales, %s.%s.date_dim, %s.%s.store, %s.%s.household_demographics
-            |    where %s.%s.store_sales.ss_sold_date_sk = %s.%s.date_dim.d_date_sk
-            |    and %s.%s.store_sales.ss_store_sk = %s.%s.store.s_store_sk
-            |    and %s.%s.store_sales.ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |    and (%s.%s.household_demographics.hd_dep_count = 6 or
-            |        %s.%s.household_demographics.hd_vehicle_count > 2)
-            |    and %s.%s.date_dim.d_dow = 1
-            |    and %s.%s.date_dim.d_year in (1999,1999+1,1999+2)
-            |    and %s.%s.store.s_number_employees between 200 and 295
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.household_demographics
+            |    where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = ${icebergCatalog}.${icebergDatabase}.date_dim.d_date_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_store_sk = ${icebergCatalog}.${icebergDatabase}.store.s_store_sk
+            |    and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |    and (${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count = 6 or
+            |        ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count > 2)
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_dow = 1
+            |    and ${icebergCatalog}.${icebergDatabase}.date_dim.d_year in (1999,1999+1,1999+2)
+            |    and ${icebergCatalog}.${icebergDatabase}.store.s_number_employees between 200 and 295
             |    group by ss_ticket_number,ss_customer_sk,ss_addr_sk,store.s_city) ms,customer
             |    where ss_customer_sk = c_customer_sk
             | order by c_last_name,c_first_name,substr(s_city,1,30), profit
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
     // Modifications: "||" -> "concat"
-    ("q80", String.format("""
+    ("q80", s"""
             | with ssr as
             | (select  s_store_id as store_id,
             |          sum(ss_ext_sales_price) as sales,
             |          sum(coalesce(sr_return_amt, 0)) as returns,
             |          sum(ss_net_profit - coalesce(sr_net_loss, 0)) as profit
-            |  from %s.%s.store_sales left outer join %s.%s.store_returns on
+            |  from ${icebergCatalog}.${icebergDatabase}.store_sales left outer join ${icebergCatalog}.${icebergDatabase}.store_returns on
             |         (ss_item_sk = sr_item_sk and ss_ticket_number = sr_ticket_number),
-            |     %s.%s.date_dim, %s.%s.store, %s.%s.item, %s.%s.promotion
+            |     ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.promotion
             | where ss_sold_date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and (cast('2000-08-23' as date) + interval 30 days)
@@ -3244,9 +3244,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          sum(cs_ext_sales_price) as sales,
             |          sum(coalesce(cr_return_amount, 0)) as returns,
             |          sum(cs_net_profit - coalesce(cr_net_loss, 0)) as profit
-            |  from %s.%s.catalog_sales left outer join %s.%s.catalog_returns on
+            |  from ${icebergCatalog}.${icebergDatabase}.catalog_sales left outer join ${icebergCatalog}.${icebergDatabase}.catalog_returns on
             |         (cs_item_sk = cr_item_sk and cs_order_number = cr_order_number),
-            |     %s.%s.date_dim, %s.%s.catalog_page, %s.%s.item, %s.%s.promotion
+            |     ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.catalog_page, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.promotion
             | where cs_sold_date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and (cast('2000-08-23' as date) + interval 30 days)
@@ -3261,9 +3261,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |          sum(ws_ext_sales_price) as sales,
             |          sum(coalesce(wr_return_amt, 0)) as returns,
             |          sum(ws_net_profit - coalesce(wr_net_loss, 0)) as profit
-            |  from %s.%s.web_sales left outer join %s.%s.web_site on
+            |  from ${icebergCatalog}.${icebergDatabase}.web_sales left outer join ${icebergCatalog}.${icebergDatabase}.web_site on
             |         (ws_item_sk = wr_item_sk and ws_order_number = wr_order_number),
-            |     %s.%s.date_dim, %s.%s.web_site, %s.%s.item, %s.%s.promotion
+            |     ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.promotion
             | where ws_sold_date_sk = d_date_sk
             |       and d_date between cast('2000-08-23' as date)
             |                  and (cast('2000-08-23' as date) + interval 30 days)
@@ -3289,13 +3289,13 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by rollup (channel, id)
             | order by channel, id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q81", String.format("""
+            """.stripMargin),
+    ("q81", s"""
             | with customer_total_return as
             | (select
             |    cr_returning_customer_sk as ctr_customer_sk, ca_state as ctr_state,
             |        sum(cr_return_amt_inc_tax) as ctr_total_return
-            | from %s.%s.catalog_returns, %s.%s.date_dim, %s.%s.customer_address
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_returns, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address
             | where cr_returned_date_sk = d_date_sk
             |   and d_year = 2000
             |   and cr_returning_addr_sk = ca_address_sk
@@ -3304,7 +3304,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    c_customer_id,c_salutation,c_first_name,c_last_name,ca_street_number,ca_street_name,
             |    ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,
             |    ca_gmt_offset,ca_location_type,ctr_total_return
-            | from customer_total_return ctr1, %s.%s.customer_address, %s.%s.customer
+            | from customer_total_return ctr1, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.customer
             | where ctr1.ctr_total_return > (select avg(ctr_total_return)*1.2
             | 			  from customer_total_return ctr2
             |                  	  where ctr1.ctr_state = ctr2.ctr_state)
@@ -3315,10 +3315,10 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                   ,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset
             |                  ,ca_location_type,ctr_total_return
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q82", String.format("""
+            """.stripMargin),
+    ("q82", s"""
             | select i_item_id, i_item_desc, i_current_price
-            | from %s.%s.item, %s.%s.inventory, %s.%s.date_dim, %s.%s.store_sales
+            | from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.inventory, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store_sales
             | where i_current_price between 62 and 62+30
             |   and inv_item_sk = i_item_sk
             |   and d_date_sk=inv_date_sk
@@ -3329,30 +3329,30 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by i_item_id,i_item_desc,i_current_price
             | order by i_item_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q83", String.format("""
+            """.stripMargin),
+    ("q83", s"""
             | with sr_items as
             |  (select i_item_id item_id, sum(sr_return_quantity) sr_item_qty
-            |   from %s.%s.store_returns, %s.%s.item, %s.%s.date_dim
+            |   from ${icebergCatalog}.${icebergDatabase}.store_returns, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |   where sr_item_sk = i_item_sk
-            |      and  d_date in (select d_date from %s.%s.date_dim where d_week_seq in
-            |		      (select d_week_seq from %s.%s.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
+            |      and  d_date in (select d_date from ${icebergCatalog}.${icebergDatabase}.date_dim where d_week_seq in
+            |		      (select d_week_seq from ${icebergCatalog}.${icebergDatabase}.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
             |      and sr_returned_date_sk   = d_date_sk
             |   group by i_item_id),
             | cr_items as
             |  (select i_item_id item_id, sum(cr_return_quantity) cr_item_qty
-            |  from %s.%s.catalog_returns, %s.%s.item, %s.%s.date_dim
+            |  from ${icebergCatalog}.${icebergDatabase}.catalog_returns, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |  where cr_item_sk = i_item_sk
-            |      and d_date in (select d_date from %s.%s.date_dim where d_week_seq in
-            |		      (select d_week_seq from %s.%s.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
+            |      and d_date in (select d_date from ${icebergCatalog}.${icebergDatabase}.date_dim where d_week_seq in
+            |		      (select d_week_seq from ${icebergCatalog}.${icebergDatabase}.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
             |      and cr_returned_date_sk   = d_date_sk
             |      group by i_item_id),
             | wr_items as
             |  (select i_item_id item_id, sum(wr_return_quantity) wr_item_qty
-            |  from %s.%s.web_site, %s.%s.item, %s.%s.date_dim
+            |  from ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |  where wr_item_sk = i_item_sk and d_date in
-            |      (select d_date	from %s.%s.date_dim	where d_week_seq in
-            |		      (select d_week_seq from %s.%s.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
+            |      (select d_date	from ${icebergCatalog}.${icebergDatabase}.date_dim	where d_week_seq in
+            |		      (select d_week_seq from ${icebergCatalog}.${icebergDatabase}.date_dim where d_date in ('2000-06-30','2000-09-27','2000-11-17')))
             |    and wr_returned_date_sk = d_date_sk
             |  group by i_item_id)
             | select sr_items.item_id
@@ -3368,12 +3368,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and sr_items.item_id=wr_items.item_id
             | order by sr_items.item_id, sr_item_qty
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "||" -> concat
-    ("q84", String.format("""
+    ("q84", s"""
             | select c_customer_id as customer_id
             |       ,concat(c_last_name, ', ', c_first_name) as customername
-            | from %s.%s.customer
+            | from ${icebergCatalog}.${icebergDatabase}.customer
             |     ,customer_address
             |     ,customer_demographics
             |     ,household_demographics
@@ -3389,12 +3389,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   and sr_cdemo_sk = cd_demo_sk
             | order by c_customer_id
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q85", String.format("""
+            """.stripMargin),
+    ("q85", s"""
             | select
             |    substr(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
-            | from %s.%s.web_sales, %s.%s.web_site, %s.%s.web_page, %s.%s.customer_demographics cd1,
-            |      %s.%s.customer_demographics cd2, %s.%s.customer_address, %s.%s.date_dim, %s.%s.reason
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.web_site, ${icebergCatalog}.${icebergDatabase}.web_page, ${icebergCatalog}.${icebergDatabase}.customer_demographics cd1,
+            |      ${icebergCatalog}.${icebergDatabase}.customer_demographics cd2, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.reason
             | where ws_web_page_sk = wp_web_page_sk
             |   and ws_item_sk = wr_item_sk
             |   and ws_order_number = wr_order_number
@@ -3470,8 +3470,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |        ,avg(wr_refunded_cash)
             |        ,avg(wr_fee)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q86", String.format("""
+            """.stripMargin),
+    ("q86", s"""
             | select sum(ws_net_paid) as total_sum, i_category, i_class,
             |  grouping(i_category)+grouping(i_class) as lochierarchy,
             |  rank() over (
@@ -3479,7 +3479,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | 	    case when grouping(i_class) = 0 then i_category end
             | 	    order by sum(ws_net_paid) desc) as rank_within_parent
             | from
-            |    %s.%s.web_sales, %s.%s.date_dim d1, %s.%s.item
+            |    ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim d1, ${icebergCatalog}.${icebergDatabase}.item
             | where
             |    d1.d_month_seq between 1200 and 1200+11
             | and d1.d_date_sk = ws_sold_date_sk
@@ -3490,121 +3490,121 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   case when lochierarchy = 0 then i_category end,
             |   rank_within_parent
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q87", String.format("""
+            """.stripMargin),
+    ("q87", s"""
             | select count(*)
             | from ((select distinct c_last_name, c_first_name, d_date
-            |       from %s.%s.store_sales, %s.%s.date_dim, %s.%s.customer
-            |       where %s.%s.store_sales.ss_sold_date_sk = %s.%s.date_dim.d_date_sk
-            |         and %s.%s.store_sales.ss_customer_sk = %s.%s.customer.c_customer_sk
+            |       from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
+            |       where ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk = ${icebergCatalog}.${icebergDatabase}.date_dim.d_date_sk
+            |         and ${icebergCatalog}.${icebergDatabase}.store_sales.ss_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |         and d_month_seq between 1200 and 1200+11)
             |       except
             |      (select distinct c_last_name, c_first_name, d_date
-            |       from catalog_sales, %s.%s.date_dim, %s.%s.customer
-            |       where catalog_sales.cs_sold_date_sk = %s.%s.date_dim.d_date_sk
-            |         and catalog_sales.cs_bill_customer_sk = %s.%s.customer.c_customer_sk
+            |       from catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
+            |       where catalog_sales.cs_sold_date_sk = ${icebergCatalog}.${icebergDatabase}.date_dim.d_date_sk
+            |         and catalog_sales.cs_bill_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |         and d_month_seq between 1200 and 1200+11)
             |       except
             |      (select distinct c_last_name, c_first_name, d_date
-            |       from %s.%s.web_sales, %s.%s.date_dim, %s.%s.customer
-            |       where %s.%s.web_sales.ws_sold_date_sk = %s.%s.date_dim.d_date_sk
-            |         and %s.%s.web_sales.ws_bill_customer_sk = %s.%s.customer.c_customer_sk
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer
+            |       where ${icebergCatalog}.${icebergDatabase}.web_sales.ws_sold_date_sk = ${icebergCatalog}.${icebergDatabase}.date_dim.d_date_sk
+            |         and ${icebergCatalog}.${icebergDatabase}.web_sales.ws_bill_customer_sk = ${icebergCatalog}.${icebergDatabase}.customer.c_customer_sk
             |         and d_month_seq between 1200 and 1200+11)
             |) cool_cust
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q88", String.format("""
+            """.stripMargin),
+    ("q88", s"""
             | select  *
             | from
             |   (select count(*) h8_30_to_9
-            |    from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            |    where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            |    where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 8
-            |     and %s.%s.time_dim.t_minute >= 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s1,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 8
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute >= 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s1,
             |   (select count(*) h9_to_9_30
-            |    from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            |    where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |      and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            |    from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            |    where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |      and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |      and ss_store_sk = s_store_sk
-            |      and %s.%s.time_dim.t_hour = 9
-            |      and %s.%s.time_dim.t_minute < 30
-            |      and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |      and %s.%s.store.s_store_name = 'ese') s2,
+            |      and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 9
+            |      and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute < 30
+            |      and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |      and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s2,
             | (select count(*) h9_30_to_10
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 9
-            |     and %s.%s.time_dim.t_minute >= 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s3,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 9
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute >= 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s3,
             | (select count(*) h10_to_10_30
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 10
-            |     and %s.%s.time_dim.t_minute < 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s4,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 10
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute < 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s4,
             | (select count(*) h10_30_to_11
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 10
-            |     and %s.%s.time_dim.t_minute >= 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s5,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 10
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute >= 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s5,
             | (select count(*) h11_to_11_30
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 11
-            |     and %s.%s.time_dim.t_minute < 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s6,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 11
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute < 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s6,
             | (select count(*) h11_30_to_12
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 11
-            |     and %s.%s.time_dim.t_minute >= 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s7,
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 11
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute >= 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s7,
             | (select count(*) h12_to_12_30
-            | from %s.%s.store_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 12
-            |     and %s.%s.time_dim.t_minute < 30
-            |     and ((household_demographics.hd_dep_count = 4 and %s.%s.household_demographics.hd_vehicle_count<=4+2) or
-            |          (household_demographics.hd_dep_count = 2 and %s.%s.household_demographics.hd_vehicle_count<=2+2) or
-            |          (household_demographics.hd_dep_count = 0 and %s.%s.household_demographics.hd_vehicle_count<=0+2))
-            |     and %s.%s.store.s_store_name = 'ese') s8
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q89", String.format("""
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 12
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute < 30
+            |     and ((household_demographics.hd_dep_count = 4 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=4+2) or
+            |          (household_demographics.hd_dep_count = 2 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=2+2) or
+            |          (household_demographics.hd_dep_count = 0 and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_vehicle_count<=0+2))
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese') s8
+            """.stripMargin),
+    ("q89", s"""
             | select *
             | from(
             | select i_category, i_class, i_brand,
@@ -3614,7 +3614,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |       avg(sum(ss_sales_price)) over
             |         (partition by i_category, i_brand, s_store_name, s_company_name)
             |         avg_monthly_sales
-            | from %s.%s.item, %s.%s.store_sales, %s.%s.date_dim, %s.%s.store
+            | from ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.store
             | where ss_item_sk = i_item_sk and
             |      ss_sold_date_sk = d_date_sk and
             |      ss_store_sk = s_store_sk and
@@ -3628,35 +3628,35 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | where case when (avg_monthly_sales <> 0) then (abs(sum_sales - avg_monthly_sales) / avg_monthly_sales) else null end > 0.1
             | order by sum_sales - avg_monthly_sales, s_store_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q90", String.format("""
+            """.stripMargin),
+    ("q90", s"""
             | select cast(amc as decimal(15,4))/cast(pmc as decimal(15,4)) am_pm_ratio
             | from ( select count(*) amc
-            |       from %s.%s.web_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.web_page
-            |       where ws_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |         and ws_ship_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |         and ws_web_page_sk = %s.%s.web_page.wp_web_page_sk
-            |         and %s.%s.time_dim.t_hour between 8 and 8+1
-            |         and %s.%s.household_demographics.hd_dep_count = 6
-            |         and %s.%s.web_page.wp_char_count between 5000 and 5200) at,
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.web_page
+            |       where ws_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |         and ws_ship_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |         and ws_web_page_sk = ${icebergCatalog}.${icebergDatabase}.web_page.wp_web_page_sk
+            |         and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour between 8 and 8+1
+            |         and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count = 6
+            |         and ${icebergCatalog}.${icebergDatabase}.web_page.wp_char_count between 5000 and 5200) at,
             |      ( select count(*) pmc
-            |       from %s.%s.web_sales, %s.%s.household_demographics , %s.%s.time_dim, %s.%s.web_page
-            |       where ws_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |         and ws_ship_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
-            |         and ws_web_page_sk = %s.%s.web_page.wp_web_page_sk
-            |         and %s.%s.time_dim.t_hour between 19 and 19+1
-            |         and %s.%s.household_demographics.hd_dep_count = 6
-            |         and %s.%s.web_page.wp_char_count between 5000 and 5200) pt
+            |       from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics , ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.web_page
+            |       where ws_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |         and ws_ship_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
+            |         and ws_web_page_sk = ${icebergCatalog}.${icebergDatabase}.web_page.wp_web_page_sk
+            |         and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour between 19 and 19+1
+            |         and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count = 6
+            |         and ${icebergCatalog}.${icebergDatabase}.web_page.wp_char_count between 5000 and 5200) pt
             | order by am_pm_ratio
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q91", String.format("""
+            """.stripMargin),
+    ("q91", s"""
             | select
             |        cc_call_center_id Call_Center, cc_name Call_Center_Name, cc_manager Manager,
             |        sum(cr_net_loss) Returns_Loss
             | from
-            |        %s.%s.call_center, %s.%s.catalog_returns, %s.%s.date_dim, %s.%s.customer, %s.%s.customer_address,
-            |        %s.%s.customer_demographics, %s.%s.household_demographics
+            |        ${icebergCatalog}.${icebergDatabase}.call_center, ${icebergCatalog}.${icebergDatabase}.catalog_returns, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer, ${icebergCatalog}.${icebergDatabase}.customer_address,
+            |        ${icebergCatalog}.${icebergDatabase}.customer_demographics, ${icebergCatalog}.${icebergDatabase}.household_demographics
             | where
             |        cr_call_center_sk        = cc_call_center_sk
             | and    cr_returned_date_sk      = d_date_sk
@@ -3672,12 +3672,12 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | and    ca_gmt_offset            = -7
             | group by cc_call_center_id,cc_name,cc_manager,cd_marital_status,cd_education_status
             | order by sum(cr_net_loss) desc
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
     // Modifications: " -> `
-    ("q92", String.format("""
+    ("q92", s"""
             | select sum(ws_ext_discount_amt) as `Excess Discount Amount`
-            | from %s.%s.web_sales, %s.%s.item, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where i_manufact_id = 350
             | and i_item_sk = ws_item_sk
             | and d_date between '2000-01-27' and (cast('2000-01-27' as date) + interval 90 days)
@@ -3685,38 +3685,38 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | and ws_ext_discount_amt >
             |     (
             |       SELECT 1.3 * avg(ws_ext_discount_amt)
-            |       FROM %s.%s.web_sales, %s.%s.date_dim
+            |       FROM ${icebergCatalog}.${icebergDatabase}.web_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             |       WHERE ws_item_sk = i_item_sk
             |         and d_date between '2000-01-27' and (cast('2000-01-27' as date) + interval 90 days)
             |         and d_date_sk = ws_sold_date_sk
             |     )
             | order by sum(ws_ext_discount_amt)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q93", String.format("""
+            """.stripMargin),
+    ("q93", s"""
             | select ss_customer_sk, sum(act_sales) sumsales
             | from (select
             |         ss_item_sk, ss_ticket_number, ss_customer_sk,
             |         case when sr_return_quantity is not null then (ss_quantity-sr_return_quantity)*ss_sales_price
             |                                                  else (ss_quantity*ss_sales_price) end act_sales
-            |       from %s.%s.store_sales
-            |       left outer join %s.%s.store_returns
+            |       from ${icebergCatalog}.${icebergDatabase}.store_sales
+            |       left outer join ${icebergCatalog}.${icebergDatabase}.store_returns
             |       on (sr_item_sk = ss_item_sk and sr_ticket_number = ss_ticket_number),
-            |       %s.%s.reason
+            |       ${icebergCatalog}.${icebergDatabase}.reason
             |       where sr_reason_sk = r_reason_sk and r_reason_desc = 'reason 28') t
             | group by ss_customer_sk
             | order by sumsales, ss_customer_sk
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
     // Modifications: " -> `
-    ("q94", String.format("""
+    ("q94", s"""
             | select
             |    count(distinct ws_order_number) as `order count`
             |   ,sum(ws_ext_ship_cost) as `total shipping cost`
             |   ,sum(ws_net_profit) as `total net profit`
             | from
-            |    %s.%s.web_sales ws1, %s.%s.date_dim, %s.%s.customer_address, %s.%s.web_site
+            |    ${icebergCatalog}.${icebergDatabase}.web_sales ws1, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.web_site
             | where
             |     d_date between '1999-02-01' and
             |            (cast('1999-02-01' as date) + interval 60 days)
@@ -3726,20 +3726,20 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | and ws1.ws_web_site_sk = web_site_sk
             | and web_company_name = 'pri'
             | and exists (select *
-            |             from %s.%s.web_sales ws2
+            |             from ${icebergCatalog}.${icebergDatabase}.web_sales ws2
             |             where ws1.ws_order_number = ws2.ws_order_number
             |               and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
             | and not exists(select *
-            |                from %s.%s.web_returns wr1
+            |                from ${icebergCatalog}.${icebergDatabase}.web_returns wr1
             |                where ws1.ws_order_number = wr1.wr_order_number)
             | order by count(distinct ws_order_number)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q95", String.format("""
+    ("q95", s"""
             | with ws_wh as
             | (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2
-            |  from %s.%s.web_sales ws1,web_sales ws2
+            |  from ${icebergCatalog}.${icebergDatabase}.web_sales ws1,web_sales ws2
             |  where ws1.ws_order_number = ws2.ws_order_number
             |    and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
             | select
@@ -3747,7 +3747,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |   ,sum(ws_ext_ship_cost) as `total shipping cost`
             |   ,sum(ws_net_profit) as `total net profit`
             | from
-            |    %s.%s.web_sales ws1, %s.%s.date_dim, %s.%s.customer_address, %s.%s.web_site
+            |    ${icebergCatalog}.${icebergDatabase}.web_sales ws1, ${icebergCatalog}.${icebergDatabase}.date_dim, ${icebergCatalog}.${icebergDatabase}.customer_address, ${icebergCatalog}.${icebergDatabase}.web_site
             | where
             |     d_date between '1999-02-01' and
             |            (cast('1999-02-01' as date) + interval 60 days)
@@ -3759,34 +3759,34 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | and ws1.ws_order_number in (select ws_order_number
             |                             from ws_wh)
             | and ws1.ws_order_number in (select wr_order_number
-            |                             from %s.%s.web_returns,ws_wh
+            |                             from ${icebergCatalog}.${icebergDatabase}.web_returns,ws_wh
             |                             where wr_order_number = ws_wh.ws_order_number)
             | order by count(distinct ws_order_number)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q96", String.format("""
+            """.stripMargin),
+    ("q96", s"""
             | select count(*)
-            | from %s.%s.store_sales, %s.%s.household_demographics, %s.%s.time_dim, %s.%s.store
-            | where ss_sold_time_sk = %s.%s.time_dim.t_time_sk
-            |     and ss_hdemo_sk = %s.%s.household_demographics.hd_demo_sk
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.household_demographics, ${icebergCatalog}.${icebergDatabase}.time_dim, ${icebergCatalog}.${icebergDatabase}.store
+            | where ss_sold_time_sk = ${icebergCatalog}.${icebergDatabase}.time_dim.t_time_sk
+            |     and ss_hdemo_sk = ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_demo_sk
             |     and ss_store_sk = s_store_sk
-            |     and %s.%s.time_dim.t_hour = 20
-            |     and %s.%s.time_dim.t_minute >= 30
-            |     and %s.%s.household_demographics.hd_dep_count = 7
-            |     and %s.%s.store.s_store_name = 'ese'
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_hour = 20
+            |     and ${icebergCatalog}.${icebergDatabase}.time_dim.t_minute >= 30
+            |     and ${icebergCatalog}.${icebergDatabase}.household_demographics.hd_dep_count = 7
+            |     and ${icebergCatalog}.${icebergDatabase}.store.s_store_name = 'ese'
             | order by count(*)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q97", String.format("""
+            """.stripMargin),
+    ("q97", s"""
             | with ssci as (
             | select ss_customer_sk customer_sk, ss_item_sk item_sk
-            | from %s.%s.store_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where ss_sold_date_sk = d_date_sk
             |   and d_month_seq between 1200 and 1200 + 11
             | group by ss_customer_sk, ss_item_sk),
             | csci as(
             |  select cs_bill_customer_sk customer_sk, cs_item_sk item_sk
-            | from %s.%s.catalog_sales, %s.%s.date_dim
+            | from ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where cs_sold_date_sk = d_date_sk
             |   and d_month_seq between 1200 and 1200 + 11
             | group by cs_bill_customer_sk, cs_item_sk)
@@ -3796,15 +3796,15 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | from ssci full outer join csci on (ssci.customer_sk=csci.customer_sk
             |                                and ssci.item_sk = csci.item_sk)
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: "+ days" -> date_add
-    ("q98", String.format("""
+    ("q98", s"""
             |select i_item_desc, i_category, i_class, i_current_price
             |      ,sum(ss_ext_sales_price) as itemrevenue
             |      ,sum(ss_ext_sales_price)*100/sum(sum(ss_ext_sales_price)) over
             |          (partition by i_class) as revenueratio
             |from
-            |	 %s.%s.store_sales, %s.%s.item, %s.%s.date_dim
+            |	 ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item, ${icebergCatalog}.${icebergDatabase}.date_dim
             |where
             |	ss_item_sk = i_item_sk
             |  	and i_category in ('Sports', 'Books', 'Home')
@@ -3815,9 +3815,9 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |	i_item_id, i_item_desc, i_category, i_class, i_current_price
             |order by
             |	i_category, i_class, i_item_id, i_item_desc, revenueratio
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
     // Modifications: " -> `
-    ("q99", String.format("""
+    ("q99", s"""
             | select
             |    substr(w_warehouse_name,1,20), sm_type, cc_name
             |   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as `30 days`
@@ -3829,7 +3829,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |                  (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
             |   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
             | from
-            |    %s.%s.catalog_sales, %s.%s.warehouse, %s.%s.ship_mode, %s.%s.call_center, %s.%s.date_dim
+            |    ${icebergCatalog}.${icebergDatabase}.catalog_sales, ${icebergCatalog}.${icebergDatabase}.warehouse, ${icebergCatalog}.${icebergDatabase}.ship_mode, ${icebergCatalog}.${icebergDatabase}.call_center, ${icebergCatalog}.${icebergDatabase}.date_dim
             | where
             |     d_month_seq between 1200 and 1200 + 11
             | and cs_ship_date_sk   = d_date_sk
@@ -3840,7 +3840,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             |    substr(w_warehouse_name,1,20), sm_type, cc_name
             | order by substr(w_warehouse_name,1,20), sm_type, cc_name
             | limit 100
-            """.stripMargin, icebergCatalog, icebergDatabase)),
+            """.stripMargin),
       ("qSsMax",
         """
           |select
@@ -3856,8 +3856,8 @@ trait Tpcds_1_4_Queries extends Benchmark {
           |  max(ss_addr_sk) as max_ss_addr_sk,
           |  max(ss_store_sk) as max_ss_store_sk,
           |  max(ss_promo_sk) as max_ss_promo_sk
-          |from %s.%s.store_sales
-        """.stripMargin, icebergCatalog, icebergDatabase))
+          |from ${icebergCatalog}.${icebergDatabase}.store_sales
+        """.stripMargin)
   ).map { case (name, sqlText) =>
     Query(name + "-v1.4", sqlText, description = "TPCDS 1.4 Query", executionMode = CollectResults)
   }
