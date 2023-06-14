@@ -34,7 +34,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
   with Tpcds_2_4_Queries_Iceberg
   with Serializable {
 
-  def this() = this(SparkSession.builder.getOrCreate().sqlContext)
+  def this() = this(SparkSession.builder.getOrCreate().sqlContext, catalog, database)
 
   /*
   def setupBroadcast(skipTables: Seq[String] = Seq("store_sales", "customer")) = {

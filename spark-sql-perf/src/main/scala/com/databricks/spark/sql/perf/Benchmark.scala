@@ -42,7 +42,7 @@ abstract class Benchmark(
 
   import Benchmark._
 
-  def this() = this(SparkSession.builder.getOrCreate().sqlContext)
+  def this() = this(SparkSession.builder.getOrCreate().sqlContext, "", "")
 
   val resultsLocation =
     sqlContext.getAllConfs.getOrElse(
