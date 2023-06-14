@@ -463,7 +463,7 @@ trait Tpcds_1_4_Queries extends Benchmark {
             | group by s_store_name
             | order by s_store_name LIMIT 100
             """.stripMargin, icebergCatalog, icebergDatabase)),
-    ("q9", s"""
+    ("q9", String.format(s"""
             |select case when (select count(*) from %s.%s.store_sales
             |                  where ss_quantity between 1 and 20) > ${rc(0)}
             |            then (select avg(ss_ext_discount_amt) from %s.%s.store_sales
