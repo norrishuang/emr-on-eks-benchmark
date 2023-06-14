@@ -15,7 +15,7 @@ RUN yum update -y && \
 
 FROM mozilla/sbt:8u292_1.5.4 as sbt
 # Build the Databricks SQL perf library
-RUN git clone https://github.com/aws-samples/emr-on-eks-benchmark.git /tmp/emr-on-eks-benchmark && \
+RUN git clone https://github.com/norrishuang/emr-on-eks-benchmark.git /tmp/emr-on-eks-benchmark && \
     cd /tmp/emr-on-eks-benchmark/spark-sql-perf/ && \
     sbt +package   
      
