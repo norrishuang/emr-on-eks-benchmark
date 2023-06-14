@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions.col
 import org.apache.log4j.{Level, LogManager}
 import scala.util.Try
 
-object BenchmarkSQL {
+object BenchmarkSQLIceberg {
   def main(args: Array[String]) {
     val tpcdsDataDir = args(0)
     val resultLocation = args(1)
