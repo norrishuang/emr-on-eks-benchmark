@@ -26,12 +26,12 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
  *
  * @param sqlContext An existing SQLContext.
  */
-class TPCDS(@transient sqlContext: SQLContext)
-  extends Benchmark(sqlContext, "", "")
+class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database: String)
+  extends Benchmark(sqlContext, catalog, database)
   with ImpalaKitQueries
   with SimpleQueries
-  with Tpcds_1_4_Queries
-  with Tpcds_2_4_Queries
+  with Tpcds_1_4_Queries_Iceberg
+  with Tpcds_2_4_Queries_Iceberg
   with Serializable {
 
   def this() = this(SparkSession.builder.getOrCreate().sqlContext)

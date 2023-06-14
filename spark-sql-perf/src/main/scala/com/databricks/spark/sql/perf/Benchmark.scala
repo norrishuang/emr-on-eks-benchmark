@@ -37,7 +37,7 @@ import com.databricks.spark.sql.perf.cpu._
  * @param sqlContext An existing SQLContext.
  */
 abstract class Benchmark(
-    @transient val sqlContext: SQLContext)
+    @transient val sqlContext: SQLContext, catalog: String, database: String)
   extends Serializable {
 
   import Benchmark._
@@ -50,6 +50,10 @@ abstract class Benchmark(
       "/spark/sql/performance")
 
   protected def sparkContext = sqlContext.sparkContext
+
+  protected def icebergCatalog = catalog
+
+  protected def icebergDatabase = database
 
   protected implicit def toOption[A](a: A): Option[A] = Option(a)
 
