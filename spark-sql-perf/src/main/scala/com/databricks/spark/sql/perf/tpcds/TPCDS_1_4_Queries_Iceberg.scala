@@ -23,7 +23,7 @@ import com.databricks.spark.sql.perf.{Benchmark, ExecutionMode, Query}
  * (noted for each query).
  * Don't modify this except for these kind of modifications.
  */
-trait Tpcds_1_4_Queries extends Benchmark {
+trait TPCDS_1_4_Queries_Iceberg extends Benchmark {
 
   import ExecutionMode._
 

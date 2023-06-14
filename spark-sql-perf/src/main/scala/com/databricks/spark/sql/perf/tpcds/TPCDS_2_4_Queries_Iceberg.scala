@@ -23,7 +23,7 @@ import com.databricks.spark.sql.perf.{Benchmark, ExecutionMode, Query}
 /**
  * This implements the official TPCDS v2.4 queries with only cosmetic modifications.
  */
-trait Tpcds_2_4_Queries extends Benchmark {
+trait TPCDS_2_4_Queries_Iceberg extends Benchmark {
 
   import ExecutionMode._
 
