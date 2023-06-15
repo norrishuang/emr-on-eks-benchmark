@@ -106,7 +106,7 @@ trait Tpcds_1_4_Queries_for_Iceberg extends Benchmark {
          | ORDER BY d_week_seq1
           """.stripMargin),
     ("q3",
-      """
+      s"""
         | SELECT dt.d_year, item.i_brand_id brand_id, item.i_brand brand,SUM(ss_ext_sales_price) sum_agg
         | FROM  date_dim dt, ${icebergCatalog}.${icebergDatabase}.store_sales, ${icebergCatalog}.${icebergDatabase}.item
         | WHERE dt.d_date_sk = ${icebergCatalog}.${icebergDatabase}.store_sales.ss_sold_date_sk
@@ -118,7 +118,7 @@ trait Tpcds_1_4_Queries_for_Iceberg extends Benchmark {
         | LIMIT 100
           """.stripMargin),
     ("q4",
-      """
+      s"""
         |WITH year_total AS (
         | SELECT c_customer_id customer_id,
         |        c_first_name customer_first_name,
@@ -229,7 +229,7 @@ trait Tpcds_1_4_Queries_for_Iceberg extends Benchmark {
     // Modifications: "+ days" -> date_add
     // Modifications: "||" -> concat
     ("q5",
-      """
+      s"""
         | WITH ssr AS
         |  (SELECT s_store_id,
         |          sum(sales_price) as sales,
