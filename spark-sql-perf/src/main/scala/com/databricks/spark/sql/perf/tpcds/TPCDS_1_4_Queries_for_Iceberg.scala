@@ -23,7 +23,7 @@ import com.databricks.spark.sql.perf.{Benchmark, ExecutionMode, Query}
  * (noted for each query).
  * Don't modify this except for these kind of modifications.
  */
-trait Tpcds_1_4_Queries_for_Iceberg extends Benchmark {
+trait Tpcds_1_4_Queries_for_Iceberg(icebergCatalog:String, icebergDatabase:String) extends Benchmark {
 
   import ExecutionMode._
 
@@ -31,6 +31,8 @@ trait Tpcds_1_4_Queries_for_Iceberg extends Benchmark {
   // RC=ulist(random(1, rowcount("store_sales")/5,uniform),5);
   val rc = Array(1000000, 1000000, 1000000, 1000000, 1000000)
 
+  println(s"""Catalog:${icebergCatalog}""")
+  println(s"""Database:${icebergDatabase}""")
   // Queries the TPCDS 1.4 queries using the qualifcations values in the templates.
   val tpcds1_4Queries = Seq(
     ("q1",

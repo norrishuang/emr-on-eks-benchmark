@@ -30,7 +30,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
   extends Benchmark(sqlContext, catalog, database)
   with ImpalaKitQueries
   with SimpleQueries
-  with Tpcds_1_4_Queries_for_Iceberg
+  with Tpcds_1_4_Queries_for_Iceberg(catalog, database)
   with Tpcds_2_4_Queries
   with Serializable {
 
