@@ -30,7 +30,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
   extends Benchmark(sqlContext, catalog, database)
   with ImpalaKitQueries
   with SimpleQueries
-  with Tpcds_1_4_Queries_for_Iceberg(catalog, database)
+  with Tpcds_1_4_Queries_for_Iceberg
   with Tpcds_2_4_Queries
   with Serializable {
 
@@ -60,6 +60,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
     queries.foreach { q =>
       println(s"Query: ${q.name}")
       try {
+        println(s"Query SQL: ${q.sqlText}")
         val df = sqlContext.sql(q.sqlText.get)
         if (showPlan) {
           df.explain()
@@ -80,6 +81,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
     val succeeded = mutable.ArrayBuffer.empty[String]
     queries.foreach { q =>
       println(s"Query: ${q.name}")
+      println(s"Query SQL: ${q.sqlText}")
       val start = System.currentTimeMillis()
       val df = sqlContext.sql(q.sqlText.get)
       var failed = false
