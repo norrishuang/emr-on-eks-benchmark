@@ -31,7 +31,7 @@ class TPCDS_Iceberg(@transient sqlContext: SQLContext,catalog: String, database:
   with ImpalaKitQueries
   with SimpleQueries
   with Tpcds_1_4_Queries_for_Iceberg
-  with Tpcds_2_4_Queries
+  with Tpcds_2_4_Queries_for_Iceberg
   with Serializable {
 
   def this() = this(SparkSession.builder.getOrCreate().sqlContext, "", "")
