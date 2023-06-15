@@ -38,7 +38,7 @@ object BenchmarkSQLIceberg {
       .config("spark.sql.catalog.glue_catalog.catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog")
       .config("spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
       .config("spark.sql.ansi.enabled", "false")
-      .config("spark.sql.iceberg.handle-timestamp-without-timezone", True)
+      .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
       .getOrCreate()
 
     if (onlyWarn) {
