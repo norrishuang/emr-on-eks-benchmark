@@ -4,7 +4,7 @@
  from glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store,
      (SELECT ca_zip
        from (
-       (SELECT substr(ca_zip,1,5) ca_zip FROMglue_catalog.tpcds_iceberg.customer_address
+       (SELECT substr(ca_zip,1,5) ca_zip FROM glue_catalog.tpcds_iceberg.customer_address
           WHERE substr(ca_zip,1,5) IN (
                '24128','76232','65084','87816','83926','77556','20548',
                '26231','43848','15126','91137','61265','98294','25782',
@@ -68,7 +68,7 @@
        (select ca_zip
           FROM
             (SELECT substr(ca_zip,1,5) ca_zip,count(*) cnt
-              FROM glue_catalog.tpcds_iceberg.customer_address, customer
+              FROM glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.customer
               WHERE ca_address_sk = c_current_addr_sk and
                     c_preferred_cust_flag='Y'
               group by ca_zip

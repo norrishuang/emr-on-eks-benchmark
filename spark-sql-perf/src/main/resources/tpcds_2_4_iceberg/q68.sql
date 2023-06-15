@@ -8,7 +8,11 @@
         sum(ss_ext_sales_price) extended_price,
         sum(ss_ext_list_price) list_price,
         sum(ss_ext_tax) extended_tax
-     from  glue_catalog.tpcds_iceberg.store_sales,  glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.household_demographics, glue_catalog.tpcds_iceberg.customer_address
+     from  glue_catalog.tpcds_iceberg.store_sales,
+           glue_catalog.tpcds_iceberg.date_dim,
+           glue_catalog.tpcds_iceberg.store,
+           glue_catalog.tpcds_iceberg.household_demographics,
+           glue_catalog.tpcds_iceberg.customer_address
      where store_sales.ss_sold_date_sk =  glue_catalog.tpcds_iceberg.date_dim.d_date_sk
         and store_sales.ss_store_sk = store.s_store_sk
         and store_sales.ss_hdemo_sk = household_demographics.hd_demo_sk

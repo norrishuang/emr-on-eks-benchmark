@@ -8,7 +8,7 @@
      ,glue_catalog.tpcds_iceberg.store
      ,glue_catalog.tpcds_iceberg.customer_demographics
      ,glue_catalog.tpcds_iceberg.household_demographics
-     ,glue_catalog.tpcds_iceberg.glue_catalog.tpcds_iceberg.customer_address
+     ,glue_catalog.tpcds_iceberg.customer_address
      ,glue_catalog.tpcds_iceberg.date_dim
  where s_store_sk = ss_store_sk
  and  ss_sold_date_sk = d_date_sk and d_year = 2001

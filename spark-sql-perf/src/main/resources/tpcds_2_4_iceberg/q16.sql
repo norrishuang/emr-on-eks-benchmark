@@ -5,7 +5,10 @@
    sum(cs_ext_ship_cost) as `total shipping cost`,
    sum(cs_net_profit) as `total net profit`
  from
-     glue_catalog.tpcds_iceberg.catalog_sales cs1, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.call_center
+     glue_catalog.tpcds_iceberg.catalog_sales cs1,
+     glue_catalog.tpcds_iceberg.date_dim,
+     glue_catalog.tpcds_iceberg.customer_address,
+     glue_catalog.tpcds_iceberg.call_center
  where
    d_date between cast ('2002-02-01' as date) and (cast('2002-02-01' as date) + interval '60' day)
  and cs1.cs_ship_date_sk = d_date_sk

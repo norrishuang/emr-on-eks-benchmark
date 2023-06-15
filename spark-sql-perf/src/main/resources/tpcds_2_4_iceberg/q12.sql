@@ -6,7 +6,9 @@
   sum(ws_ext_sales_price)*100/sum(sum(ws_ext_sales_price)) over
           (partition by i_class) as revenueratio
  from
-     glue_catalog.tpcds_iceberg.web_sales, glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.date_dim
+     glue_catalog.tpcds_iceberg.web_sales,
+     glue_catalog.tpcds_iceberg.item,
+     glue_catalog.tpcds_iceberg.date_dim
  where
 	ws_item_sk = i_item_sk
   	and i_category in ('Sports', 'Books', 'Home')
