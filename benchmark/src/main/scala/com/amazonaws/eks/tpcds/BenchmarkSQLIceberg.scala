@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT-0
 package com.amazonaws.eks.tpcds
 
-import com.databricks.spark.sql.perf.tpcds.{TPCDS, TPCDSTables}
+import com.databricks.spark.sql.perf.tpcds.{TPCDS_Iceberg, TPCDSTables}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
