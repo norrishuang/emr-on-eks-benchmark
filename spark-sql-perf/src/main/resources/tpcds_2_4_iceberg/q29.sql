@@ -9,8 +9,14 @@
     ,sum(sr_return_quantity) as store_returns_quantity
     ,sum(cs_quantity)        as catalog_sales_quantity
  from
-     glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.store_returns, glue_catalog.tpcds_iceberg.catalog_sales, glue_catalog.tpcds_iceberg.date_dim d1, glue_catalog.tpcds_iceberg.date_dim d2,
-    date_dim d3, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.item
+     glue_catalog.tpcds_iceberg.store_sales,
+     glue_catalog.tpcds_iceberg.store_returns,
+     glue_catalog.tpcds_iceberg.catalog_sales,
+     glue_catalog.tpcds_iceberg.date_dim d1,
+     glue_catalog.tpcds_iceberg.date_dim d2,
+     glue_catalog.tpcds_iceberg.date_dim d3,
+     glue_catalog.tpcds_iceberg.store,
+     glue_catalog.tpcds_iceberg.item
  where
      d1.d_moy               = 9
  and d1.d_year              = 1999

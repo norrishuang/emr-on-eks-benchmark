@@ -14,7 +14,10 @@
        ,count(cs_quantity) as catalog_sales_quantitycount ,avg(cs_quantity) as catalog_sales_quantityave
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitystdev
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitycov
- from  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.store_returns, glue_catalog.tpcds_iceberg.catalog_sales, glue_catalog.tpcds_iceberg.date_dim d1, glue_catalog.tpcds_iceberg.date_dim d2, glue_catalog.tpcds_iceberg.date_dim d3, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.item
+ from  glue_catalog.tpcds_iceberg.store_sales,
+       glue_catalog.tpcds_iceberg.store_returns,
+       glue_catalog.tpcds_iceberg.catalog_sales,
+       glue_catalog.tpcds_iceberg.date_dim d1, glue_catalog.tpcds_iceberg.date_dim d2, glue_catalog.tpcds_iceberg.date_dim d3, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.item
  where d1.d_quarter_name = '2001Q1'
    and d1.d_date_sk = ss_sold_date_sk
    and i_item_sk = ss_item_sk

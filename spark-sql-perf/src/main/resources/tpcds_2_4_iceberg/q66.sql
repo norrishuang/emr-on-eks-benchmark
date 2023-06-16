@@ -68,8 +68,10 @@
  	    ,sum(case when d_moy = 11 then ws_net_paid * ws_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then ws_net_paid * ws_quantity else 0 end) as dec_net
     from
-       glue_catalog.tpcds_iceberg.web_sales, glue_catalog.tpcds_iceberg.warehouse,
-       glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.time_dim,
+       glue_catalog.tpcds_iceberg.web_sales,
+       glue_catalog.tpcds_iceberg.warehouse,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.time_dim,
        glue_catalog.tpcds_iceberg.ship_mode
     where
       ws_warehouse_sk =  w_warehouse_sk
@@ -110,7 +112,11 @@
  	    ,sum(case when d_moy = 11 then cs_net_paid_inc_tax * cs_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then cs_net_paid_inc_tax * cs_quantity else 0 end) as dec_net
      from
-        glue_catalog.tpcds_iceberg.catalog_sales, glue_catalog.tpcds_iceberg.warehouse, glue_catalog.tpcds_iceberg.date_dim, time_dim, ship_mode
+        glue_catalog.tpcds_iceberg.catalog_sales,
+        glue_catalog.tpcds_iceberg.warehouse,
+        glue_catalog.tpcds_iceberg.date_dim,
+        glue_catalog.tpcds_iceberg.time_dim,
+        glue_catalog.tpcds_iceberg.ship_mode
      where
         cs_warehouse_sk =  w_warehouse_sk
         and cs_sold_date_sk = d_date_sk

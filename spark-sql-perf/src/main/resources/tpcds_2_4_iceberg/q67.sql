@@ -6,7 +6,10 @@
       from
          (select i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,
                  s_store_id, sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
-          from  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.item
+          from  glue_catalog.tpcds_iceberg.store_sales,
+                glue_catalog.tpcds_iceberg.date_dim,
+                glue_catalog.tpcds_iceberg.store,
+                glue_catalog.tpcds_iceberg.item
         where  ss_sold_date_sk=d_date_sk
            and ss_item_sk=i_item_sk
            and ss_store_sk = s_store_sk

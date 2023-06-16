@@ -1,7 +1,9 @@
 --q8.sql--
 
  select s_store_name, sum(ss_net_profit)
- from glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store,
+ from glue_catalog.tpcds_iceberg.store_sales,
+      glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.store,
      (SELECT ca_zip
        from (
        (SELECT substr(ca_zip,1,5) ca_zip FROM glue_catalog.tpcds_iceberg.customer_address
@@ -68,7 +70,8 @@
        (select ca_zip
           FROM
             (SELECT substr(ca_zip,1,5) ca_zip,count(*) cnt
-              FROM glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.customer
+              FROM glue_catalog.tpcds_iceberg.customer_address,
+                   glue_catalog.tpcds_iceberg.customer
               WHERE ca_address_sk = c_current_addr_sk and
                     c_preferred_cust_flag='Y'
               group by ca_zip

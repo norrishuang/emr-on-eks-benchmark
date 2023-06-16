@@ -4,10 +4,13 @@
         cc_call_center_id Call_Center, cc_name Call_Center_Name, cc_manager Manager,
         sum(cr_net_loss) Returns_Loss
  from
-     glue_catalog.tpcds_iceberg.call_center, glue_catalog.tpcds_iceberg.catalog_returns,
-         glue_catalog.tpcds_iceberg.date_dim,  glue_catalog.tpcds_iceberg.customer,
-         glue_catalog.tpcds_iceberg.customer_address,
-     glue_catalog.tpcds_iceberg.customer_demographics, glue_catalog.tpcds_iceberg.household_demographics
+     glue_catalog.tpcds_iceberg.call_center,
+     glue_catalog.tpcds_iceberg.catalog_returns,
+     glue_catalog.tpcds_iceberg.date_dim,
+     glue_catalog.tpcds_iceberg.customer,
+     glue_catalog.tpcds_iceberg.customer_address,
+     glue_catalog.tpcds_iceberg.customer_demographics,
+     glue_catalog.tpcds_iceberg.household_demographics
  where
         cr_call_center_sk        = cc_call_center_sk
  and    cr_returned_date_sk      = d_date_sk

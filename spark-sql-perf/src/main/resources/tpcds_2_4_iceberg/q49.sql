@@ -3,7 +3,7 @@
  select 'web' as channel, web.item, web.return_ratio, web.return_rank, web.currency_rank
  from (
  	select
-     glue_catalog.tpcds_iceberg.item, return_ratio, currency_ratio,
+     item, return_ratio, currency_ratio,
  	  rank() over (order by return_ratio) as return_rank,
  	  rank() over (order by currency_ratio) as currency_rank
  	from
@@ -35,7 +35,7 @@
     catalog.return_rank, catalog.currency_rank
  from (
  	select
-     glue_catalog.tpcds_iceberg.item, return_ratio, currency_ratio,
+      item, return_ratio, currency_ratio,
  	  rank() over (order by return_ratio) as return_rank,
  	  rank() over (order by currency_ratio) as currency_rank
  	from
@@ -64,11 +64,11 @@
  where (catalog.return_rank <= 10 or catalog.currency_rank <=10)
  union
  select
-    'store' as channel, glue_catalog.tpcds_iceberg.store.item, glue_catalog.tpcds_iceberg.store.return_ratio,
-    store.return_rank, glue_catalog.tpcds_iceberg.store.currency_rank
+    'store' as channel, item, store.return_ratio,
+    store.return_rank, store.currency_rank
  from (
  	select
-       glue_catalog.tpcds_iceberg.item, return_ratio, currency_ratio,
+       item, return_ratio, currency_ratio,
  	    rank() over (order by return_ratio) as return_rank,
  	    rank() over (order by currency_ratio) as currency_rank
  	from
@@ -78,7 +78,7 @@
  		,(cast(sum(coalesce(sr.sr_return_amt,0)) as decimal(15,4))/
                cast(sum(coalesce(sts.ss_net_paid,0)) as decimal(15,4) )) as currency_ratio
  		from
- 		store_sales sts left outer join store_returns sr
+            glue_catalog.tpcds_iceberg.store_sales sts left outer join glue_catalog.tpcds_iceberg.store_returns sr
  			on (sts.ss_ticket_number = sr.sr_ticket_number and sts.ss_item_sk = sr.sr_item_sk)
                 ,date_dim
  		where

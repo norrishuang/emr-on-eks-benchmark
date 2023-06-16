@@ -10,7 +10,8 @@
         sum(case when (d_day_name='Thursday') then ss_sales_price else null end) thu_sales,
         sum(case when (d_day_name='Friday') then ss_sales_price else null end) fri_sales,
         sum(case when (d_day_name='Saturday') then ss_sales_price else null end) sat_sales
- from  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim
+ from  glue_catalog.tpcds_iceberg.store_sales,
+       glue_catalog.tpcds_iceberg.date_dim
  where d_date_sk = ss_sold_date_sk
  group by d_week_seq,ss_store_sk
  )

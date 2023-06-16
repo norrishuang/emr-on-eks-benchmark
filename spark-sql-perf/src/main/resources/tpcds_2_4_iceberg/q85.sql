@@ -2,8 +2,14 @@
 
  select
     substr(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
- from  glue_catalog.tpcds_iceberg.web_sales, web_returns, web_page, customer_demographics cd1,
-      customer_demographics cd2, glue_catalog.tpcds_iceberg.customer_address,  glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.reason
+ from  glue_catalog.tpcds_iceberg.web_sales,
+       glue_catalog.tpcds_iceberg.web_returns,
+       glue_catalog.tpcds_iceberg.web_page,
+       glue_catalog.tpcds_iceberg.customer_demographics cd1,
+       glue_catalog.tpcds_iceberg.customer_demographics cd2,
+       glue_catalog.tpcds_iceberg.customer_address,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.reason
  where ws_web_page_sk = wp_web_page_sk
    and ws_item_sk = wr_item_sk
    and ws_order_number = wr_order_number

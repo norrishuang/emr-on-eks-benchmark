@@ -22,7 +22,7 @@
     and date_dim.d_year in (1999, 1999+1, 1999+2)
     and store.s_county in ('Williamson County','Williamson County','Williamson County','Williamson County',
                            'Williamson County','Williamson County','Williamson County','Williamson County')
-    group by ss_ticket_number,ss_customer_sk) dn,customer
+    group by ss_ticket_number,ss_customer_sk) dn, glue_catalog.tpcds_iceberg.customer
     where ss_customer_sk = c_customer_sk
       and cnt between 15 and 20
     order by c_last_name,c_first_name,c_salutation,c_preferred_cust_flag desc, ss_ticket_number

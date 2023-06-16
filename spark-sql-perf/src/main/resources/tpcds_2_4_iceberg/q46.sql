@@ -7,19 +7,23 @@
           ,ca_city bought_city
           ,sum(ss_coupon_amt) amt
           ,sum(ss_net_profit) profit
-    from  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.household_demographics, glue_catalog.tpcds_iceberg.customer_address
-    where store_sales.ss_sold_date_sk = date_dim.d_date_sk
-    and store_sales.ss_store_sk = store.s_store_sk
-    and store_sales.ss_hdemo_sk = household_demographics.hd_demo_sk
-    and store_sales.ss_addr_sk =glue_catalog.tpcds_iceberg.customer_address.ca_address_sk
-    and (household_demographics.hd_dep_count = 4 or
-         household_demographics.hd_vehicle_count= 3)
-    and date_dim.d_dow in (6,0)
-    and date_dim.d_year in (1999,1999+1,1999+2)
-    and store.s_city in ('Fairview','Midway','Fairview','Fairview','Fairview') 
-    group by ss_ticket_number,ss_customer_sk,ss_addr_sk,ca_city) dn,customer,customer_address current_addr
+    from  glue_catalog.tpcds_iceberg.store_sales a,
+          glue_catalog.tpcds_iceberg.date_dim b,
+          glue_catalog.tpcds_iceberg.store c,
+          glue_catalog.tpcds_iceberg.household_demographics d,
+          glue_catalog.tpcds_iceberg.customer_address e
+    where a.ss_sold_date_sk = b.d_date_sk
+    and a.ss_store_sk = c.s_store_sk
+    and a.ss_hdemo_sk = d.hd_demo_sk
+    and a.ss_addr_sk = e.ca_address_sk
+    and (d.hd_dep_count = 4 or
+         d.hd_vehicle_count= 3)
+    and b.d_dow in (6,0)
+    and b.d_year in (1999,1999+1,1999+2)
+    and c.s_city in ('Fairview','Midway','Fairview','Fairview','Fairview')
+    group by ss_ticket_number,ss_customer_sk,ss_addr_sk,ca_city) dn, glue_catalog.tpcds_iceberg.customer, glue_catalog.tpcds_iceberg.customer_address current_addr
     where ss_customer_sk = c_customer_sk
-      and customer.c_current_addr_sk = current_addr.ca_address_sk
+      and glue_catalog.tpcds_iceberg.customer.c_current_addr_sk = current_addr.ca_address_sk
       and current_addr.ca_city <> bought_city
   order by c_last_name, c_first_name, ca_city, bought_city, ss_ticket_number
   limit 100

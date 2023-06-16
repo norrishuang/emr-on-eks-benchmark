@@ -14,9 +14,9 @@
                  ws_item_sk item_sk
           from    glue_catalog.tpcds_iceberg.web_sales
          ) cs_or_ws_sales,
-          glue_catalog.tpcds_iceberg.item,
+         glue_catalog.tpcds_iceberg.item,
          glue_catalog.tpcds_iceberg.date_dim,
-         customer
+         glue_catalog.tpcds_iceberg.customer
  where   sold_date_sk = d_date_sk
          and item_sk = i_item_sk
          and i_category = 'Women'
@@ -32,7 +32,7 @@
         glue_catalog.tpcds_iceberg.store_sales,
         glue_catalog.tpcds_iceberg.customer_address,
         glue_catalog.tpcds_iceberg.store,
-        date_dim
+        glue_catalog.tpcds_iceberg.date_dim
  where  c_current_addr_sk = ca_address_sk
         and ca_county = s_county
         and ca_state = s_state

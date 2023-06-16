@@ -1,7 +1,11 @@
 --q45.sql--
 
  select ca_zip, ca_city, sum(ws_sales_price)
- from  glue_catalog.tpcds_iceberg.web_sales,  glue_catalog.tpcds_iceberg.customer, glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.item
+ from  glue_catalog.tpcds_iceberg.web_sales,
+       glue_catalog.tpcds_iceberg.customer,
+       glue_catalog.tpcds_iceberg.customer_address,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.item
  where ws_bill_customer_sk = c_customer_sk
  	and c_current_addr_sk = ca_address_sk
  	and ws_item_sk = i_item_sk

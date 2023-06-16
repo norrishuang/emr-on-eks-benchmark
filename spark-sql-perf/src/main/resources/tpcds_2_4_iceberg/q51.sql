@@ -5,7 +5,8 @@
    ws_item_sk item_sk, d_date,
    sum(sum(ws_sales_price))
        over (partition by ws_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
- from  glue_catalog.tpcds_iceberg.web_sales, glue_catalog.tpcds_iceberg.date_dim
+ from  glue_catalog.tpcds_iceberg.web_sales,
+       glue_catalog.tpcds_iceberg.date_dim
  where ws_sold_date_sk=d_date_sk
    and d_month_seq between 1200 and 1200+11
    and ws_item_sk is not NULL
@@ -15,13 +16,14 @@
    ss_item_sk item_sk, d_date,
    sum(sum(ss_sales_price))
        over (partition by ss_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
- from  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim
+ from  glue_catalog.tpcds_iceberg.store_sales,
+       glue_catalog.tpcds_iceberg.date_dim
  where ss_sold_date_sk=d_date_sk
    and d_month_seq between 1200 and 1200+11
    and ss_item_sk is not NULL
  group by ss_item_sk, d_date)
  select *
- from (select item_sk, d_date, web_sales, glue_catalog.tpcds_iceberg.store_sales
+ from (select item_sk, d_date, web_sales, store_sales
       ,max(web_sales)
           over (partition by item_sk order by d_date rows between unbounded preceding and current row) web_cumulative
       ,max(store_sales)

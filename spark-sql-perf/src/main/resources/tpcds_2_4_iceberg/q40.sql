@@ -8,10 +8,12 @@
   ,sum(case when (cast(d_date as date) >= cast('2000-03-11' as date))
  		then cs_sales_price - coalesce(cr_refunded_cash,0) else 0 end) as sales_after
  from
-   catalog_sales left outer join catalog_returns on
+     glue_catalog.tpcds_iceberg.catalog_sales left outer join glue_catalog.tpcds_iceberg.catalog_returns on
        (cs_order_number = cr_order_number
         and cs_item_sk = cr_item_sk)
-  , glue_catalog.tpcds_iceberg.warehouse,  glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.date_dim
+  , glue_catalog.tpcds_iceberg.warehouse,
+    glue_catalog.tpcds_iceberg.item,
+    glue_catalog.tpcds_iceberg.date_dim
  where
      i_current_price between 0.99 and 1.49
  and i_item_sk          = cs_item_sk

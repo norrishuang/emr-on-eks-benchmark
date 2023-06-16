@@ -2,7 +2,9 @@
 
 select i_brand_id brand_id, i_brand brand,
  	sum(ss_ext_sales_price) ext_price
- from glue_catalog.tpcds_iceberg.date_dim,  glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.item
+ from glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.store_sales,
+      glue_catalog.tpcds_iceberg.item
  where d_date_sk = ss_sold_date_sk
  	and ss_item_sk = i_item_sk
  	and i_manager_id=28

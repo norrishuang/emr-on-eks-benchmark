@@ -4,18 +4,21 @@
     c_last_name, c_first_name, c_salutation, c_preferred_cust_flag,
     ss_ticket_number, cnt from
    (select ss_ticket_number, ss_customer_sk, count(*) cnt
-    from  glue_catalog.tpcds_iceberg.store_sales,date_dim,store,household_demographics
-    where store_sales.ss_sold_date_sk =  glue_catalog.tpcds_iceberg.date_dim.d_date_sk
-    and store_sales.ss_store_sk = store.s_store_sk
-    and store_sales.ss_hdemo_sk = household_demographics.hd_demo_sk
-    and  glue_catalog.tpcds_iceberg.date_dim.d_dom between 1 and 2
-    and (household_demographics.hd_buy_potential = '>10000' or
-         household_demographics.hd_buy_potential = 'unknown')
-    and household_demographics.hd_vehicle_count > 0
-    and case when household_demographics.hd_vehicle_count > 0 then
-             household_demographics.hd_dep_count/ household_demographics.hd_vehicle_count else null end > 1
-    and  glue_catalog.tpcds_iceberg.date_dim.d_year in (1999,1999+1,1999+2)
-    and store.s_county in ('Williamson County','Franklin Parish','Bronx County','Orange County')
+    from  glue_catalog.tpcds_iceberg.store_sales a,
+          glue_catalog.tpcds_iceberg.date_dim b,
+          glue_catalog.tpcds_iceberg.store c,
+          glue_catalog.tpcds_iceberg.household_demographics d
+    where a.ss_sold_date_sk =  b.d_date_sk
+    and a.ss_store_sk = c.s_store_sk
+    and a.ss_hdemo_sk = d.hd_demo_sk
+    and  b.d_dom between 1 and 2
+    and (d.hd_buy_potential = '>10000' or
+         d.hd_buy_potential = 'unknown')
+    and d.hd_vehicle_count > 0
+    and case when d.hd_vehicle_count > 0 then
+             d.hd_dep_count/ d.hd_vehicle_count else null end > 1
+    and b.d_year in (1999,1999+1,1999+2)
+    and c.s_county in ('Williamson County','Franklin Parish','Bronx County','Orange County')
     group by ss_ticket_number,ss_customer_sk) dj,customer
     where ss_customer_sk = c_customer_sk
       and cnt between 1 and 5

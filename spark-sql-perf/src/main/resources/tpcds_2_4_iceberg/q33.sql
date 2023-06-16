@@ -4,7 +4,10 @@
     select
         i_manufact_id,sum(ss_ext_sales_price) total_sales
     from
- 	       glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.item
+ 	       glue_catalog.tpcds_iceberg.store_sales,
+ 	       glue_catalog.tpcds_iceberg.date_dim,
+ 	       glue_catalog.tpcds_iceberg.customer_address,
+ 	       glue_catalog.tpcds_iceberg.item
     where
         i_manufact_id in (select i_manufact_id
                           from item
@@ -17,7 +20,10 @@
                             and ca_gmt_offset = -5
                           group by i_manufact_id), cs as
          (select i_manufact_id, sum(cs_ext_sales_price) total_sales
-          from glue_catalog.tpcds_iceberg.catalog_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.item
+          from glue_catalog.tpcds_iceberg.catalog_sales,
+               glue_catalog.tpcds_iceberg.date_dim,
+               glue_catalog.tpcds_iceberg.customer_address,
+               glue_catalog.tpcds_iceberg.item
           where
             i_manufact_id in (
                 select i_manufact_id from item
@@ -33,7 +39,10 @@
  ws as (
  select i_manufact_id,sum(ws_ext_sales_price) total_sales
  from
- 	   glue_catalog.tpcds_iceberg.web_sales, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.item
+ 	   glue_catalog.tpcds_iceberg.web_sales,
+ 	   glue_catalog.tpcds_iceberg.date_dim,
+ 	   glue_catalog.tpcds_iceberg.customer_address,
+ 	   glue_catalog.tpcds_iceberg.item
  where
     i_manufact_id in (select i_manufact_id from item
                       where i_category in ('Electronics'))

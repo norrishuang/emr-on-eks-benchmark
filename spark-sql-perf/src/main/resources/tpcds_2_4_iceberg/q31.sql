@@ -2,13 +2,17 @@
 
  with ss as
  (select ca_county,d_qoy, d_year,sum(ss_ext_sales_price) as store_sales
- from  glue_catalog.tpcds_iceberg.store_sales,glue_catalog.tpcds_iceberg.date_dim,glue_catalog.tpcds_iceberg.customer_address
+ from  glue_catalog.tpcds_iceberg.store_sales,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.customer_address
  where ss_sold_date_sk = d_date_sk
   and ss_addr_sk=ca_address_sk
  group by ca_county,d_qoy, d_year),
  ws as
  (select ca_county,d_qoy, d_year,sum(ws_ext_sales_price) as web_sales
- from  glue_catalog.tpcds_iceberg.web_sales,glue_catalog.tpcds_iceberg.date_dim,glue_catalog.tpcds_iceberg.customer_address
+ from  glue_catalog.tpcds_iceberg.web_sales,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.customer_address
  where ws_sold_date_sk = d_date_sk
   and ws_bill_addr_sk=ca_address_sk
  group by ca_county,d_qoy, d_year)

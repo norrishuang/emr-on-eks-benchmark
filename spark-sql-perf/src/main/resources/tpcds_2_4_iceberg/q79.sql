@@ -8,16 +8,19 @@
           ,store.s_city
           ,sum(ss_coupon_amt) amt
           ,sum(ss_net_profit) profit
-    from  glue_catalog.tpcds_iceberg.store_sales,date_dim,store,household_demographics
-    where store_sales.ss_sold_date_sk =  glue_catalog.tpcds_iceberg.date_dim.d_date_sk
-    and store_sales.ss_store_sk = store.s_store_sk
-    and store_sales.ss_hdemo_sk = household_demographics.hd_demo_sk
-    and (household_demographics.hd_dep_count = 6 or
-        household_demographics.hd_vehicle_count > 2)
-    and  glue_catalog.tpcds_iceberg.date_dim.d_dow = 1
-    and  glue_catalog.tpcds_iceberg.date_dim.d_year in (1999,1999+1,1999+2)
-    and store.s_number_employees between 200 and 295
-    group by ss_ticket_number,ss_customer_sk,ss_addr_sk,store.s_city) ms,customer
+    from  glue_catalog.tpcds_iceberg.store_sales a,
+          glue_catalog.tpcds_iceberg.date_dim b,
+          glue_catalog.tpcds_iceberg.store c,
+          glue_catalog.tpcds_iceberg.household_demographics d
+    where a.ss_sold_date_sk =  b.d_date_sk
+    and a.ss_store_sk = c.s_store_sk
+    and a.ss_hdemo_sk = d.hd_demo_sk
+    and (d.hd_dep_count = 6 or
+        d.hd_vehicle_count > 2)
+    and b.date_dim.d_dow = 1
+    and b.date_dim.d_year in (1999,1999+1,1999+2)
+    and c.s_number_employees between 200 and 295
+    group by ss_ticket_number, ss_customer_sk, ss_addr_sk, c.s_city) ms, glue_catalog.tpcds_iceberg.customer
     where ss_customer_sk = c_customer_sk
  order by c_last_name,c_first_name,substr(s_city,1,30), profit
  limit 100

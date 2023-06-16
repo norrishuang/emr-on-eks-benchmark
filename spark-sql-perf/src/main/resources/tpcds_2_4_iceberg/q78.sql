@@ -19,7 +19,7 @@
      sum(cs_wholesale_cost) cs_wc,
      sum(cs_sales_price) cs_sp
     from glue_catalog.tpcds_iceberg.catalog_sales
-    left join catalog_returns on cr_order_number=cs_order_number and cs_item_sk=cr_item_sk
+    left join glue_catalog.tpcds_iceberg.catalog_returns on cr_order_number=cs_order_number and cs_item_sk=cr_item_sk
     join  glue_catalog.tpcds_iceberg.date_dim on cs_sold_date_sk = d_date_sk
     where cr_order_number is null
     group by d_year, cs_item_sk, cs_bill_customer_sk

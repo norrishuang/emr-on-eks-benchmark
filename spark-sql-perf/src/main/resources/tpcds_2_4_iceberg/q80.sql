@@ -7,7 +7,10 @@
           sum(ss_net_profit - coalesce(sr_net_loss, 0)) as profit
   from store_sales left outer join store_returns on
          (ss_item_sk = sr_item_sk and ss_ticket_number = sr_ticket_number),
-      glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store,  glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.promotion
+      glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.store,
+      glue_catalog.tpcds_iceberg.item,
+      glue_catalog.tpcds_iceberg.promotion
  where ss_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)
@@ -24,7 +27,10 @@
           sum(cs_net_profit - coalesce(cr_net_loss, 0)) as profit
   from catalog_sales left outer join catalog_returns on
          (cs_item_sk = cr_item_sk and cs_order_number = cr_order_number),
-      glue_catalog.tpcds_iceberg.date_dim, catalog_page,  glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.promotion
+      glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.catalog_page,
+      glue_catalog.tpcds_iceberg.item,
+      glue_catalog.tpcds_iceberg.promotion
  where cs_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)
@@ -39,9 +45,12 @@
           sum(ws_ext_sales_price) as sales,
           sum(coalesce(wr_return_amt, 0)) as returns,
           sum(ws_net_profit - coalesce(wr_net_loss, 0)) as profit
-  from  glue_catalog.tpcds_iceberg.web_sales left outer join web_returns on
+  from  glue_catalog.tpcds_iceberg.web_sales left outer join glue_catalog.tpcds_iceberg.web_returns on
          (ws_item_sk = wr_item_sk and ws_order_number = wr_order_number),
-      glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.web_site, glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.promotion
+      glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.web_site,
+      glue_catalog.tpcds_iceberg.item,
+      glue_catalog.tpcds_iceberg.promotion
  where ws_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)

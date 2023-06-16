@@ -1,8 +1,10 @@
 --q15.sql--
 
  select ca_zip, sum(cs_sales_price)
- from glue_catalog.tpcds_iceberg.catalog_sales,  glue_catalog.tpcds_iceberg.customer,
-      glue_catalog.tpcds_iceberg.customer_address, glue_catalog.tpcds_iceberg.date_dim
+ from glue_catalog.tpcds_iceberg.catalog_sales,
+      glue_catalog.tpcds_iceberg.customer,
+      glue_catalog.tpcds_iceberg.customer_address,
+      glue_catalog.tpcds_iceberg.date_dim
  where cs_bill_customer_sk = c_customer_sk
  	and c_current_addr_sk = ca_address_sk
  	and ( substr(ca_zip,1,5) in ('85669', '86197','88274','83405','86475',

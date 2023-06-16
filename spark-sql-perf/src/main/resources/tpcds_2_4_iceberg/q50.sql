@@ -12,7 +12,11 @@
                   (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
    ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
  from
-     glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.store_returns, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.date_dim d1, glue_catalog.tpcds_iceberg.date_dim d2
+     glue_catalog.tpcds_iceberg.store_sales,
+     glue_catalog.tpcds_iceberg.store_returns,
+     glue_catalog.tpcds_iceberg.store,
+     glue_catalog.tpcds_iceberg.date_dim d1,
+     glue_catalog.tpcds_iceberg.date_dim d2
  where
      d2.d_year = 2001
  and d2.d_moy  = 8

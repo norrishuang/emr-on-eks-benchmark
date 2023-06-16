@@ -22,7 +22,8 @@
            sr_return_amt as return_amt,
            sr_net_loss as net_loss
     FROM glue_catalog.tpcds_iceberg.store_returns)
-    salesreturns, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.store
+    salesreturns, glue_catalog.tpcds_iceberg.date_dim,
+                  glue_catalog.tpcds_iceberg.store
   WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))
@@ -50,7 +51,8 @@
            cr_return_amount as return_amt,
            cr_net_loss as net_loss
     from glue_catalog.tpcds_iceberg.catalog_returns
-   ) salesreturns, glue_catalog.tpcds_iceberg.date_dim, catalog_page
+   ) salesreturns, glue_catalog.tpcds_iceberg.date_dim,
+                   glue_catalog.tpcds_iceberg.catalog_page
  WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))
@@ -81,7 +83,8 @@
     FROM glue_catalog.tpcds_iceberg.web_returns LEFT  OUTER JOIN glue_catalog.tpcds_iceberg.web_sales on
          ( wr_item_sk = ws_item_sk
            and wr_order_number = ws_order_number)
-   ) salesreturns, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.web_site
+   ) salesreturns, glue_catalog.tpcds_iceberg.date_dim,
+                   glue_catalog.tpcds_iceberg.web_site
  WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))

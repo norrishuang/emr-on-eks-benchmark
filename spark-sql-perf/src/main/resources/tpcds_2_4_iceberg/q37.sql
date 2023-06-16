@@ -1,7 +1,10 @@
 --q37.sql--
 
  select i_item_id, i_item_desc, i_current_price
- from  glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.inventory, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.catalog_sales
+ from  glue_catalog.tpcds_iceberg.item,
+       glue_catalog.tpcds_iceberg.inventory,
+       glue_catalog.tpcds_iceberg.date_dim,
+       glue_catalog.tpcds_iceberg.catalog_sales
  where i_current_price between 68 and 68 + 30
    and inv_item_sk = i_item_sk
    and d_date_sk=inv_date_sk

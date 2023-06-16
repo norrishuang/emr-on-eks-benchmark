@@ -5,7 +5,11 @@
         avg(ss_list_price) agg2,
         avg(ss_coupon_amt) agg3,
         avg(ss_sales_price) agg4
- FROM glue_catalog.tpcds_iceberg.store_sales, glue_catalog.tpcds_iceberg.customer_demographics, glue_catalog.tpcds_iceberg.date_dim, glue_catalog.tpcds_iceberg.item, glue_catalog.tpcds_iceberg.promotion
+ FROM glue_catalog.tpcds_iceberg.store_sales,
+      glue_catalog.tpcds_iceberg.customer_demographics,
+      glue_catalog.tpcds_iceberg.date_dim,
+      glue_catalog.tpcds_iceberg.item,
+      glue_catalog.tpcds_iceberg.promotion
  WHERE ss_sold_date_sk = d_date_sk AND
        ss_item_sk = i_item_sk AND
        ss_cdemo_sk = cd_demo_sk AND

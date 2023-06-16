@@ -24,7 +24,7 @@
         and store.s_city in ('Midway','Fairview')
      group by ss_ticket_number, ss_customer_sk, ss_addr_sk,ca_city) dn,
      glue_catalog.tpcds_iceberg.customer,
-    customer_address current_addr
+     glue_catalog.tpcds_iceberg.customer_address current_addr
  where ss_customer_sk = c_customer_sk
    and customer.c_current_addr_sk = current_addr.ca_address_sk
    and current_addr.ca_city <> bought_city
