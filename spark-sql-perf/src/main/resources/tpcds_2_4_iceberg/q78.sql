@@ -31,7 +31,7 @@
      sum(ss_wholesale_cost) ss_wc,
      sum(ss_sales_price) ss_sp
     from glue_catalog.tpcds_iceberg.store_sales
-    left join store_returns on sr_ticket_number=ss_ticket_number and ss_item_sk=sr_item_sk
+    left join glue_catalog.tpcds_iceberg.store_returns on sr_ticket_number=ss_ticket_number and ss_item_sk=sr_item_sk
     join  glue_catalog.tpcds_iceberg.date_dim on ss_sold_date_sk = d_date_sk
     where sr_ticket_number is null
     group by d_year, ss_item_sk, ss_customer_sk

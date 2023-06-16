@@ -25,7 +25,7 @@
           sum(cs_ext_sales_price) as sales,
           sum(coalesce(cr_return_amount, 0)) as returns,
           sum(cs_net_profit - coalesce(cr_net_loss, 0)) as profit
-  from catalog_sales left outer join catalog_returns on
+  from glue_catalog.tpcds_iceberg.catalog_sales left outer join glue_catalog.tpcds_iceberg.catalog_returns on
          (cs_item_sk = cr_item_sk and cs_order_number = cr_order_number),
       glue_catalog.tpcds_iceberg.date_dim,
       glue_catalog.tpcds_iceberg.catalog_page,

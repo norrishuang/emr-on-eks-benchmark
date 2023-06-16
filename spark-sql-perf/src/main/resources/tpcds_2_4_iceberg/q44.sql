@@ -25,7 +25,7 @@
                                                     and ss_addr_sk is null
                                                   group by ss_store_sk))V2)V21
      where rnk  < 11) descending,
- item i1, glue_catalog.tpcds_iceberg.item i2
+     glue_catalog.tpcds_iceberg.item i1, glue_catalog.tpcds_iceberg.item i2
  where asceding.rnk = descending.rnk
    and i1.i_item_sk=asceding.item_sk
    and i2.i_item_sk=descending.item_sk

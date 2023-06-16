@@ -29,7 +29,7 @@
         glue_catalog.tpcds_iceberg.household_demographics hd2,
         glue_catalog.tpcds_iceberg.customer_address ad1,
         glue_catalog.tpcds_iceberg.customer_address ad2,
-        income_band ib1, income_band ib2,
+        glue_catalog.tpcds_iceberg.income_band ib1,glue_catalog.tpcds_iceberg.income_band ib2,
         glue_catalog.tpcds_iceberg.item
    WHERE  ss_store_sk = s_store_sk AND
           ss_sold_date_sk = d1.d_date_sk AND

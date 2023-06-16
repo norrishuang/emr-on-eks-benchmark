@@ -5,7 +5,7 @@
   from
    (select ss_ticket_number
           ,ss_customer_sk
-          ,store.s_city
+          ,c.s_city
           ,sum(ss_coupon_amt) amt
           ,sum(ss_net_profit) profit
     from  glue_catalog.tpcds_iceberg.store_sales a,

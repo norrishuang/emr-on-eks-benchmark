@@ -32,7 +32,7 @@
             ws_quantity - COALESCE(wr_return_quantity,0) AS sales_cnt,
             ws_ext_sales_price - COALESCE(wr_return_amt,0.0) AS sales_amt
         FROM  glue_catalog.tpcds_iceberg.web_sales
-        JOIN item ON i_item_sk=ws_item_sk
+        JOIN  glue_catalog.tpcds_iceberg.item ON i_item_sk=ws_item_sk
         JOIN  glue_catalog.tpcds_iceberg.date_dim ON d_date_sk=ws_sold_date_sk
         LEFT JOIN glue_catalog.tpcds_iceberg.web_returns ON (ws_order_number=wr_order_number
                                   AND ws_item_sk=wr_item_sk)

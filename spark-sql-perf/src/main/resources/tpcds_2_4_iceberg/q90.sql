@@ -17,7 +17,7 @@
              glue_catalog.tpcds_iceberg.household_demographics b2,
              glue_catalog.tpcds_iceberg.time_dim c2,
              glue_catalog.tpcds_iceberg.web_page d2
-       where ws_sold_time_sk = time_dim.t_time_sk
+       where ws_sold_time_sk = c2.t_time_sk
          and ws_ship_hdemo_sk = b2.hd_demo_sk
          and ws_web_page_sk = d2.wp_web_page_sk
          and c2.t_hour between 19 and 19+1

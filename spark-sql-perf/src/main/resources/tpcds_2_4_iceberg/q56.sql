@@ -40,7 +40,7 @@
  	   glue_catalog.tpcds_iceberg.customer_address,
  	   glue_catalog.tpcds_iceberg.item
  where
-    i_item_id in (select i_item_id from item where i_color in ('slate','blanched','burnished'))
+    i_item_id in (select i_item_id from glue_catalog.tpcds_iceberg.item where i_color in ('slate','blanched','burnished'))
  and     ws_item_sk              = i_item_sk
  and     ws_sold_date_sk         = d_date_sk
  and     d_year                  = 2001 

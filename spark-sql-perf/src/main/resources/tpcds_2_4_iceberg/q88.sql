@@ -49,7 +49,7 @@
        glue_catalog.tpcds_iceberg.household_demographics b2,
        glue_catalog.tpcds_iceberg.time_dim c2,
        glue_catalog.tpcds_iceberg.store d2
- where ss_sold_time_sk = time_dim.t_time_sk
+ where ss_sold_time_sk = c2.t_time_sk
      and ss_hdemo_sk = b2.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 10
