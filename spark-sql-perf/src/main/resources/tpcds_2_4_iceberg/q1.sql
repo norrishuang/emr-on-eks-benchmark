@@ -7,7 +7,9 @@
     WHERE sr_returned_date_sk = d_date_sk AND d_year = 2000
     GROUP BY sr_customer_sk, sr_store_sk)
  SELECT c_customer_id
-   FROM customer_total_return ctr1, glue_catalog.tpcds_iceberg.store, customer
+   FROM customer_total_return ctr1,
+        glue_catalog.tpcds_iceberg.store,
+        glue_catalog.tpcds_iceberg.customer
    WHERE ctr1.ctr_total_return >
     (SELECT avg(ctr_total_return)*1.2
       FROM customer_total_return ctr2
