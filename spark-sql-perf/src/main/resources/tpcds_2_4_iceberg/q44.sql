@@ -20,7 +20,7 @@
                  where ss_store_sk = 4
                  group by ss_item_sk
                  having avg(ss_net_profit) > 0.9*(select avg(ss_net_profit) rank_col
-                                                  from store_sales
+                                                  from glue_catalog.tpcds_iceberg.store_sales
                                                   where ss_store_sk = 4
                                                     and ss_addr_sk is null
                                                   group by ss_store_sk))V2)V21

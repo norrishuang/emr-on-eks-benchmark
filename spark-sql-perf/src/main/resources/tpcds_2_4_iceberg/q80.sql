@@ -5,7 +5,7 @@
           sum(ss_ext_sales_price) as sales,
           sum(coalesce(sr_return_amt, 0)) as returns,
           sum(ss_net_profit - coalesce(sr_net_loss, 0)) as profit
-  from store_sales left outer join store_returns on
+  from glue_catalog.tpcds_iceberg.store_sales left outer join glue_catalog.tpcds_iceberg.store_returns on
          (ss_item_sk = sr_item_sk and ss_ticket_number = sr_ticket_number),
       glue_catalog.tpcds_iceberg.date_dim,
       glue_catalog.tpcds_iceberg.store,

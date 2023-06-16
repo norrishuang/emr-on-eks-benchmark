@@ -7,7 +7,7 @@
           glue_catalog.tpcds_iceberg.customer_address,
           glue_catalog.tpcds_iceberg.item
     where
-        i_item_id in (select i_item_id from item where i_category in ('Music'))
+        i_item_id in (select i_item_id from glue_catalog.tpcds_iceberg.item where i_category in ('Music'))
     and     ss_item_sk              = i_item_sk
     and     ss_sold_date_sk         = d_date_sk
     and     d_year                  = 1998
@@ -22,7 +22,7 @@
          glue_catalog.tpcds_iceberg.customer_address,
          glue_catalog.tpcds_iceberg.item
     where
-        i_item_id in (select i_item_id from item where i_category in ('Music'))
+        i_item_id in (select i_item_id from glue_catalog.tpcds_iceberg.item where i_category in ('Music'))
     and     cs_item_sk              = i_item_sk
     and     cs_sold_date_sk         = d_date_sk
     and     d_year                  = 1998

@@ -30,7 +30,7 @@
  group by cs_call_center_sk),
  cr as
  (select cr_call_center_sk, sum(cr_return_amount) as returns, sum(cr_net_loss) as profit_loss
- from catalog_returns,  glue_catalog.tpcds_iceberg.date_dim
+ from glue_catalog.tpcds_iceberg.catalog_returns, glue_catalog.tpcds_iceberg.date_dim
  where cr_returned_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)

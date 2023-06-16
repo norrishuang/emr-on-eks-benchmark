@@ -22,7 +22,7 @@
              where ws1.ws_order_number = ws2.ws_order_number
                and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  and not exists(select *
-                from web_returns wr1
+                from glue_catalog.tpcds_iceberg.web_returns wr1
                 where ws1.ws_order_number = wr1.wr_order_number)
  order by count(distinct ws_order_number)
  limit 100

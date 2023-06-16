@@ -16,7 +16,7 @@
  		  glue_catalog.tpcds_iceberg.web_sales ws left outer join glue_catalog.tpcds_iceberg.web_returns wr
  			on (ws.ws_order_number = wr.wr_order_number and
  			ws.ws_item_sk = wr.wr_item_sk)
-        ,date_dim
+        ,glue_catalog.tpcds_iceberg.date_dim
  		where
  			wr.wr_return_amt > 10000
  			and ws.ws_net_profit > 1
@@ -49,7 +49,7 @@
             glue_catalog.tpcds_iceberg.catalog_sales cs left outer join glue_catalog.tpcds_iceberg.catalog_returns cr
  			on (cs.cs_order_number = cr.cr_order_number and
  			cs.cs_item_sk = cr.cr_item_sk)
-                ,date_dim
+                ,glue_catalog.tpcds_iceberg.date_dim
  		where
  			cr.cr_return_amount > 10000
  			and cs.cs_net_profit > 1
@@ -80,7 +80,7 @@
  		from
             glue_catalog.tpcds_iceberg.store_sales sts left outer join glue_catalog.tpcds_iceberg.store_returns sr
  			on (sts.ss_ticket_number = sr.sr_ticket_number and sts.ss_item_sk = sr.sr_item_sk)
-                ,date_dim
+                ,glue_catalog.tpcds_iceberg.date_dim
  		where
  			sr.sr_return_amt > 10000
  			and sts.ss_net_profit > 1

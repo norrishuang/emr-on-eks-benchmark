@@ -6,7 +6,7 @@ select case when (select count(*) from glue_catalog.tpcds_iceberg.store_sales
                   where ss_quantity between 1 and 20)
             else (select avg(ss_net_paid) from glue_catalog.tpcds_iceberg.store_sales
                   where ss_quantity between 1 and 20) end bucket1 ,
-       case when (select count(*) from store_sales
+       case when (select count(*) from glue_catalog.tpcds_iceberg.store_sales
                   where ss_quantity between 21 and 40) > 122840
             then (select avg(ss_ext_discount_amt) from glue_catalog.tpcds_iceberg.store_sales
                   where ss_quantity between 21 and 40)

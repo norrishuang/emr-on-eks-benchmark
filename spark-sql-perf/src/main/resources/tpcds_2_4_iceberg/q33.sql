@@ -26,7 +26,7 @@
                glue_catalog.tpcds_iceberg.item
           where
             i_manufact_id in (
-                select i_manufact_id from item
+                select i_manufact_id from glue_catalog.tpcds_iceberg.item
                 where
                     i_category in ('Electronics'))
                     and cs_item_sk = i_item_sk
@@ -44,7 +44,7 @@
  	   glue_catalog.tpcds_iceberg.customer_address,
  	   glue_catalog.tpcds_iceberg.item
  where
-    i_manufact_id in (select i_manufact_id from item
+    i_manufact_id in (select i_manufact_id from glue_catalog.tpcds_iceberg.item
                       where i_category in ('Electronics'))
                           and ws_item_sk = i_item_sk
                           and ws_sold_date_sk = d_date_sk

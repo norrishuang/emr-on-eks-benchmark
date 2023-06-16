@@ -7,7 +7,7 @@
           glue_catalog.tpcds_iceberg.household_demographics b,
           glue_catalog.tpcds_iceberg.time_dim c,
           glue_catalog.tpcds_iceberg.store d
-    where ss_sold_time_sk = time_dim.t_time_sk
+    where ss_sold_time_sk = c.t_time_sk
      and ss_hdemo_sk = b.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 8
@@ -35,7 +35,7 @@
        glue_catalog.tpcds_iceberg.household_demographics b1,
        glue_catalog.tpcds_iceberg.time_dim c1,
        glue_catalog.tpcds_iceberg.store d1
- where ss_sold_time_sk = time_dim.t_time_sk
+ where ss_sold_time_sk = c1.t_time_sk
      and ss_hdemo_sk = b1.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 9
@@ -63,7 +63,7 @@
        glue_catalog.tpcds_iceberg.household_demographics b3,
        glue_catalog.tpcds_iceberg.time_dim c3,
        glue_catalog.tpcds_iceberg.store d3
- where ss_sold_time_sk = time_dim.t_time_sk
+ where ss_sold_time_sk = c3.t_time_sk
      and ss_hdemo_sk = b3.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 10
@@ -91,7 +91,7 @@
        glue_catalog.tpcds_iceberg.household_demographics b5,
        glue_catalog.tpcds_iceberg.time_dim c5,
        glue_catalog.tpcds_iceberg.store d5
- where ss_sold_time_sk = time_dim.t_time_sk
+ where ss_sold_time_sk = c5.t_time_sk
      and ss_hdemo_sk = b5.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 11
@@ -105,7 +105,7 @@
        glue_catalog.tpcds_iceberg.household_demographics b6,
        glue_catalog.tpcds_iceberg.time_dim c6,
        glue_catalog.tpcds_iceberg.store  d6
- where ss_sold_time_sk = time_dim.t_time_sk
+ where ss_sold_time_sk = c6.t_time_sk
      and ss_hdemo_sk = b6.hd_demo_sk
      and ss_store_sk = s_store_sk
      and time_dim.t_hour = 12

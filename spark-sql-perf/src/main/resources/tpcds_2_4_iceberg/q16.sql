@@ -17,7 +17,7 @@
  and cs1.cs_call_center_sk = cc_call_center_sk
  and cc_county in ('Williamson County','Williamson County','Williamson County','Williamson County', 'Williamson County') 
  and exists (select *
-            from catalog_sales cs2
+            from glue_catalog.tpcds_iceberg.catalog_sales cs2
             where cs1.cs_order_number = cs2.cs_order_number
               and cs1.cs_warehouse_sk <> cs2.cs_warehouse_sk)
  and not exists(select *

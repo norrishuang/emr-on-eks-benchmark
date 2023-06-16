@@ -34,7 +34,7 @@
         FROM  glue_catalog.tpcds_iceberg.web_sales
         JOIN item ON i_item_sk=ws_item_sk
         JOIN  glue_catalog.tpcds_iceberg.date_dim ON d_date_sk=ws_sold_date_sk
-        LEFT JOIN web_returns ON (ws_order_number=wr_order_number
+        LEFT JOIN glue_catalog.tpcds_iceberg.web_returns ON (ws_order_number=wr_order_number
                                   AND ws_item_sk=wr_item_sk)
         WHERE i_category='Books') sales_detail
     GROUP BY d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id)

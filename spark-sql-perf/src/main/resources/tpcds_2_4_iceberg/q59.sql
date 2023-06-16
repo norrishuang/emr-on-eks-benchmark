@@ -25,7 +25,7 @@
         ,mon_sales mon_sales1,tue_sales tue_sales1
         ,wed_sales wed_sales1,thu_sales thu_sales1
         ,fri_sales fri_sales1,sat_sales sat_sales1
-  from wss, glue_catalog.tpcds_iceberg.store,date_dim d
+  from wss, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.date_dim d
   where d.d_week_seq = wss.d_week_seq and
         ss_store_sk = s_store_sk and
         d_month_seq between 1212 and 1212 + 11) y,
@@ -34,7 +34,7 @@
         ,mon_sales mon_sales2,tue_sales tue_sales2
         ,wed_sales wed_sales2,thu_sales thu_sales2
         ,fri_sales fri_sales2,sat_sales sat_sales2
-  from wss, glue_catalog.tpcds_iceberg.store,date_dim d
+  from wss, glue_catalog.tpcds_iceberg.store, glue_catalog.tpcds_iceberg.date_dim d
   where d.d_week_seq = wss.d_week_seq and
         ss_store_sk = s_store_sk and
         d_month_seq between 1212+ 12 and 1212 + 23) x

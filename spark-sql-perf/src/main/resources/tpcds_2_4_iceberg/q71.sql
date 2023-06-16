@@ -35,7 +35,7 @@
      where d_date_sk = ss_sold_date_sk
         and d_moy=11
         and d_year=1999
-     ) tmp, time_dim
+     ) tmp, glue_catalog.tpcds_iceberg.time_dim
  where
    sold_item_sk = i_item_sk
    and i_manager_id=1
