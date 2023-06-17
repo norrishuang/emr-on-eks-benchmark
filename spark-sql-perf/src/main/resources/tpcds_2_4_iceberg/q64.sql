@@ -16,21 +16,22 @@
           ad2.ca_city c_city, ad2.ca_zip c_zip, d1.d_year as syear, d2.d_year as fsyear, d3.d_year s2year,
           count(*) cnt, sum(ss_wholesale_cost) s1, sum(ss_list_price) s2, sum(ss_coupon_amt) s3
    FROM  glue_catalog.tpcds_iceberg.store_sales,
-         glue_catalog.tpcds_iceberg.store_returns cs_ui,
+         glue_catalog.tpcds_iceberg.store_returns,
+         cs_ui,
          glue_catalog.tpcds_iceberg.date_dim d1,
          glue_catalog.tpcds_iceberg.date_dim d2,
          glue_catalog.tpcds_iceberg.date_dim d3,
-        glue_catalog.tpcds_iceberg.store,
-        glue_catalog.tpcds_iceberg.customer,
-        customer_demographics cd1,
-        customer_demographics cd2,
-        glue_catalog.tpcds_iceberg.promotion,
-        glue_catalog.tpcds_iceberg.household_demographics hd1,
-        glue_catalog.tpcds_iceberg.household_demographics hd2,
-        glue_catalog.tpcds_iceberg.customer_address ad1,
-        glue_catalog.tpcds_iceberg.customer_address ad2,
-        glue_catalog.tpcds_iceberg.income_band ib1,glue_catalog.tpcds_iceberg.income_band ib2,
-        glue_catalog.tpcds_iceberg.item
+         glue_catalog.tpcds_iceberg.store,
+         glue_catalog.tpcds_iceberg.customer,
+         glue_catalog.tpcds_iceberg.customer_demographics cd1,
+         glue_catalog.tpcds_iceberg.customer_demographics cd2,
+            glue_catalog.tpcds_iceberg.promotion,
+            glue_catalog.tpcds_iceberg.household_demographics hd1,
+            glue_catalog.tpcds_iceberg.household_demographics hd2,
+            glue_catalog.tpcds_iceberg.customer_address ad1,
+            glue_catalog.tpcds_iceberg.customer_address ad2,
+            glue_catalog.tpcds_iceberg.income_band ib1,glue_catalog.tpcds_iceberg.income_band ib2,
+            glue_catalog.tpcds_iceberg.item
    WHERE  ss_store_sk = s_store_sk AND
           ss_sold_date_sk = d1.d_date_sk AND
           ss_customer_sk = c_customer_sk AND
