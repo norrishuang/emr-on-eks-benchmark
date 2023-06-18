@@ -31,7 +31,7 @@ object BenchmarkSQLIceberg {
 
     val spark = SparkSession
       .builder
-      .appName(s"TPCDS SQL Benchmark $scaleFactor GB")
+      .appName(s"TPCDS SQL(Iceberg) Benchmark $scaleFactor GB")
       .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
       .config("spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog")
       .config("spark.sql.catalog.glue_catalog.warehouse", warehouse)
@@ -39,6 +39,7 @@ object BenchmarkSQLIceberg {
       .config("spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
       .config("spark.sql.ansi.enabled", "false")
       .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
+      .config("spark.sql.autoBroadcastJoinThreshold","104857600")
       .getOrCreate()
 
     if (onlyWarn) {
