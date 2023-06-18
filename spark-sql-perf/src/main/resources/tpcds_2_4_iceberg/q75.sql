@@ -23,7 +23,7 @@
         FROM glue_catalog.tpcds_iceberg.store_sales
         JOIN glue_catalog.tpcds_iceberg.item ON i_item_sk=ss_item_sk
         JOIN  glue_catalog.tpcds_iceberg.date_dim ON d_date_sk=ss_sold_date_sk
-        LEFT JOIN store_returns ON (ss_ticket_number=sr_ticket_number
+        LEFT JOIN glue_catalog.tpcds_iceberg.store_returns ON (ss_ticket_number=sr_ticket_number
                                     AND ss_item_sk=sr_item_sk)
         WHERE i_category='Books'
         UNION
