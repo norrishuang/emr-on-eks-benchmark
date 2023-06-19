@@ -47,23 +47,24 @@ object BenchmarkSQLIceberg {
       LogManager.getLogger("org").setLevel(Level.WARN)
     }
 
-    /*Iceberg 的场景下，不需要新建表*/
+
 //    val tables = new TPCDSTables(spark.sqlContext,
 //      dsdgenDir = dsdgenDir,
 //      scaleFactor = scaleFactor,
 //      useDoubleForDecimal = false,
 //      useStringForDate = false)
 //
-//    if (optimizeQueries) {
+    if (optimizeQueries) {
+      /*Iceberg 的场景下，不需要新建表*/
 //      Try {
 //        spark.sql(s"create database $databaseName")
 //      }
 //      tables.createExternalTables(tpcdsDataDir, format, databaseName, overwrite = true, discoverPartitions = true)
 //      tables.analyzeTables(databaseName, analyzeColumns = true)
-//      spark.conf.set("spark.sql.cbo.enabled", "true")
-//    } else {
+      spark.conf.set("spark.sql.cbo.enabled", "true")
+    } else {
 //      tables.createTemporaryTables(tpcdsDataDir, format)
-//    }
+    }
 
     val tpcds = new TPCDS_Iceberg(spark.sqlContext, "glue_catalog", databaseName)
 
