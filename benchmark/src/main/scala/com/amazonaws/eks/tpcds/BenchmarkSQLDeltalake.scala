@@ -29,16 +29,12 @@ object BenchmarkSQLIceberg {
 
     println(s"DATA DIR is $tpcdsDataDir")
 
-    val spark = SparkSession
-      .builder
-      .appName(s"TPCDS SQL(Iceberg) Benchmark $scaleFactor GB")
-      .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
-      .config("spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog")
-      .config("spark.sql.catalog.glue_catalog.warehouse", warehouse)
-      .config("spark.sql.catalog.glue_catalog.catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog")
-      .config("spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
-      .config("spark.sql.ansi.enabled", "false")
-      .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
+    spark = SparkSession.builder \
+      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory") \
+      .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+      .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+      .config("spark.databricks.delta.schema.autoMerge.enabled", "true") \
+      .enableHiveSupport() \
       .getOrCreate()
 
     if (onlyWarn) {
