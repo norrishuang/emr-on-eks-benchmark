@@ -24,7 +24,7 @@ object BenchmarkSQLIceberg {
     val onlyWarn = Try(args(8).toBoolean).getOrElse(false)
     val warehouse = args(9)
 
-    val databaseName = "tpcds_iceberg"
+    val databaseName = "tpcds_deltalake"
     val timeout = 24*60*60
 
     println(s"DATA DIR is $tpcdsDataDir")
@@ -41,7 +41,6 @@ object BenchmarkSQLIceberg {
       .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
       .getOrCreate()
 
-    spark.conf.set("spark.sql.cbo.enabled", "true")
     if (onlyWarn) {
       println(s"Only WARN")
       LogManager.getLogger("org").setLevel(Level.WARN)
@@ -65,7 +64,10 @@ object BenchmarkSQLIceberg {
 //      tables.createTemporaryTables(tpcdsDataDir, format)
 //    }
 
-    val tpcds = new TPCDS_Iceberg(spark.sqlContext, "glue_catalog", databaseName)
+    spark.sql(s"use $databaseName")
+    spark.conf.set("spark.sql.cbo.enabled", "true")
+
+    val tpcds = new TPCDS(spark.sqlContext, "", databaseName)
 
     var query_filter : Seq[String] = Seq()
     if (!filterQueries.isEmpty) {
