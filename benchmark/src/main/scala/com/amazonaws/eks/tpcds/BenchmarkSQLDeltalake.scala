@@ -11,7 +11,7 @@ import scala.util.Try
 
 
 
-object BenchmarkSQLIceberg {
+object BenchmarkSQLDeltalake {
   def main(args: Array[String]) {
     val tpcdsDataDir = args(0)
     val resultLocation = args(1)
