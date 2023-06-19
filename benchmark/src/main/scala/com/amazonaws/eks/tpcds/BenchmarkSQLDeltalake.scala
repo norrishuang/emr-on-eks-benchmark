@@ -29,12 +29,15 @@ object BenchmarkSQLIceberg {
 
     println(s"DATA DIR is $tpcdsDataDir")
 
-    spark = SparkSession.builder \
-      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory") \
-      .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-      .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-      .config("spark.databricks.delta.schema.autoMerge.enabled", "true") \
-      .enableHiveSupport() \
+
+    val spark = SparkSession
+      .builder
+      .appName(s"TPCDS SQL(Deltalake) Benchmark $scaleFactor GB")
+      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+      .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+      .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+      .config("spark.databricks.delta.schema.autoMerge.enabled", "true")
+      .enableHiveSupport()
       .getOrCreate()
 
     if (onlyWarn) {
