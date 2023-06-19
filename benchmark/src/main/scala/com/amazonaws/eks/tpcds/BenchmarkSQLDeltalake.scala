@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT-0
 package com.amazonaws.eks.tpcds
 
-import com.databricks.spark.sql.perf.tpcds.{TPCDS_Iceberg, TPCDSTables}
+import com.databricks.spark.sql.perf.tpcds.{TPCDS, TPCDSTables}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.col
@@ -66,7 +66,7 @@ object BenchmarkSQLDeltalake {
     spark.sql(s"use $databaseName")
     spark.conf.set("spark.sql.cbo.enabled", "true")
 
-    val tpcds = new TPCDS(spark.sqlContext, "", databaseName)
+    val tpcds = new TPCDS(spark.sqlContext)
 
     var query_filter : Seq[String] = Seq()
     if (!filterQueries.isEmpty) {
