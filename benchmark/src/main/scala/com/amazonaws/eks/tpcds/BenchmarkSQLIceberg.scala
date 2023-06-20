@@ -41,7 +41,6 @@ object BenchmarkSQLIceberg {
       .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
       .getOrCreate()
 
-    spark.conf.set("spark.sql.cbo.enabled", "true")
     if (onlyWarn) {
       println(s"Only WARN")
       LogManager.getLogger("org").setLevel(Level.WARN)

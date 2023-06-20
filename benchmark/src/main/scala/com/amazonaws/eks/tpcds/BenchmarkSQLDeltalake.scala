@@ -63,7 +63,6 @@ object BenchmarkSQLDeltalake {
     }
 
     spark.sql(s"use $databaseName")
-    spark.conf.set("spark.sql.cbo.enabled", "true")
 
     val tpcds = new TPCDS(spark.sqlContext)
 
