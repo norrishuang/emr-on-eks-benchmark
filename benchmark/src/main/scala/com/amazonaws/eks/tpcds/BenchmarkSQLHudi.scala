@@ -27,11 +27,13 @@ object BenchmarkSQLHudi {
     val databaseName = "tpcds_hudi"
     val timeout = 24*60*60
 
-    println(s"DATA DIR is $tpcdsDataDir")
+//    println(s"DATA DIR is $tpcdsDataDir")
 
     val spark = SparkSession
       .builder
       .appName(s"TPCDS SQL(Hudi) Benchmark $scaleFactor GB")
+      .config("spark.hadoop.hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+      .config("spark.serializer","org.apache.spark.serializer.KryoSerializer")
       .getOrCreate()
 
 
