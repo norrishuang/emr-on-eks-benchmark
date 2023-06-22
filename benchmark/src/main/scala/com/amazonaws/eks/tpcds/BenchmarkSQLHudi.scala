@@ -32,7 +32,6 @@ object BenchmarkSQLHudi {
     val spark = SparkSession
       .builder
       .appName(s"TPCDS SQL(Hudi) Benchmark $scaleFactor GB")
-      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").getOrCreate()
 
 
