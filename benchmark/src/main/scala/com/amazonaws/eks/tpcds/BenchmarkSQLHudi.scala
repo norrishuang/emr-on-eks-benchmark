@@ -29,9 +29,12 @@ object BenchmarkSQLDeltalake {
 
     println(s"DATA DIR is $tpcdsDataDir")
 
+    val spark = SparkSession
+      .builder
+      .appName(s"TPCDS SQL(Hudi) Benchmark $scaleFactor GB")
+      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").getOrCreate()
 
-    val spark = SparkSession.builder
-      .config('spark.serializer', 'org.apache.spark.serializer.KryoSerializer').getOrCreate()
 
     if (onlyWarn) {
       println(s"Only WARN")
