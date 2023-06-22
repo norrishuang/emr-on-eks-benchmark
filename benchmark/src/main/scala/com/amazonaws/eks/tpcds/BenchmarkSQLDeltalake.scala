@@ -62,6 +62,8 @@ object BenchmarkSQLDeltalake {
 //      tables.createTemporaryTables(tpcdsDataDir, format)
     }
 
+    spark.sql(s"show databases").show()
+
     spark.sql(s"use $databaseName")
 
     val tpcds = new TPCDS(spark.sqlContext)
