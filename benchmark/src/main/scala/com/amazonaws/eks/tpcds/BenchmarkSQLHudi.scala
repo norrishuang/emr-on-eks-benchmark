@@ -29,11 +29,12 @@ object BenchmarkSQLHudi {
 
 //    println(s"DATA DIR is $tpcdsDataDir")
 
-    val spark = SparkSession
+    val spark = (SparkSession
       .builder
       .appName(s"TPCDS SQL(Hudi) Benchmark $scaleFactor GB")
       .config("spark.hadoop.hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
-      .config("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .enableHiveSupport()
       .getOrCreate()
 
 
