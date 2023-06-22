@@ -32,7 +32,9 @@ object BenchmarkSQLHudi {
     val spark = SparkSession
       .builder
       .appName(s"TPCDS SQL(Hudi) Benchmark $scaleFactor GB")
-      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").getOrCreate()
+      .config("hive.metastore.client.factory.class", "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory")
+      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .getOrCreate()
 
 
     if (onlyWarn) {
@@ -40,6 +42,7 @@ object BenchmarkSQLHudi {
       LogManager.getLogger("org").setLevel(Level.WARN)
     }
 
+    spark.sql(s"show databases").show()
 //    val tables = new TPCDSTables(spark.sqlContext,
 //      dsdgenDir = dsdgenDir,
 //      scaleFactor = scaleFactor,
