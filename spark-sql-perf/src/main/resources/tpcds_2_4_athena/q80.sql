@@ -42,7 +42,7 @@ with ssr as
           from web_sales left outer join web_returns on
               (ws_item_sk = wr_item_sk and ws_order_number = wr_order_number),
                date_dim, web_site, item, promotion
-          where ws_sold_date_sk = d_date_sk
+          where ws_sold_date_sk = cast(d_date_sk as varchar)
             and d_date between cast('2000-08-23' as date)
               and (cast('2000-08-23' as date) + interval '30' day)
             and ws_web_site_sk = web_site_sk

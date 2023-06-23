@@ -71,7 +71,7 @@
       web_sales, warehouse, date_dim, time_dim, ship_mode
     where
       ws_warehouse_sk =  w_warehouse_sk
-      and ws_sold_date_sk = d_date_sk
+      and ws_sold_date_sk = cast(d_date_sk as varchar)
       and ws_sold_time_sk = t_time_sk
  	    and ws_ship_mode_sk = sm_ship_mode_sk
       and d_year = 2001
@@ -111,7 +111,7 @@
         catalog_sales, warehouse, date_dim, time_dim, ship_mode
      where
         cs_warehouse_sk =  w_warehouse_sk
-        and cs_sold_date_sk = d_date_sk
+        and cs_sold_date_sk = cast(d_date_sk as varchar)
         and cs_sold_time_sk = t_time_sk
  	      and cs_ship_mode_sk = sm_ship_mode_sk
         and d_year = 2001

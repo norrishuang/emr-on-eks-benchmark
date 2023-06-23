@@ -47,6 +47,7 @@ def load_sql_file(sqlpath):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
+    i = 0;
     for root, dirs, files in os.walk(sqlpath):
         for file in files:
             sqlfilepath = os.path.join(root, file)
@@ -54,13 +55,11 @@ def load_sql_file(sqlpath):
             sqlfile=open(sqlfilepath, encoding='utf-8')
             sqltext=sqlfile.read()
             sqlfile.close()
-            # print(sqltext)
-            # if("q1.sql" in sqlfilepath):
-            #     print('exec sql:' + sqlfilepath)
-            #     print(sqltext)
-            #     executeSQL(file, sqltext)
+
             print('exec sql:' + sqlfilepath)
             executeSQL(file, sqltext)
+            i = i + 1
+            print("process:[{:d}/99]".format(i))
 
 
 def executeSQL(filename, sqltext):
@@ -93,14 +92,13 @@ def executeSQL(filename, sqltext):
             else:
                 raise(err)
 
-    print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
+    # print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
     # print(int(query_results['QueryRuntimeStatistics']['Timeline']['QueryQueueTimeInMillis']))
 
     with open("./result_" + DATABASE + ".csv", "a+", newline='') as csvfile:
         fieldnames = ['SQL', 'QueryQueueTimeInMillis', 'EngineExecutionTimeInMillis', 'ServiceProcessingTimeInMillis', 'TotalExecutionTimeInMillis']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #
-        # writer.writeheader()
         writer.writerow({'SQL': filename,
                          'QueryQueueTimeInMillis': int(query_results['QueryRuntimeStatistics']['Timeline']['QueryQueueTimeInMillis']),
                          'EngineExecutionTimeInMillis': int(query_results['QueryRuntimeStatistics']['Timeline']['EngineExecutionTimeInMillis']),
@@ -109,20 +107,3 @@ def executeSQL(filename, sqltext):
 
 
 load_sql_file(SQLFILES)
-
-'''
-{
-	"QueryExecutionId": "b774ac88-c115-4d49-acc1-310f5822288a",
-	'ResponseMetadata': {
-		'RequestId': '83271a2f-bcc2-4174-96d4-3d0330bfe338',
-		'HTTPStatusCode': 200,
-		'HTTPHeaders': {
-			'date': 'Fri, 23 Jun 2023 02:48:40 GMT',
-			'content-type': 'application/x-amz-json-1.1',
-			'content-length': '59',
-			'connection': 'keep-alive',
-			'x-amzn-requestid': '83271a2f-bcc2-4174-96d4-3d0330bfe338'
-		},
-		'RetryAttempts': 0
-	}
-}'''
