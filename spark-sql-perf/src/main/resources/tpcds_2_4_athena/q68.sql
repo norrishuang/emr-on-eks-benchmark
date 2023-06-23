@@ -9,7 +9,7 @@
         sum(ss_ext_list_price) list_price,
         sum(ss_ext_tax) extended_tax
      from store_sales, date_dim, store, household_demographics, customer_address
-     where store_sales.ss_sold_date_sk = date_dim.d_date_sk
+     where store_sales.ss_sold_date_sk = cast(date_dim.d_date_sk as varchar)
         and store_sales.ss_store_sk = store.s_store_sk
         and store_sales.ss_hdemo_sk = household_demographics.hd_demo_sk
         and store_sales.ss_addr_sk = customer_address.ca_address_sk

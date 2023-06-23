@@ -6,7 +6,7 @@
         avg(cs_coupon_amt) agg3,
         avg(cs_sales_price) agg4
  from catalog_sales, customer_demographics, date_dim, item, promotion
- where cs_sold_date_sk = d_date_sk and
+ where cs_sold_date_sk = cast(d_date_sk as varchar) and
        cs_item_sk = i_item_sk and
        cs_bill_cdemo_sk = cd_demo_sk and
        cs_promo_sk = p_promo_sk and
