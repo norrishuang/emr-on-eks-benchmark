@@ -39,7 +39,7 @@ if len(sys.argv) > 1:
         elif opt_name in ('-p', '--port'):
             PORT = opt_value
             print("PORT:" + PORT)
-        elif opt_name in ('-d', '--catalog'):
+        elif opt_name in ('-c', '--catalog'):
             CATALOG = opt_value
             print("CATALOG:" + CATALOG)
         elif opt_name in ('-s', '--schema'):
