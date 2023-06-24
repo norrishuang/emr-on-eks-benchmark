@@ -117,7 +117,7 @@ def executeSQL(filename, sqltext):
         #
         writer.writerow({'SQL': filename,
                          'ExecuteTime': int(endtime - starttime),
-                         'Rows': rows.count()})
+                         'Rows': len(rows)})
 
 
 load_sql_file(SQLFILES)
