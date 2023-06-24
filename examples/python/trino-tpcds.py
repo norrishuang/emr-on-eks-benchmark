@@ -102,7 +102,7 @@ def executeSQL(filename, sqltext):
     cursor = conn.cursor()
     cursor.execute(sqltext)
     rows = cursor.fetchall()
-    print(rows)
+    # print(rows)
     cursor.close()
     conn.close()
 
@@ -117,7 +117,7 @@ def executeSQL(filename, sqltext):
         #
         writer.writerow({'SQL': filename,
                          'ExecuteTime': int(endtime - starttime),
-                         'Rows': int(rows)})
+                         'Rows': rows.count()})
 
 
 load_sql_file(SQLFILES)
