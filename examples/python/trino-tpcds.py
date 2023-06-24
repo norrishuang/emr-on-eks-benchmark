@@ -96,18 +96,20 @@ def executeSQL(filename, sqltext):
         schema=SCHEMA,
         isolation_level=transaction.IsolationLevel.READ_COMMITTED
     )
-
+    rowcount = 0
     starttime = int(round(time.time()*1000))
     cursor = conn.cursor()
     try:
         cursor.execute(sqltext)
         rows = cursor.fetchall()
+        rowcount = len(rows)
     except Exception as err:
         print(err)
-        raise err
+        # raise err
         # print(rows)
         cursor.close()
         conn.close()
+        rowcount = 0
     endtime = int(round(time.time()*1000))
 
     # print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
@@ -119,7 +121,7 @@ def executeSQL(filename, sqltext):
         #
         writer.writerow({'SQL': filename,
                          'ExecuteTime': int(endtime - starttime),
-                         'Rows': len(rows)})
+                         'Rows': rowcount})
 
 
 load_sql_file(SQLFILES)
