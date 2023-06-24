@@ -1,7 +1,7 @@
 import csv
 import json
 import time
-import presto
+import prestodb
 # from presto import transaction
 import sys
 import getopt
@@ -88,7 +88,7 @@ def load_sql_file(sqlpath):
 def executeSQL(filename, sqltext):
 
 
-    conn = presto.dbapi.connect(
+    conn = prestodb.dbapi.connect(
         host=HOST,
         port=PORT,
         user='trino',
