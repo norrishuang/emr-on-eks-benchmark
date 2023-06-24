@@ -98,14 +98,16 @@ def executeSQL(filename, sqltext):
     )
 
     starttime = int(round(time.time()*1000))
-
     cursor = conn.cursor()
-    cursor.execute(sqltext)
-    rows = cursor.fetchall()
-    # print(rows)
-    cursor.close()
-    conn.close()
-
+    try:
+        cursor.execute(sqltext)
+        rows = cursor.fetchall()
+    except Exception as err:
+        print(err)
+        raise err
+        # print(rows)
+        cursor.close()
+        conn.close()
     endtime = int(round(time.time()*1000))
 
     # print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
