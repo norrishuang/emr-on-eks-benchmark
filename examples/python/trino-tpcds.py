@@ -42,7 +42,7 @@ if len(sys.argv) > 1:
         elif opt_name in ('-d', '--catalog'):
             CATALOG = opt_value
             print("CATALOG:" + CATALOG)
-        elif opt_name in ('-ds', '--schema'):
+        elif opt_name in ('-s', '--schema'):
             SCHEMA = opt_value
             print("SCHEMA:" + SCHEMA)
         elif opt_name in ('-o', '--output'):
