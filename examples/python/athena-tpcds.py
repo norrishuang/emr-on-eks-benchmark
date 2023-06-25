@@ -1,11 +1,9 @@
 import csv
-import json
 import time
 import boto3
 import sys
 import getopt
 import os
-from urllib.parse import urlparse
 
 SQLFILES = ''
 REGION = ''
