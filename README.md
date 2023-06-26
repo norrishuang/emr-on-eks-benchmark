@@ -85,12 +85,12 @@ aws emr-serverless start-job-run \
 
 对应不同的数据格式使用不同的类替换
 
-| 类                                            |                     |
-| --------------------------------------------- | ------------------- |
+| 类                                            |               |
+| --------------------------------------------- |---------------|
 | com.amazonaws.eks.tpcds.BenchmarkSQL          | 无数据格式，Parquet |
-| com.amazonaws.eks.tpcds.BenchmarkSQLIceberg   | Iceberg             |
-| com.amazonaws.eks.tpcds.BenchmarkSQLDeltalake | Delta Lake          |
-| com.amazonaws.eks.tpcds.BenchmarkSQLHudi      | Audi                |
+| com.amazonaws.eks.tpcds.BenchmarkSQLIceberg   | Iceberg       |
+| com.amazonaws.eks.tpcds.BenchmarkSQLDeltalake | Delta Lake    |
+| com.amazonaws.eks.tpcds.BenchmarkSQLHudi      | Hudi          |
 
 
 
