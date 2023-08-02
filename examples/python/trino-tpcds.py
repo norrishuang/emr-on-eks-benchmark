@@ -86,8 +86,6 @@ def load_sql_file(sqlpath):
 
 
 def executeSQL(filename, sqltext):
-
-
     conn = trino.dbapi.connect(
         host=HOST,
         port=PORT,
@@ -103,15 +101,14 @@ def executeSQL(filename, sqltext):
         cursor.execute(sqltext)
         rows = cursor.fetchall()
         rowcount = len(rows)
+        cursor.close()
     except Exception as err:
         print(err)
-        # raise err
-        # print(rows)
         cursor.close()
         conn.close()
-        rowcount = 0
+        rowcount = -999
     endtime = int(round(time.time()*1000))
-
+    conn.close()
     # print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
     # print(int(query_results['QueryRuntimeStatistics']['Timeline']['QueryQueueTimeInMillis']))
 
