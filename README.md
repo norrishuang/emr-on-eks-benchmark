@@ -145,6 +145,8 @@ cd emr-on-eks-benchmark
 export SQLFILE=./spark-sql-perf/src/main/resources/tpcds_2_4_redshift
 export REDSHIFT_SERVER=<redshift-endporint>
 export OUTPUT_PATH=<log-path>
-python ./examples/python/redshift-tpcds.py -f $SQLFILE -h $REDSHIFT_SERVER -o $OUTPUT_PATH
+export USERNAME=<username>
+export PASSWORD=<password>
+python ./examples/python/redshift-tpcds.py -f $SQLFILE -h $REDSHIFT_SERVER -u $USERNAME -p $PASSWORD -o $OUTPUT_PATH
 ```
 
