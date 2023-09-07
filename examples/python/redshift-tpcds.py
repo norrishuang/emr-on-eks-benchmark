@@ -13,15 +13,17 @@ SQLFILES = ''
 HOST = ''
 OUTPUT = './'
 SCHEMA = 'iceberg'
+USERNAME = 'awsuser'
+PASSWORD = 'awsuser'
 
 '''
 Trino TPC DS 测试
 python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift \
-    -h lotuscar.812046859005.us-east-1.redshift-serverless.amazonaws.com -o /home/ec2-user/environment/redshift
+    -h <redshift-endporint> -o /home/ec2-user/environment/redshift
 '''
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "f:h:p:c:o:s:",
+                               "f:h:o:u:p:",
                                ["sqlfiles=",
                                 "host=",
                                 "output="])
@@ -32,6 +34,11 @@ if len(sys.argv) > 1:
         elif opt_name in ('-h', '--host'):
             HOST = opt_value
             print("HOST:" + HOST)
+        elif opt_name in ('-u', '--username'):
+            USERNAME = opt_value
+            print("USERNAME:" + USERNAME)
+        elif opt_name in ('-p', '--password'):
+            PASSWORD = opt_value
         elif opt_name in ('-o', '--output'):
             OUTPUT = opt_value
             print("OUTPUT:" + OUTPUT)
@@ -78,8 +85,8 @@ def executeSQL(filename, sqltext):
         host=HOST,
         database='dev',
         port=5439,
-        user='awsuser',
-        password='Amazon123!'
+        user=USERNAME,
+        password=PASSWORD
     )
     rowcount = 0
     starttime = int(round(time.time()*1000))

@@ -1,7 +1,7 @@
 --q85.sql--
 
  select
-    substr(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
+    substring(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
  from  dev.spectrum_iceberg_schema.web_sales,
        dev.spectrum_iceberg_schema.web_returns,
        dev.spectrum_iceberg_schema.web_page,
@@ -80,7 +80,7 @@
     )
    )
  group by r_reason_desc
- order by substr(r_reason_desc,1,20)
+ order by substring(r_reason_desc,1,20)
         ,avg(ws_quantity)
         ,avg(wr_refunded_cash)
         ,avg(wr_fee)

@@ -1,9 +1,9 @@
 --q16.sql--
 
 select
-    count(distinct cs_order_number) as `order count`,
-    sum(cs_ext_ship_cost) as `total shipping cost`,
-    sum(cs_net_profit) as `total net profit`
+    count(distinct cs_order_number) as order_count,
+    sum(cs_ext_ship_cost) as total_shipping_cost,
+    sum(cs_net_profit) as total_net_profit
 from
     dev.spectrum_iceberg_schema.catalog_sales cs1,
     dev.spectrum_iceberg_schema.date_dim,

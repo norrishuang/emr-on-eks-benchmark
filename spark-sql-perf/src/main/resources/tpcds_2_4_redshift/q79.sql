@@ -1,7 +1,7 @@
 --q79.sql--
 
  select
-  c_last_name,c_first_name,substr(s_city,1,30),ss_ticket_number,amt,profit
+  c_last_name,c_first_name,substring(s_city,1,30),ss_ticket_number,amt,profit
   from
    (select ss_ticket_number
           ,ss_customer_sk
@@ -22,6 +22,6 @@
     and c.s_number_employees between 200 and 295
     group by ss_ticket_number, ss_customer_sk, ss_addr_sk, c.s_city) ms, dev.spectrum_iceberg_schema.customer
     where ss_customer_sk = c_customer_sk
- order by c_last_name,c_first_name,substr(s_city,1,30), profit
+ order by c_last_name,c_first_name,substring(s_city,1,30), profit
  limit 100
             

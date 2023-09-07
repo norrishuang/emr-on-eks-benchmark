@@ -2,14 +2,14 @@
 
 
  with frequent_ss_items as
- (select substr(i_item_desc,1,30) itemdesc,i_item_sk item_sk,d_date solddate,count(*) cnt
+ (select substring(i_item_desc,1,30) itemdesc,i_item_sk item_sk,d_date solddate,count(*) cnt
   from  dev.spectrum_iceberg_schema.store_sales,
         dev.spectrum_iceberg_schema.date_dim,
         dev.spectrum_iceberg_schema.item
   where ss_sold_date_sk = d_date_sk
     and ss_item_sk = i_item_sk
     and d_year in (2000, 2000+1, 2000+2,2000+3)
-  group by substr(i_item_desc,1,30),i_item_sk,d_date
+  group by substring(i_item_desc,1,30),i_item_sk,d_date
   having count(*) > 4),
  max_store_sales as
  (select max(csales) tpcds_cmax

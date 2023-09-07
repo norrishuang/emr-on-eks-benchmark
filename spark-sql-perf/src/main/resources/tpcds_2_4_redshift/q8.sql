@@ -6,8 +6,8 @@
       dev.spectrum_iceberg_schema.store,
      (SELECT ca_zip
        from (
-       (SELECT substr(ca_zip,1,5) ca_zip FROM dev.spectrum_iceberg_schema.customer_address
-          WHERE substr(ca_zip,1,5) IN (
+       (SELECT substring(ca_zip,1,5) ca_zip FROM dev.spectrum_iceberg_schema.customer_address
+          WHERE substring(ca_zip,1,5) IN (
                '24128','76232','65084','87816','83926','77556','20548',
                '26231','43848','15126','91137','61265','98294','25782',
                '17920','18426','98235','40081','84093','28577','55565',
@@ -69,7 +69,7 @@
        INTERSECT
        (select ca_zip
           FROM
-            (SELECT substr(ca_zip,1,5) ca_zip,count(*) cnt
+            (SELECT substring(ca_zip,1,5) ca_zip,count(*) cnt
               FROM dev.spectrum_iceberg_schema.customer_address,
                    dev.spectrum_iceberg_schema.customer
               WHERE ca_address_sk = c_current_addr_sk and
@@ -81,7 +81,7 @@
  where ss_store_sk = s_store_sk
   and ss_sold_date_sk = d_date_sk
   and d_qoy = 2 and d_year = 1998
-  and (substr(s_zip,1,2) = substr(V1.ca_zip,1,2))
+  and (substring(s_zip,1,2) = substring(V1.ca_zip,1,2))
  group by s_store_name
  order by s_store_name LIMIT 100
             
