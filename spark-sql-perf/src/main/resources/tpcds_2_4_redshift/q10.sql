@@ -6,28 +6,28 @@
   cd_dep_count, count(*) cnt4, cd_dep_employed_count,  count(*) cnt5,
   cd_dep_college_count, count(*) cnt6
  from
-     dev.spectrum_iceberg_schema.store_returns.customer c,
-     dev.spectrum_iceberg_schema.store_returns.customer_address ca,
-     dev.spectrum_iceberg_schema.store_returns.customer_demographics
+     dev.spectrum_iceberg_schema.customer c,
+     dev.spectrum_iceberg_schema.customer_address ca,
+     dev.spectrum_iceberg_schema.customer_demographics
  where
   c.c_current_addr_sk = ca.ca_address_sk and
   ca_county in ('Rush County','Toole County','Jefferson County',
                 'Dona Ana County','La Porte County') and
   cd_demo_sk = c.c_current_cdemo_sk AND
-  exists (select * from dev.spectrum_iceberg_schema.store_returns.store_sales,
-                        dev.spectrum_iceberg_schema.store_returns.date_dim
+  exists (select * from dev.spectrum_iceberg_schema.store_sales,
+                        dev.spectrum_iceberg_schema.date_dim
           where c.c_customer_sk = ss_customer_sk AND
                 ss_sold_date_sk = d_date_sk AND
                 d_year = 2002 AND
                 d_moy between 1 AND 1+3) AND
-   (exists (select * from  dev.spectrum_iceberg_schema.store_returns.web_sales,
-                           dev.spectrum_iceberg_schema.store_returns.date_dim
+   (exists (select * from  dev.spectrum_iceberg_schema.web_sales,
+                           dev.spectrum_iceberg_schema.date_dim
             where c.c_customer_sk = ws_bill_customer_sk AND
                   ws_sold_date_sk = d_date_sk AND
                   d_year = 2002 AND
                   d_moy between 1 AND 1+3) or
-    exists (select * from dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-                          dev.spectrum_iceberg_schema.store_returns.date_dim
+    exists (select * from dev.spectrum_iceberg_schema.catalog_sales,
+                          dev.spectrum_iceberg_schema.date_dim
             where c.c_customer_sk = cs_ship_customer_sk AND
                   cs_sold_date_sk = d_date_sk AND
                   d_year = 2002 AND

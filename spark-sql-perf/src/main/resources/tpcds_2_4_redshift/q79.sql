@@ -8,10 +8,10 @@
           ,c.s_city
           ,sum(ss_coupon_amt) amt
           ,sum(ss_net_profit) profit
-    from  dev.spectrum_iceberg_schema.store_returns.store_sales a,
-          dev.spectrum_iceberg_schema.store_returns.date_dim b,
-          dev.spectrum_iceberg_schema.store_returns.store c,
-          dev.spectrum_iceberg_schema.store_returns.household_demographics d
+    from  dev.spectrum_iceberg_schema.store_sales a,
+          dev.spectrum_iceberg_schema.date_dim b,
+          dev.spectrum_iceberg_schema.store c,
+          dev.spectrum_iceberg_schema.household_demographics d
     where a.ss_sold_date_sk =  b.d_date_sk
     and a.ss_store_sk = c.s_store_sk
     and a.ss_hdemo_sk = d.hd_demo_sk
@@ -20,7 +20,7 @@
     and b.d_dow = 1
     and b.d_year in (1999,1999+1,1999+2)
     and c.s_number_employees between 200 and 295
-    group by ss_ticket_number, ss_customer_sk, ss_addr_sk, c.s_city) ms, dev.spectrum_iceberg_schema.store_returns.customer
+    group by ss_ticket_number, ss_customer_sk, ss_addr_sk, c.s_city) ms, dev.spectrum_iceberg_schema.customer
     where ss_customer_sk = c_customer_sk
  order by c_last_name,c_first_name,substr(s_city,1,30), profit
  limit 100

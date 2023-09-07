@@ -1,10 +1,10 @@
 --q37.sql--
 
  select i_item_id, i_item_desc, i_current_price
- from  dev.spectrum_iceberg_schema.store_returns.item,
-       dev.spectrum_iceberg_schema.store_returns.inventory,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.catalog_sales
+ from  dev.spectrum_iceberg_schema.item,
+       dev.spectrum_iceberg_schema.inventory,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.catalog_sales
  where i_current_price between 68 and 68 + 30
    and inv_item_sk = i_item_sk
    and d_date_sk=inv_date_sk

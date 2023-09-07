@@ -5,9 +5,9 @@ select i_item_desc, i_category, i_class, i_current_price
       ,sum(ss_ext_sales_price)*100/sum(sum(ss_ext_sales_price)) over
           (partition by i_class) as revenueratio
 from
-	  dev.spectrum_iceberg_schema.store_returns.store_sales,
-	  dev.spectrum_iceberg_schema.store_returns.item,
-	  dev.spectrum_iceberg_schema.store_returns.date_dim
+	  dev.spectrum_iceberg_schema.store_sales,
+	  dev.spectrum_iceberg_schema.item,
+	  dev.spectrum_iceberg_schema.date_dim
 where
 	ss_item_sk = i_item_sk
   	and i_category in ('Sports', 'Books', 'Home')

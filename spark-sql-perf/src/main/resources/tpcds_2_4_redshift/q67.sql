@@ -6,10 +6,10 @@
       from
          (select i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,
                  s_store_id, sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
-          from  dev.spectrum_iceberg_schema.store_returns.store_sales,
-                dev.spectrum_iceberg_schema.store_returns.date_dim,
-                dev.spectrum_iceberg_schema.store_returns.store,
-                dev.spectrum_iceberg_schema.store_returns.item
+          from  dev.spectrum_iceberg_schema.store_sales,
+                dev.spectrum_iceberg_schema.date_dim,
+                dev.spectrum_iceberg_schema.store,
+                dev.spectrum_iceberg_schema.item
         where  ss_sold_date_sk=d_date_sk
            and ss_item_sk=i_item_sk
            and ss_store_sk = s_store_sk

@@ -3,12 +3,12 @@
  with ss as (
  select i_item_id,sum(ss_ext_sales_price) total_sales
  from
- 	   dev.spectrum_iceberg_schema.store_returns.store_sales,
- 	   dev.spectrum_iceberg_schema.store_returns.date_dim,
- 	   dev.spectrum_iceberg_schema.store_returns.customer_address,
- 	   dev.spectrum_iceberg_schema.store_returns.item
+ 	   dev.spectrum_iceberg_schema.store_sales,
+ 	   dev.spectrum_iceberg_schema.date_dim,
+ 	   dev.spectrum_iceberg_schema.customer_address,
+ 	   dev.spectrum_iceberg_schema.item
  where
-    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.store_returns.item where i_color in ('slate','blanched','burnished'))
+    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_color in ('slate','blanched','burnished'))
  and     ss_item_sk              = i_item_sk
  and     ss_sold_date_sk         = d_date_sk
  and     d_year                  = 2001
@@ -19,12 +19,12 @@
  cs as (
  select i_item_id,sum(cs_ext_sales_price) total_sales
  from
- 	  dev.spectrum_iceberg_schema.store_returns.catalog_sales,
- 	  dev.spectrum_iceberg_schema.store_returns.date_dim,
- 	  dev.spectrum_iceberg_schema.store_returns.customer_address,
- 	  dev.spectrum_iceberg_schema.store_returns.item
+ 	  dev.spectrum_iceberg_schema.catalog_sales,
+ 	  dev.spectrum_iceberg_schema.date_dim,
+ 	  dev.spectrum_iceberg_schema.customer_address,
+ 	  dev.spectrum_iceberg_schema.item
  where
-    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.store_returns.item where i_color in ('slate','blanched','burnished'))
+    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_color in ('slate','blanched','burnished'))
  and     cs_item_sk              = i_item_sk
  and     cs_sold_date_sk         = d_date_sk
  and     d_year                  = 2001
@@ -35,12 +35,12 @@
  ws as (
  select i_item_id,sum(ws_ext_sales_price) total_sales
  from
- 	   dev.spectrum_iceberg_schema.store_returns.web_sales,
- 	   dev.spectrum_iceberg_schema.store_returns.date_dim,
- 	   dev.spectrum_iceberg_schema.store_returns.customer_address,
- 	   dev.spectrum_iceberg_schema.store_returns.item
+ 	   dev.spectrum_iceberg_schema.web_sales,
+ 	   dev.spectrum_iceberg_schema.date_dim,
+ 	   dev.spectrum_iceberg_schema.customer_address,
+ 	   dev.spectrum_iceberg_schema.item
  where
-    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.store_returns.item where i_color in ('slate','blanched','burnished'))
+    i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_color in ('slate','blanched','burnished'))
  and     ws_item_sk              = i_item_sk
  and     ws_sold_date_sk         = d_date_sk
  and     d_year                  = 2001 

@@ -11,10 +11,10 @@
         rank() over
           (partition by i_category, i_brand, cc_name
            order by d_year, d_moy) rn
- from  dev.spectrum_iceberg_schema.store_returns.item,
-       dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.call_center
+ from  dev.spectrum_iceberg_schema.item,
+       dev.spectrum_iceberg_schema.catalog_sales,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.call_center
  where cs_item_sk = i_item_sk and
        cs_sold_date_sk = d_date_sk and
        cc_call_center_sk= cs_call_center_sk and

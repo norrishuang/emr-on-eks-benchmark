@@ -7,9 +7,9 @@
  	    case when grouping(i_class) = 0 then i_category end
  	    order by sum(ws_net_paid) desc) as rank_within_parent
  from
-     dev.spectrum_iceberg_schema.store_returns.web_sales,
-     dev.spectrum_iceberg_schema.store_returns.date_dim d1,
-     dev.spectrum_iceberg_schema.store_returns.item
+     dev.spectrum_iceberg_schema.web_sales,
+     dev.spectrum_iceberg_schema.date_dim d1,
+     dev.spectrum_iceberg_schema.item
  where
     d1.d_month_seq between 1200 and 1200+11
  and d1.d_date_sk = ws_sold_date_sk

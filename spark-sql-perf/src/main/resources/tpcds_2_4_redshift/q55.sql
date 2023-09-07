@@ -2,9 +2,9 @@
 
 select i_brand_id brand_id, i_brand brand,
  	sum(ss_ext_sales_price) ext_price
- from dev.spectrum_iceberg_schema.store_returns.date_dim,
-      dev.spectrum_iceberg_schema.store_returns.store_sales,
-      dev.spectrum_iceberg_schema.store_returns.item
+ from dev.spectrum_iceberg_schema.date_dim,
+      dev.spectrum_iceberg_schema.store_sales,
+      dev.spectrum_iceberg_schema.item
  where d_date_sk = ss_sold_date_sk
  	and ss_item_sk = i_item_sk
  	and i_manager_id=28

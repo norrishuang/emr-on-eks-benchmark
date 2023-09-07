@@ -5,10 +5,10 @@
    ,sum(ws_ext_ship_cost) as `total shipping cost`
    ,sum(ws_net_profit) as `total net profit`
  from
-     dev.spectrum_iceberg_schema.store_returns.web_sales ws1,
-     dev.spectrum_iceberg_schema.store_returns.date_dim,
-     dev.spectrum_iceberg_schema.store_returns.customer_address,
-     dev.spectrum_iceberg_schema.store_returns.web_site
+     dev.spectrum_iceberg_schema.web_sales ws1,
+     dev.spectrum_iceberg_schema.date_dim,
+     dev.spectrum_iceberg_schema.customer_address,
+     dev.spectrum_iceberg_schema.web_site
  where
      d_date between cast('1999-02-01' as date) and
             (cast('1999-02-01' as date) + interval '60' day)
@@ -18,11 +18,11 @@
  and ws1.ws_web_site_sk = web_site_sk
  and web_company_name = 'pri'
  and exists (select *
-             from  dev.spectrum_iceberg_schema.store_returns.web_sales ws2
+             from  dev.spectrum_iceberg_schema.web_sales ws2
              where ws1.ws_order_number = ws2.ws_order_number
                and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  and not exists(select *
-                from dev.spectrum_iceberg_schema.store_returns.web_returns wr1
+                from dev.spectrum_iceberg_schema.web_returns wr1
                 where ws1.ws_order_number = wr1.wr_order_number)
  order by count(distinct ws_order_number)
  limit 100

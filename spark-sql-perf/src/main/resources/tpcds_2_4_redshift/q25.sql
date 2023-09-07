@@ -5,8 +5,8 @@
     sum(sr_net_loss) as store_returns_loss,
     sum(cs_net_profit) as catalog_sales_profit
  from
-     dev.spectrum_iceberg_schema.store_returns.store_sales, dev.spectrum_iceberg_schema.store_returns.store_returns, dev.spectrum_iceberg_schema.store_returns.catalog_sales, dev.spectrum_iceberg_schema.store_returns.date_dim d1, dev.spectrum_iceberg_schema.store_returns.date_dim d2, dev.spectrum_iceberg_schema.store_returns.date_dim d3,
-    dev.spectrum_iceberg_schema.store_returns.store, dev.spectrum_iceberg_schema.store_returns.item
+     dev.spectrum_iceberg_schema.store_sales, dev.spectrum_iceberg_schema.store_returns, dev.spectrum_iceberg_schema.catalog_sales, dev.spectrum_iceberg_schema.date_dim d1, dev.spectrum_iceberg_schema.date_dim d2, dev.spectrum_iceberg_schema.date_dim d3,
+    dev.spectrum_iceberg_schema.store, dev.spectrum_iceberg_schema.item
  where
     d1.d_moy = 4
     and d1.d_year = 2001

@@ -2,14 +2,14 @@
 
  select i_brand_id brand_id, i_brand brand,t_hour,t_minute,
  	  sum(ext_price) ext_price
- from  dev.spectrum_iceberg_schema.store_returns.item,
+ from  dev.spectrum_iceberg_schema.item,
     (select
         ws_ext_sales_price as ext_price,
         ws_sold_date_sk as sold_date_sk,
         ws_item_sk as sold_item_sk,
         ws_sold_time_sk as time_sk
-     from  dev.spectrum_iceberg_schema.store_returns.web_sales,
-           dev.spectrum_iceberg_schema.store_returns.date_dim
+     from  dev.spectrum_iceberg_schema.web_sales,
+           dev.spectrum_iceberg_schema.date_dim
      where d_date_sk = ws_sold_date_sk
         and d_moy=11
         and d_year=1999
@@ -19,8 +19,8 @@
         cs_sold_date_sk as sold_date_sk,
         cs_item_sk as sold_item_sk,
         cs_sold_time_sk as time_sk
-      from dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-           dev.spectrum_iceberg_schema.store_returns.date_dim
+      from dev.spectrum_iceberg_schema.catalog_sales,
+           dev.spectrum_iceberg_schema.date_dim
       where d_date_sk = cs_sold_date_sk
           and d_moy=11
           and d_year=1999
@@ -30,12 +30,12 @@
         ss_sold_date_sk as sold_date_sk,
         ss_item_sk as sold_item_sk,
         ss_sold_time_sk as time_sk
-     from  dev.spectrum_iceberg_schema.store_returns.store_sales,
-           dev.spectrum_iceberg_schema.store_returns.date_dim
+     from  dev.spectrum_iceberg_schema.store_sales,
+           dev.spectrum_iceberg_schema.date_dim
      where d_date_sk = ss_sold_date_sk
         and d_moy=11
         and d_year=1999
-     ) tmp, dev.spectrum_iceberg_schema.store_returns.time_dim
+     ) tmp, dev.spectrum_iceberg_schema.time_dim
  where
    sold_item_sk = i_item_sk
    and i_manager_id=1

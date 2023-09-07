@@ -13,11 +13,11 @@
                  (ws_ship_date_sk - ws_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
   ,sum(case when (ws_ship_date_sk - ws_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
  from
-     dev.spectrum_iceberg_schema.store_returns.web_sales,
-     dev.spectrum_iceberg_schema.store_returns.warehouse,
-     dev.spectrum_iceberg_schema.store_returns.ship_mode,
-     dev.spectrum_iceberg_schema.store_returns.web_site,
-     dev.spectrum_iceberg_schema.store_returns.date_dim
+     dev.spectrum_iceberg_schema.web_sales,
+     dev.spectrum_iceberg_schema.warehouse,
+     dev.spectrum_iceberg_schema.ship_mode,
+     dev.spectrum_iceberg_schema.web_site,
+     dev.spectrum_iceberg_schema.date_dim
  where
      d_month_seq between 1200 and 1200 + 11
  and ws_ship_date_sk   = d_date_sk

@@ -11,13 +11,13 @@
         avg( cast(cs_net_profit as decimal(12,2))) agg5,
         avg( cast(c_birth_year as decimal(12,2))) agg6,
         avg( cast(cd1.cd_dep_count as decimal(12,2))) agg7
- from dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-      dev.spectrum_iceberg_schema.store_returns.customer_demographics cd1,
-      dev.spectrum_iceberg_schema.store_returns.customer_demographics cd2,
-      dev.spectrum_iceberg_schema.store_returns.customer,
-      dev.spectrum_iceberg_schema.store_returns.customer_address,
-      dev.spectrum_iceberg_schema.store_returns.date_dim,
-      dev.spectrum_iceberg_schema.store_returns.item
+ from dev.spectrum_iceberg_schema.catalog_sales,
+      dev.spectrum_iceberg_schema.customer_demographics cd1,
+      dev.spectrum_iceberg_schema.customer_demographics cd2,
+      dev.spectrum_iceberg_schema.customer,
+      dev.spectrum_iceberg_schema.customer_address,
+      dev.spectrum_iceberg_schema.date_dim,
+      dev.spectrum_iceberg_schema.item
  where cs_sold_date_sk = d_date_sk and
        cs_item_sk = i_item_sk and
        cs_bill_cdemo_sk = cd1.cd_demo_sk and

@@ -10,7 +10,7 @@
  	case when grouping(i_class) = 0 then i_category end
  	order by sum(ss_net_profit)/sum(ss_ext_sales_price) asc) as rank_within_parent
  from
-     dev.spectrum_iceberg_schema.store_returns.store_sales, dev.spectrum_iceberg_schema.store_returns.date_dim d1,  dev.spectrum_iceberg_schema.store_returns.item, dev.spectrum_iceberg_schema.store_returns.store
+     dev.spectrum_iceberg_schema.store_sales, dev.spectrum_iceberg_schema.date_dim d1,  dev.spectrum_iceberg_schema.item, dev.spectrum_iceberg_schema.store
  where
     d1.d_year = 2001
     and d1.d_date_sk = ss_sold_date_sk

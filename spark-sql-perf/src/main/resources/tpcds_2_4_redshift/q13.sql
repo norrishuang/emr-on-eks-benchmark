@@ -4,12 +4,12 @@
        ,avg(ss_ext_sales_price)
        ,avg(ss_ext_wholesale_cost)
        ,sum(ss_ext_wholesale_cost)
- from dev.spectrum_iceberg_schema.store_returns.store_sales
-     ,dev.spectrum_iceberg_schema.store_returns.store
-     ,dev.spectrum_iceberg_schema.store_returns.customer_demographics
-     ,dev.spectrum_iceberg_schema.store_returns.household_demographics
-     ,dev.spectrum_iceberg_schema.store_returns.customer_address
-     ,dev.spectrum_iceberg_schema.store_returns.date_dim
+ from dev.spectrum_iceberg_schema.store_sales
+     ,dev.spectrum_iceberg_schema.store
+     ,dev.spectrum_iceberg_schema.customer_demographics
+     ,dev.spectrum_iceberg_schema.household_demographics
+     ,dev.spectrum_iceberg_schema.customer_address
+     ,dev.spectrum_iceberg_schema.date_dim
  where s_store_sk = ss_store_sk
  and  ss_sold_date_sk = d_date_sk and d_year = 2001
  and((ss_hdemo_sk=hd_demo_sk

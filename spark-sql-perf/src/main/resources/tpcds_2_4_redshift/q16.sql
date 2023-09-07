@@ -5,10 +5,10 @@ select
     sum(cs_ext_ship_cost) as `total shipping cost`,
     sum(cs_net_profit) as `total net profit`
 from
-    dev.spectrum_iceberg_schema.store_returns.catalog_sales cs1,
-    dev.spectrum_iceberg_schema.store_returns.date_dim,
-    dev.spectrum_iceberg_schema.store_returns.customer_address,
-    dev.spectrum_iceberg_schema.store_returns.call_center
+    dev.spectrum_iceberg_schema.catalog_sales cs1,
+    dev.spectrum_iceberg_schema.date_dim,
+    dev.spectrum_iceberg_schema.customer_address,
+    dev.spectrum_iceberg_schema.call_center
 where
     d_date between cast ('2002-02-01' as date) and (cast('2002-02-01' as date) + interval '60' day)
   and cs1.cs_ship_date_sk = d_date_sk
@@ -17,11 +17,11 @@ where
   and cs1.cs_call_center_sk = cc_call_center_sk
   and cc_county in ('Williamson County','Williamson County','Williamson County','Williamson County', 'Williamson County')
   and exists (select *
-              from dev.spectrum_iceberg_schema.store_returns.catalog_sales cs2
+              from dev.spectrum_iceberg_schema.catalog_sales cs2
               where cs1.cs_order_number = cs2.cs_order_number
                 and cs1.cs_warehouse_sk <> cs2.cs_warehouse_sk)
   and not exists(select *
-                 from dev.spectrum_iceberg_schema.store_returns.catalog_returns cr1
+                 from dev.spectrum_iceberg_schema.catalog_returns cr1
                  where cs1.cs_order_number = cr1.cr_order_number)
 order by count(distinct cs_order_number)
 limit 100

@@ -11,4 +11,4 @@ select
   max(ss_addr_sk) as max_ss_addr_sk,
   max(ss_store_sk) as max_ss_store_sk,
   max(ss_promo_sk) as max_ss_promo_sk
-from dev.spectrum_iceberg_schema.store_returns.store_sales
+from dev.spectrum_iceberg_schema.store_sales

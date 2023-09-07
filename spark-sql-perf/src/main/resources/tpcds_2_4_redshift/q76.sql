@@ -7,9 +7,9 @@
     SELECT
         'store' as channel, ss_store_sk col_name, d_year, d_qoy, i_category,
         ss_ext_sales_price ext_sales_price
-    FROM  dev.spectrum_iceberg_schema.store_returns.store_sales,
-          dev.spectrum_iceberg_schema.store_returns.item,
-          dev.spectrum_iceberg_schema.store_returns.date_dim
+    FROM  dev.spectrum_iceberg_schema.store_sales,
+          dev.spectrum_iceberg_schema.item,
+          dev.spectrum_iceberg_schema.date_dim
     WHERE ss_store_sk IS NULL
       AND ss_sold_date_sk=d_date_sk
       AND ss_item_sk=i_item_sk
@@ -17,9 +17,9 @@
     SELECT
         'web' as channel, ws_ship_customer_sk col_name, d_year, d_qoy, i_category,
         ws_ext_sales_price ext_sales_price
-    FROM  dev.spectrum_iceberg_schema.store_returns.web_sales,
-          dev.spectrum_iceberg_schema.store_returns.item,
-          dev.spectrum_iceberg_schema.store_returns.date_dim
+    FROM  dev.spectrum_iceberg_schema.web_sales,
+          dev.spectrum_iceberg_schema.item,
+          dev.spectrum_iceberg_schema.date_dim
     WHERE ws_ship_customer_sk IS NULL
       AND ws_sold_date_sk=d_date_sk
       AND ws_item_sk=i_item_sk
@@ -27,9 +27,9 @@
     SELECT
         'catalog' as channel, cs_ship_addr_sk col_name, d_year, d_qoy, i_category,
         cs_ext_sales_price ext_sales_price
-    FROM dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-         dev.spectrum_iceberg_schema.store_returns.item,
-         dev.spectrum_iceberg_schema.store_returns.date_dim
+    FROM dev.spectrum_iceberg_schema.catalog_sales,
+         dev.spectrum_iceberg_schema.item,
+         dev.spectrum_iceberg_schema.date_dim
     WHERE cs_ship_addr_sk IS NULL
       AND cs_sold_date_sk=d_date_sk
       AND cs_item_sk=i_item_sk) foo

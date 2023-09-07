@@ -16,7 +16,8 @@ SCHEMA = 'iceberg'
 
 '''
 Trino TPC DS 测试
-
+python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift \
+    -h lotuscar.812046859005.us-east-1.redshift-serverless.amazonaws.com -o /home/ec2-user/environment/redshift
 '''
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],

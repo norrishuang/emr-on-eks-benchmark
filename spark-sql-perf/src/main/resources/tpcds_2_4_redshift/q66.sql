@@ -68,11 +68,11 @@
  	    ,sum(case when d_moy = 11 then ws_net_paid * ws_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then ws_net_paid * ws_quantity else 0 end) as dec_net
     from
-       dev.spectrum_iceberg_schema.store_returns.web_sales,
-       dev.spectrum_iceberg_schema.store_returns.warehouse,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.time_dim,
-       dev.spectrum_iceberg_schema.store_returns.ship_mode
+       dev.spectrum_iceberg_schema.web_sales,
+       dev.spectrum_iceberg_schema.warehouse,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.time_dim,
+       dev.spectrum_iceberg_schema.ship_mode
     where
       ws_warehouse_sk =  w_warehouse_sk
       and ws_sold_date_sk = d_date_sk
@@ -112,11 +112,11 @@
  	    ,sum(case when d_moy = 11 then cs_net_paid_inc_tax * cs_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then cs_net_paid_inc_tax * cs_quantity else 0 end) as dec_net
      from
-        dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-        dev.spectrum_iceberg_schema.store_returns.warehouse,
-        dev.spectrum_iceberg_schema.store_returns.date_dim,
-        dev.spectrum_iceberg_schema.store_returns.time_dim,
-        dev.spectrum_iceberg_schema.store_returns.ship_mode
+        dev.spectrum_iceberg_schema.catalog_sales,
+        dev.spectrum_iceberg_schema.warehouse,
+        dev.spectrum_iceberg_schema.date_dim,
+        dev.spectrum_iceberg_schema.time_dim,
+        dev.spectrum_iceberg_schema.ship_mode
      where
         cs_warehouse_sk =  w_warehouse_sk
         and cs_sold_date_sk = d_date_sk

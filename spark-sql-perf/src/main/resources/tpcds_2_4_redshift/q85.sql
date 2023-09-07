@@ -2,14 +2,14 @@
 
  select
     substr(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
- from  dev.spectrum_iceberg_schema.store_returns.web_sales,
-       dev.spectrum_iceberg_schema.store_returns.web_returns,
-       dev.spectrum_iceberg_schema.store_returns.web_page,
-       dev.spectrum_iceberg_schema.store_returns.customer_demographics cd1,
-       dev.spectrum_iceberg_schema.store_returns.customer_demographics cd2,
-       dev.spectrum_iceberg_schema.store_returns.customer_address,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.reason
+ from  dev.spectrum_iceberg_schema.web_sales,
+       dev.spectrum_iceberg_schema.web_returns,
+       dev.spectrum_iceberg_schema.web_page,
+       dev.spectrum_iceberg_schema.customer_demographics cd1,
+       dev.spectrum_iceberg_schema.customer_demographics cd2,
+       dev.spectrum_iceberg_schema.customer_address,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.reason
  where ws_web_page_sk = wp_web_page_sk
    and ws_item_sk = wr_item_sk
    and ws_order_number = wr_order_number

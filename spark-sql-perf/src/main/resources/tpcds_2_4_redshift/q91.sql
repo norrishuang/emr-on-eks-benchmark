@@ -4,13 +4,13 @@
         cc_call_center_id Call_Center, cc_name Call_Center_Name, cc_manager Manager,
         sum(cr_net_loss) Returns_Loss
  from
-     dev.spectrum_iceberg_schema.store_returns.call_center,
-     dev.spectrum_iceberg_schema.store_returns.catalog_returns,
-     dev.spectrum_iceberg_schema.store_returns.date_dim,
-     dev.spectrum_iceberg_schema.store_returns.customer,
-     dev.spectrum_iceberg_schema.store_returns.customer_address,
-     dev.spectrum_iceberg_schema.store_returns.customer_demographics,
-     dev.spectrum_iceberg_schema.store_returns.household_demographics
+     dev.spectrum_iceberg_schema.call_center,
+     dev.spectrum_iceberg_schema.catalog_returns,
+     dev.spectrum_iceberg_schema.date_dim,
+     dev.spectrum_iceberg_schema.customer,
+     dev.spectrum_iceberg_schema.customer_address,
+     dev.spectrum_iceberg_schema.customer_demographics,
+     dev.spectrum_iceberg_schema.household_demographics
  where
         cr_call_center_sk        = cc_call_center_sk
  and    cr_returned_date_sk      = d_date_sk

@@ -2,17 +2,17 @@
 
  with ss as
  (select ca_county,d_qoy, d_year,sum(ss_ext_sales_price) as store_sales
- from  dev.spectrum_iceberg_schema.store_returns.store_sales,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.customer_address
+ from  dev.spectrum_iceberg_schema.store_sales,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.customer_address
  where ss_sold_date_sk = d_date_sk
   and ss_addr_sk=ca_address_sk
  group by ca_county,d_qoy, d_year),
  ws as
  (select ca_county,d_qoy, d_year,sum(ws_ext_sales_price) as web_sales
- from  dev.spectrum_iceberg_schema.store_returns.web_sales,
-       dev.spectrum_iceberg_schema.store_returns.date_dim,
-       dev.spectrum_iceberg_schema.store_returns.customer_address
+ from  dev.spectrum_iceberg_schema.web_sales,
+       dev.spectrum_iceberg_schema.date_dim,
+       dev.spectrum_iceberg_schema.customer_address
  where ws_sold_date_sk = d_date_sk
   and ws_bill_addr_sk=ca_address_sk
  group by ca_county,d_qoy, d_year)

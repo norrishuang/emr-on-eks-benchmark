@@ -8,12 +8,12 @@
   ,sum(case when (cast(d_date as date) >= cast('2000-03-11' as date))
  		then cs_sales_price - coalesce(cr_refunded_cash,0) else 0 end) as sales_after
  from
-     dev.spectrum_iceberg_schema.store_returns.catalog_sales left outer join dev.spectrum_iceberg_schema.store_returns.catalog_returns on
+     dev.spectrum_iceberg_schema.catalog_sales left outer join dev.spectrum_iceberg_schema.catalog_returns on
        (cs_order_number = cr_order_number
         and cs_item_sk = cr_item_sk)
-  , dev.spectrum_iceberg_schema.store_returns.warehouse,
-    dev.spectrum_iceberg_schema.store_returns.item,
-    dev.spectrum_iceberg_schema.store_returns.date_dim
+  , dev.spectrum_iceberg_schema.warehouse,
+    dev.spectrum_iceberg_schema.item,
+    dev.spectrum_iceberg_schema.date_dim
  where
      i_current_price between 0.99 and 1.49
  and i_item_sk          = cs_item_sk

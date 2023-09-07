@@ -5,10 +5,10 @@
         ,stdev,mean, case mean when 0 then null else stdev/mean end cov
   from(select w_warehouse_name,w_warehouse_sk,i_item_sk,d_moy
              ,stddev_samp(inv_quantity_on_hand) stdev,avg(inv_quantity_on_hand) mean
-       from dev.spectrum_iceberg_schema.store_returns.inventory,
-            dev.spectrum_iceberg_schema.store_returns.item,
-            dev.spectrum_iceberg_schema.store_returns.warehouse,
-            dev.spectrum_iceberg_schema.store_returns.date_dim
+       from dev.spectrum_iceberg_schema.inventory,
+            dev.spectrum_iceberg_schema.item,
+            dev.spectrum_iceberg_schema.warehouse,
+            dev.spectrum_iceberg_schema.date_dim
        where inv_item_sk = i_item_sk
          and inv_warehouse_sk = w_warehouse_sk
          and inv_date_sk = d_date_sk

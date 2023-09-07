@@ -14,10 +14,10 @@
        ,count(cs_quantity) as catalog_sales_quantitycount ,avg(cs_quantity) as catalog_sales_quantityave
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitystdev
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitycov
- from  dev.spectrum_iceberg_schema.store_returns.store_sales,
-       dev.spectrum_iceberg_schema.store_returns.store_returns,
-       dev.spectrum_iceberg_schema.store_returns.catalog_sales,
-       dev.spectrum_iceberg_schema.store_returns.date_dim d1, dev.spectrum_iceberg_schema.store_returns.date_dim d2, dev.spectrum_iceberg_schema.store_returns.date_dim d3, dev.spectrum_iceberg_schema.store_returns.store, dev.spectrum_iceberg_schema.store_returns.item
+ from  dev.spectrum_iceberg_schema.store_sales,
+       dev.spectrum_iceberg_schema.store_returns,
+       dev.spectrum_iceberg_schema.catalog_sales,
+       dev.spectrum_iceberg_schema.date_dim d1, dev.spectrum_iceberg_schema.date_dim d2, dev.spectrum_iceberg_schema.date_dim d3, dev.spectrum_iceberg_schema.store, dev.spectrum_iceberg_schema.item
  where d1.d_quarter_name = '2001Q1'
    and d1.d_date_sk = ss_sold_date_sk
    and i_item_sk = ss_item_sk

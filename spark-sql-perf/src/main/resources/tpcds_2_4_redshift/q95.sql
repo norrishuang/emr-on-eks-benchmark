@@ -2,8 +2,8 @@
 
  with ws_wh as
  (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2
-  from  dev.spectrum_iceberg_schema.store_returns.web_sales ws1,
-        dev.spectrum_iceberg_schema.store_returns.web_sales ws2
+  from  dev.spectrum_iceberg_schema.web_sales ws1,
+        dev.spectrum_iceberg_schema.web_sales ws2
   where ws1.ws_order_number = ws2.ws_order_number
     and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  select
@@ -11,10 +11,10 @@
    ,sum(ws_ext_ship_cost) as `total shipping cost`
    ,sum(ws_net_profit) as `total net profit`
  from
-     dev.spectrum_iceberg_schema.store_returns.web_sales ws1,
-     dev.spectrum_iceberg_schema.store_returns.date_dim,
-     dev.spectrum_iceberg_schema.store_returns.customer_address,
-     dev.spectrum_iceberg_schema.store_returns.web_site
+     dev.spectrum_iceberg_schema.web_sales ws1,
+     dev.spectrum_iceberg_schema.date_dim,
+     dev.spectrum_iceberg_schema.customer_address,
+     dev.spectrum_iceberg_schema.web_site
  where
      d_date between cast ('1999-02-01' as date) and
             (cast('1999-02-01' as date) + interval '60' day)
@@ -26,7 +26,7 @@
  and ws1.ws_order_number in (select ws_order_number
                              from ws_wh)
  and ws1.ws_order_number in (select wr_order_number
-                             from dev.spectrum_iceberg_schema.store_returns.web_returns,ws_wh
+                             from dev.spectrum_iceberg_schema.web_returns,ws_wh
                              where wr_order_number = ws_wh.ws_order_number)
  order by count(distinct ws_order_number)
  limit 100
