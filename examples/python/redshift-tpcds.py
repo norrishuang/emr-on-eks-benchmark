@@ -1,8 +1,7 @@
 import csv
 import json
 import time
-import trino
-from trino import transaction
+import redshift_connector
 import sys
 import getopt
 import os
@@ -12,10 +11,8 @@ from urllib.parse import urlparse
 
 SQLFILES = ''
 HOST = ''
-PORT = ''
-CATALOG = 'tpcds'
 OUTPUT = './'
-SCHEMA = 'default'
+SCHEMA = 'iceberg'
 
 '''
 Trino TPC DS 测试
@@ -26,8 +23,6 @@ if len(sys.argv) > 1:
                                "f:h:p:c:o:s:",
                                ["sqlfiles=",
                                 "host=",
-                                "port=",
-                                "catalog=",
                                 "output="])
     for opt_name, opt_value in opts:
         if opt_name in ('-f', '--sqlfiles'):
@@ -36,15 +31,6 @@ if len(sys.argv) > 1:
         elif opt_name in ('-h', '--host'):
             HOST = opt_value
             print("HOST:" + HOST)
-        elif opt_name in ('-p', '--port'):
-            PORT = opt_value
-            print("PORT:" + PORT)
-        elif opt_name in ('-c', '--catalog'):
-            CATALOG = opt_value
-            print("CATALOG:" + CATALOG)
-        elif opt_name in ('-s', '--schema'):
-            SCHEMA = opt_value
-            print("SCHEMA:" + SCHEMA)
         elif opt_name in ('-o', '--output'):
             OUTPUT = opt_value
             print("OUTPUT:" + OUTPUT)
@@ -58,11 +44,11 @@ else:
 
 '''
 Load SQL files from
-/Users/xiohuang/IdeaProjects/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_athena
+/Users/xiohuang/IdeaProjects/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift
 '''
 
 #write result csv
-writeresultfile = "{:s}/result_{:s}_{:s}.csv".format(OUTPUT, CATALOG, SCHEMA)
+writeresultfile = "{:s}/result_{:s}.csv".format(OUTPUT, SCHEMA)
 
 def load_sql_file(sqlpath):
     ##写结果集的表头 覆盖原来的文件
@@ -86,13 +72,13 @@ def load_sql_file(sqlpath):
 
 
 def executeSQL(filename, sqltext):
-    conn = trino.dbapi.connect(
+
+    conn = redshift_connector.connect(
         host=HOST,
-        port=PORT,
-        user='trino',
-        catalog=CATALOG,
-        schema=SCHEMA,
-        isolation_level=transaction.IsolationLevel.READ_COMMITTED
+        database='dev',
+        port=5439,
+        user='awsuser',
+        password='Amazon123!'
     )
     rowcount = 0
     starttime = int(round(time.time()*1000))
@@ -104,8 +90,10 @@ def executeSQL(filename, sqltext):
         cursor.close()
     except Exception as err:
         print(err)
+        # raise err
+        # print(rows)
         cursor.close()
-        conn.close()
+        # conn.close()
         rowcount = -999
     endtime = int(round(time.time()*1000))
     conn.close()
@@ -117,7 +105,7 @@ def executeSQL(filename, sqltext):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #
         writer.writerow({'SQL': filename,
-                         'ExecuteTime': int(endtime - starttime)/1000,
+                         'ExecuteTime': int(endtime - starttime),
                          'Rows': rowcount})
 
 
