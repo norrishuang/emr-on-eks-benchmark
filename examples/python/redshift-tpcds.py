@@ -50,10 +50,10 @@ else:
     print("Job failed. Please provided params sqlfiles,region .etc ")
     sys.exit(1)
 
-'''
-Load SQL files from
-/Users/xiohuang/IdeaProjects/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift
-'''
+##
+##Load SQL files from
+##/Users/xiohuang/IdeaProjects/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift
+
 
 #write result csv
 writeresultfile = "{:s}/result_{:s}.csv".format(OUTPUT, SCHEMA)
@@ -66,17 +66,20 @@ def load_sql_file(sqlpath):
         writer.writeheader()
 
     i = 0
+
+
     for root, dirs, files in os.walk(sqlpath):
         for file in sorted(files):
-            sqlfilepath = os.path.join(root, file)
-            sqlfile = open(sqlfilepath, encoding='utf-8')
-            sqltext = sqlfile.read()
-            sqlfile.close()
+            if os.path.splitext(file)[1] == '.sql':
+                sqlfilepath = os.path.join(root, file)
+                sqlfile = open(sqlfilepath, encoding='utf-8')
+                sqltext = sqlfile.read()
+                sqlfile.close()
 
-            print('exec sql:' + sqlfilepath)
-            executeSQL(file, sqltext)
-            i = i + 1
-            print("process:[{:d}/105]".format(i))
+                print('exec sql:' + sqlfilepath)
+                executeSQL(file, sqltext)
+                i = i + 1
+                print("process:[{:d}/105]".format(i))
 
 
 def executeSQL(filename, sqltext):
