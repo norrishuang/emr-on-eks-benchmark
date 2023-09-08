@@ -20,26 +20,26 @@
   max(cd_dep_college_count),
   avg(cd_dep_college_count)
  from
-     dev.spectrum_iceberg_schema.customer c,
-     dev.spectrum_iceberg_schema.customer_address ca,
-     dev.spectrum_iceberg_schema.customer_demographics
+     dev.%s.customer c,
+     dev.%s.customer_address ca,
+     dev.%s.customer_demographics
  where
   c.c_current_addr_sk = ca.ca_address_sk and
   cd_demo_sk = c.c_current_cdemo_sk and
-  exists (select * from  dev.spectrum_iceberg_schema.store_sales,
-                         dev.spectrum_iceberg_schema.date_dim
+  exists (select * from  dev.%s.store_sales,
+                         dev.%s.date_dim
           where c.c_customer_sk = ss_customer_sk and
                 ss_sold_date_sk = d_date_sk and
                 d_year = 2002 and
                 d_qoy < 4) and
-   (exists (select * from  dev.spectrum_iceberg_schema.web_sales,
-                           dev.spectrum_iceberg_schema.date_dim
+   (exists (select * from  dev.%s.web_sales,
+                           dev.%s.date_dim
             where c.c_customer_sk = ws_bill_customer_sk and
                   ws_sold_date_sk = d_date_sk and
                   d_year = 2002 and
                   d_qoy < 4) or
-    exists (select * from dev.spectrum_iceberg_schema.catalog_sales,
-                          dev.spectrum_iceberg_schema.date_dim
+    exists (select * from dev.%s.catalog_sales,
+                          dev.%s.date_dim
             where c.c_customer_sk = cs_ship_customer_sk and
                   cs_sold_date_sk = d_date_sk and
                   d_year = 2002 and

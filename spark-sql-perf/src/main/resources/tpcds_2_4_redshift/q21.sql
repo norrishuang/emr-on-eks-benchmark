@@ -8,7 +8,7 @@
           sum(case when (cast(d_date as date) >= cast ('2000-03-11' as date))
                    then inv_quantity_on_hand
                    else 0 end) as inv_after
-   from dev.spectrum_iceberg_schema.inventory, dev.spectrum_iceberg_schema.warehouse,  dev.spectrum_iceberg_schema.item, dev.spectrum_iceberg_schema.date_dim
+   from dev.%s.inventory, dev.%s.warehouse,  dev.%s.item, dev.%s.date_dim
    where i_current_price between 0.99 and 1.49
      and i_item_sk          = inv_item_sk
      and inv_warehouse_sk   = w_warehouse_sk

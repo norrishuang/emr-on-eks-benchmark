@@ -1,10 +1,10 @@
 --q96.sql--
 
  select count(*)
- from  dev.spectrum_iceberg_schema.store_sales,
-       dev.spectrum_iceberg_schema.household_demographics b1,
-       dev.spectrum_iceberg_schema.time_dim c1,
-       dev.spectrum_iceberg_schema.store d1
+ from  dev.%s.store_sales,
+       dev.%s.household_demographics b1,
+       dev.%s.time_dim c1,
+       dev.%s.store d1
  where ss_sold_time_sk = c1.t_time_sk
      and ss_hdemo_sk = b1.hd_demo_sk
      and ss_store_sk = s_store_sk

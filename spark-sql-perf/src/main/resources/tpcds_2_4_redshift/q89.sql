@@ -9,10 +9,10 @@
        avg(sum(ss_sales_price)) over
          (partition by i_category, i_brand, s_store_name, s_company_name)
          avg_monthly_sales
- from  dev.spectrum_iceberg_schema.item,
-       dev.spectrum_iceberg_schema.store_sales,
-       dev.spectrum_iceberg_schema.date_dim,
-       dev.spectrum_iceberg_schema.store
+ from  dev.%s.item,
+       dev.%s.store_sales,
+       dev.%s.date_dim,
+       dev.%s.store
  where ss_item_sk = i_item_sk and
       ss_sold_date_sk = d_date_sk and
       ss_store_sk = s_store_sk and

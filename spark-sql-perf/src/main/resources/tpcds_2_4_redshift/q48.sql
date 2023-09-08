@@ -1,11 +1,11 @@
 --q48.sql--
 
  select sum (ss_quantity)
- from  dev.spectrum_iceberg_schema.store_sales,
-       dev.spectrum_iceberg_schema.store,
-       dev.spectrum_iceberg_schema.customer_demographics,
-       dev.spectrum_iceberg_schema.customer_address,
-       dev.spectrum_iceberg_schema.date_dim
+ from  dev.%s.store_sales,
+       dev.%s.store,
+       dev.%s.customer_demographics,
+       dev.%s.customer_address,
+       dev.%s.date_dim
  where s_store_sk = ss_store_sk
  and  ss_sold_date_sk = d_date_sk and d_year = 2000
  and

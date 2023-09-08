@@ -5,12 +5,12 @@
           sum(ss_ext_sales_price) as sales,
           sum(coalesce(sr_return_amt, 0)) as returns,
           sum(ss_net_profit - coalesce(sr_net_loss, 0)) as profit
-  from dev.spectrum_iceberg_schema.store_sales left outer join dev.spectrum_iceberg_schema.store_returns on
+  from dev.%s.store_sales left outer join dev.%s.store_returns on
          (ss_item_sk = sr_item_sk and ss_ticket_number = sr_ticket_number),
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.store,
-      dev.spectrum_iceberg_schema.item,
-      dev.spectrum_iceberg_schema.promotion
+      dev.%s.date_dim,
+      dev.%s.store,
+      dev.%s.item,
+      dev.%s.promotion
  where ss_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)
@@ -25,12 +25,12 @@
           sum(cs_ext_sales_price) as sales,
           sum(coalesce(cr_return_amount, 0)) as returns,
           sum(cs_net_profit - coalesce(cr_net_loss, 0)) as profit
-  from dev.spectrum_iceberg_schema.catalog_sales left outer join dev.spectrum_iceberg_schema.catalog_returns on
+  from dev.%s.catalog_sales left outer join dev.%s.catalog_returns on
          (cs_item_sk = cr_item_sk and cs_order_number = cr_order_number),
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.catalog_page,
-      dev.spectrum_iceberg_schema.item,
-      dev.spectrum_iceberg_schema.promotion
+      dev.%s.date_dim,
+      dev.%s.catalog_page,
+      dev.%s.item,
+      dev.%s.promotion
  where cs_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)
@@ -45,12 +45,12 @@
           sum(ws_ext_sales_price) as sales,
           sum(coalesce(wr_return_amt, 0)) as returns,
           sum(ws_net_profit - coalesce(wr_net_loss, 0)) as profit
-  from  dev.spectrum_iceberg_schema.web_sales left outer join dev.spectrum_iceberg_schema.web_returns on
+  from  dev.%s.web_sales left outer join dev.%s.web_returns on
          (ws_item_sk = wr_item_sk and ws_order_number = wr_order_number),
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.web_site,
-      dev.spectrum_iceberg_schema.item,
-      dev.spectrum_iceberg_schema.promotion
+      dev.%s.date_dim,
+      dev.%s.web_site,
+      dev.%s.item,
+      dev.%s.promotion
  where ws_sold_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and (cast('2000-08-23' as date) + interval '30' day)

@@ -1,10 +1,10 @@
 --q82.sql--
 
  select i_item_id, i_item_desc, i_current_price
- from  dev.spectrum_iceberg_schema.item,
-       dev.spectrum_iceberg_schema.inventory,
-       dev.spectrum_iceberg_schema.date_dim,
-       dev.spectrum_iceberg_schema.store_sales
+ from  dev.%s.item,
+       dev.%s.inventory,
+       dev.%s.date_dim,
+       dev.%s.store_sales
  where i_current_price between 62 and 62+30
    and inv_item_sk = i_item_sk
    and d_date_sk=inv_date_sk

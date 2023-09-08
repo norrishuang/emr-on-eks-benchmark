@@ -3,8 +3,8 @@
  with cs_ui as
   (select cs_item_sk
          ,sum(cs_ext_list_price) as sale,sum(cr_refunded_cash+cr_reversed_charge+cr_store_credit) as refund
-   from dev.spectrum_iceberg_schema.catalog_sales,
-        dev.spectrum_iceberg_schema.catalog_returns
+   from dev.%s.catalog_sales,
+        dev.%s.catalog_returns
    where cs_item_sk = cr_item_sk
      and cs_order_number = cr_order_number
    group by cs_item_sk
@@ -15,23 +15,23 @@
           ad1.ca_zip b_zip, ad2.ca_street_number c_street_number, ad2.ca_street_name c_street_name,
           ad2.ca_city c_city, ad2.ca_zip c_zip, d1.d_year as syear, d2.d_year as fsyear, d3.d_year s2year,
           count(*) cnt, sum(ss_wholesale_cost) s1, sum(ss_list_price) s2, sum(ss_coupon_amt) s3
-   FROM  dev.spectrum_iceberg_schema.store_sales,
-         dev.spectrum_iceberg_schema.store_returns,
+   FROM  dev.%s.store_sales,
+         dev.%s.store_returns,
          cs_ui,
-         dev.spectrum_iceberg_schema.date_dim d1,
-         dev.spectrum_iceberg_schema.date_dim d2,
-         dev.spectrum_iceberg_schema.date_dim d3,
-         dev.spectrum_iceberg_schema.store,
-         dev.spectrum_iceberg_schema.customer,
-         dev.spectrum_iceberg_schema.customer_demographics cd1,
-         dev.spectrum_iceberg_schema.customer_demographics cd2,
-            dev.spectrum_iceberg_schema.promotion,
-            dev.spectrum_iceberg_schema.household_demographics hd1,
-            dev.spectrum_iceberg_schema.household_demographics hd2,
-            dev.spectrum_iceberg_schema.customer_address ad1,
-            dev.spectrum_iceberg_schema.customer_address ad2,
-            dev.spectrum_iceberg_schema.income_band ib1,dev.spectrum_iceberg_schema.income_band ib2,
-            dev.spectrum_iceberg_schema.item
+         dev.%s.date_dim d1,
+         dev.%s.date_dim d2,
+         dev.%s.date_dim d3,
+         dev.%s.store,
+         dev.%s.customer,
+         dev.%s.customer_demographics cd1,
+         dev.%s.customer_demographics cd2,
+            dev.%s.promotion,
+            dev.%s.household_demographics hd1,
+            dev.%s.household_demographics hd2,
+            dev.%s.customer_address ad1,
+            dev.%s.customer_address ad2,
+            dev.%s.income_band ib1,dev.%s.income_band ib2,
+            dev.%s.item
    WHERE  ss_store_sk = s_store_sk AND
           ss_sold_date_sk = d1.d_date_sk AND
           ss_customer_sk = c_customer_sk AND

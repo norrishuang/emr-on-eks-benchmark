@@ -5,11 +5,11 @@
         avg(cs_list_price) agg2,
         avg(cs_coupon_amt) agg3,
         avg(cs_sales_price) agg4
- from dev.spectrum_iceberg_schema.catalog_sales,
-      dev.spectrum_iceberg_schema.customer_demographics,
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.item,
-      dev.spectrum_iceberg_schema.promotion
+ from dev.%s.catalog_sales,
+      dev.%s.customer_demographics,
+      dev.%s.date_dim,
+      dev.%s.item,
+      dev.%s.promotion
  where cs_sold_date_sk = d_date_sk and
        cs_item_sk = i_item_sk and
        cs_bill_cdemo_sk = cd_demo_sk and

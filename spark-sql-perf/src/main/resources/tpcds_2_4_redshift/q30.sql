@@ -4,9 +4,9 @@
  (select wr_returning_customer_sk as ctr_customer_sk
         ,ca_state as ctr_state,
  	sum(wr_return_amt) as ctr_total_return
- from dev.spectrum_iceberg_schema.web_returns,
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.customer_address
+ from dev.%s.web_returns,
+      dev.%s.date_dim,
+      dev.%s.customer_address
  where wr_returned_date_sk = d_date_sk
    and d_year = 2002
    and wr_returning_addr_sk = ca_address_sk
@@ -15,8 +15,8 @@
        ,c_birth_day,c_birth_month,c_birth_year,c_birth_country,c_login,c_email_address
        ,c_last_review_date,ctr_total_return
  from customer_total_return ctr1,
-      dev.spectrum_iceberg_schema.customer_address,
-      dev.spectrum_iceberg_schema.customer
+      dev.%s.customer_address,
+      dev.%s.customer
  where ctr1.ctr_total_return > (select avg(ctr_total_return)*1.2
  			  from customer_total_return ctr2
                   	  where ctr1.ctr_state = ctr2.ctr_state)

@@ -4,11 +4,11 @@
  from(select *
      from (select item_sk,rank() over (order by rank_col asc) rnk
            from (select ss_item_sk item_sk,avg(ss_net_profit) rank_col
-                 from dev.spectrum_iceberg_schema.store_sales ss1
+                 from dev.%s.store_sales ss1
                  where ss_store_sk = 4
                  group by ss_item_sk
                  having avg(ss_net_profit) > 0.9*(select avg(ss_net_profit) rank_col
-                                                  from dev.spectrum_iceberg_schema.store_sales
+                                                  from dev.%s.store_sales
                                                   where ss_store_sk = 4
                                                     and ss_addr_sk is null
                                                   group by ss_store_sk))V1)V11
@@ -16,16 +16,16 @@
     (select *
      from (select item_sk,rank() over (order by rank_col desc) rnk
            from (select ss_item_sk item_sk,avg(ss_net_profit) rank_col
-                 from dev.spectrum_iceberg_schema.store_sales ss1
+                 from dev.%s.store_sales ss1
                  where ss_store_sk = 4
                  group by ss_item_sk
                  having avg(ss_net_profit) > 0.9*(select avg(ss_net_profit) rank_col
-                                                  from dev.spectrum_iceberg_schema.store_sales
+                                                  from dev.%s.store_sales
                                                   where ss_store_sk = 4
                                                     and ss_addr_sk is null
                                                   group by ss_store_sk))V2)V21
      where rnk  < 11) descending,
-     dev.spectrum_iceberg_schema.item i1, dev.spectrum_iceberg_schema.item i2
+     dev.%s.item i1, dev.%s.item i2
  where asceding.rnk = descending.rnk
    and i1.i_item_sk=asceding.item_sk
    and i2.i_item_sk=descending.item_sk

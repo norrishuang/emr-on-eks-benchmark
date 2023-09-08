@@ -3,13 +3,13 @@
  select promotions,total,cast(promotions as decimal(15,4))/cast(total as decimal(15,4))*100
  from
    (select sum(ss_ext_sales_price) promotions
-     from   dev.spectrum_iceberg_schema.store_sales,
-            dev.spectrum_iceberg_schema.store,
-            dev.spectrum_iceberg_schema.promotion,
-            dev.spectrum_iceberg_schema.date_dim,
-            dev.spectrum_iceberg_schema.customer,
-            dev.spectrum_iceberg_schema.customer_address,
-            dev.spectrum_iceberg_schema.item
+     from   dev.%s.store_sales,
+            dev.%s.store,
+            dev.%s.promotion,
+            dev.%s.date_dim,
+            dev.%s.customer,
+            dev.%s.customer_address,
+            dev.%s.item
      where ss_sold_date_sk = d_date_sk
      and   ss_store_sk = s_store_sk
      and   ss_promo_sk = p_promo_sk
@@ -23,12 +23,12 @@
      and   d_year = 1998
      and   d_moy  = 11) promotional_sales cross join
    (select sum(ss_ext_sales_price) total
-     from   dev.spectrum_iceberg_schema.store_sales,
-            dev.spectrum_iceberg_schema.store,
-            dev.spectrum_iceberg_schema.date_dim,
-            dev.spectrum_iceberg_schema.customer,
-            dev.spectrum_iceberg_schema.customer_address,
-            dev.spectrum_iceberg_schema.item
+     from   dev.%s.store_sales,
+            dev.%s.store,
+            dev.%s.date_dim,
+            dev.%s.customer,
+            dev.%s.customer_address,
+            dev.%s.item
      where ss_sold_date_sk = d_date_sk
      and   ss_store_sk = s_store_sk
      and   ss_customer_sk= c_customer_sk

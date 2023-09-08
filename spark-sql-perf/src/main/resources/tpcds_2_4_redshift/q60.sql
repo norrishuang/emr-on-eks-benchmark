@@ -2,12 +2,12 @@
 
  with ss as (
     select i_item_id,sum(ss_ext_sales_price) total_sales
-    from  dev.spectrum_iceberg_schema.store_sales,
-          dev.spectrum_iceberg_schema.date_dim,
-          dev.spectrum_iceberg_schema.customer_address,
-          dev.spectrum_iceberg_schema.item
+    from  dev.%s.store_sales,
+          dev.%s.date_dim,
+          dev.%s.customer_address,
+          dev.%s.item
     where
-        i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_category in ('Music'))
+        i_item_id in (select i_item_id from dev.%s.item where i_category in ('Music'))
     and     ss_item_sk              = i_item_sk
     and     ss_sold_date_sk         = d_date_sk
     and     d_year                  = 1998
@@ -17,12 +17,12 @@
     group by i_item_id),
   cs as (
     select i_item_id,sum(cs_ext_sales_price) total_sales
-    from dev.spectrum_iceberg_schema.catalog_sales,
-         dev.spectrum_iceberg_schema.date_dim,
-         dev.spectrum_iceberg_schema.customer_address,
-         dev.spectrum_iceberg_schema.item
+    from dev.%s.catalog_sales,
+         dev.%s.date_dim,
+         dev.%s.customer_address,
+         dev.%s.item
     where
-        i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_category in ('Music'))
+        i_item_id in (select i_item_id from dev.%s.item where i_category in ('Music'))
     and     cs_item_sk              = i_item_sk
     and     cs_sold_date_sk         = d_date_sk
     and     d_year                  = 1998
@@ -32,12 +32,12 @@
     group by i_item_id),
   ws as (
     select i_item_id,sum(ws_ext_sales_price) total_sales
-    from  dev.spectrum_iceberg_schema.web_sales,
-          dev.spectrum_iceberg_schema.date_dim,
-          dev.spectrum_iceberg_schema.customer_address,
-          dev.spectrum_iceberg_schema.item
+    from  dev.%s.web_sales,
+          dev.%s.date_dim,
+          dev.%s.customer_address,
+          dev.%s.item
     where
-        i_item_id in (select i_item_id from dev.spectrum_iceberg_schema.item where i_category in ('Music'))
+        i_item_id in (select i_item_id from dev.%s.item where i_category in ('Music'))
     and     ws_item_sk              = i_item_sk
     and     ws_sold_date_sk         = d_date_sk
     and     d_year                  = 1998

@@ -23,7 +23,7 @@ python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spar
 '''
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "f:h:o:u:p:",
+                               "f:h:o:u:p:s:",
                                ["sqlfiles=",
                                 "host=",
                                 "output="])
@@ -42,6 +42,9 @@ if len(sys.argv) > 1:
         elif opt_name in ('-o', '--output'):
             OUTPUT = opt_value
             print("OUTPUT:" + OUTPUT)
+        elif opt_name in ('-s', '--schema'):
+            OUTPUT = opt_value
+            print("SCHEMA:" + SCHEMA)
         else:
             print("need parameters [sqlfiles,region,database etc.]")
             exit()
@@ -95,7 +98,7 @@ def executeSQL(filename, sqltext):
     starttime = int(round(time.time()*1000))
     cursor = conn.cursor()
     try:
-        cursor.execute(sqltext)
+        cursor.execute(sqltext, SCHEMA)
         rows = cursor.fetchall()
         rowcount = len(rows)
         cursor.close()

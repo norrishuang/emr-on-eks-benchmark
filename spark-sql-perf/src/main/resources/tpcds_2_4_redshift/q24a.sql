@@ -3,7 +3,7 @@
  with ssales as
  (select c_last_name, c_first_name, s_store_name, ca_state, s_state, i_color,
         i_current_price, i_manager_id, i_units, i_size, sum(ss_net_paid) netpaid
- from  dev.spectrum_iceberg_schema.store_sales, dev.spectrum_iceberg_schema.store_returns, dev.spectrum_iceberg_schema.store,  dev.spectrum_iceberg_schema.item,  dev.spectrum_iceberg_schema.customer, dev.spectrum_iceberg_schema.customer_address
+ from  dev.%s.store_sales, dev.%s.store_returns, dev.%s.store,  dev.%s.item,  dev.%s.customer, dev.%s.customer_address
  where ss_ticket_number = sr_ticket_number
    and ss_item_sk = sr_item_sk
    and ss_customer_sk = c_customer_sk

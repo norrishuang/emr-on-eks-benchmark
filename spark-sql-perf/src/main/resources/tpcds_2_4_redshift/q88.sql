@@ -3,10 +3,10 @@
  select  *
  from
    (select count(*) h8_30_to_9
-    from  dev.spectrum_iceberg_schema.store_sales a,
-          dev.spectrum_iceberg_schema.household_demographics b,
-          dev.spectrum_iceberg_schema.time_dim c,
-          dev.spectrum_iceberg_schema.store d
+    from  dev.%s.store_sales a,
+          dev.%s.household_demographics b,
+          dev.%s.time_dim c,
+          dev.%s.store d
     where ss_sold_time_sk = c.t_time_sk
      and ss_hdemo_sk = b.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -17,10 +17,10 @@
           (b.hd_dep_count = 0 and b.hd_vehicle_count<=0+2))
      and d.s_store_name = 'ese') s1 cross join
    (select count(*) h9_to_9_30
-    from  dev.spectrum_iceberg_schema.store_sales a,
-          dev.spectrum_iceberg_schema.household_demographics b,
-          dev.spectrum_iceberg_schema.time_dim c,
-          dev.spectrum_iceberg_schema.store d
+    from  dev.%s.store_sales a,
+          dev.%s.household_demographics b,
+          dev.%s.time_dim c,
+          dev.%s.store d
     where ss_sold_time_sk = c.t_time_sk
       and ss_hdemo_sk = b.hd_demo_sk
       and ss_store_sk = s_store_sk
@@ -31,10 +31,10 @@
           (b.hd_dep_count = 0 and b.hd_vehicle_count<=0+2))
       and d.s_store_name = 'ese') s2 cross join
  (select count(*) h9_30_to_10
- from  dev.spectrum_iceberg_schema.store_sales a1,
-       dev.spectrum_iceberg_schema.household_demographics b1,
-       dev.spectrum_iceberg_schema.time_dim c1,
-       dev.spectrum_iceberg_schema.store d1
+ from  dev.%s.store_sales a1,
+       dev.%s.household_demographics b1,
+       dev.%s.time_dim c1,
+       dev.%s.store d1
  where ss_sold_time_sk = c1.t_time_sk
      and ss_hdemo_sk = b1.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -45,10 +45,10 @@
           (b1.hd_dep_count = 0 and b1.hd_vehicle_count<=0+2))
      and d1.s_store_name = 'ese') s3 cross join
  (select count(*) h10_to_10_30
- from  dev.spectrum_iceberg_schema.store_sales a2,
-       dev.spectrum_iceberg_schema.household_demographics b2,
-       dev.spectrum_iceberg_schema.time_dim c2,
-       dev.spectrum_iceberg_schema.store d2
+ from  dev.%s.store_sales a2,
+       dev.%s.household_demographics b2,
+       dev.%s.time_dim c2,
+       dev.%s.store d2
  where ss_sold_time_sk = c2.t_time_sk
      and ss_hdemo_sk = b2.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -59,10 +59,10 @@
           (b2.hd_dep_count = 0 and b2.hd_vehicle_count<=0+2))
      and d2.s_store_name = 'ese') s4 cross join
  (select count(*) h10_30_to_11
- from  dev.spectrum_iceberg_schema.store_sales a3,
-       dev.spectrum_iceberg_schema.household_demographics b3,
-       dev.spectrum_iceberg_schema.time_dim c3,
-       dev.spectrum_iceberg_schema.store d3
+ from  dev.%s.store_sales a3,
+       dev.%s.household_demographics b3,
+       dev.%s.time_dim c3,
+       dev.%s.store d3
  where ss_sold_time_sk = c3.t_time_sk
      and ss_hdemo_sk = b3.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -73,10 +73,10 @@
           (b3.hd_dep_count = 0 and b3.hd_vehicle_count<=0+2))
      and d3.s_store_name = 'ese') s5 cross join
  (select count(*) h11_to_11_30
- from  dev.spectrum_iceberg_schema.store_sales a4,
-       dev.spectrum_iceberg_schema.household_demographics b4,
-       dev.spectrum_iceberg_schema.time_dim c4,
-       dev.spectrum_iceberg_schema.store d4
+ from  dev.%s.store_sales a4,
+       dev.%s.household_demographics b4,
+       dev.%s.time_dim c4,
+       dev.%s.store d4
  where ss_sold_time_sk = c4.t_time_sk
      and ss_hdemo_sk = b4.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -87,10 +87,10 @@
           (b4.hd_dep_count = 0 and b4.hd_vehicle_count<=0+2))
      and d4.s_store_name = 'ese') s6 cross join
  (select count(*) h11_30_to_12
- from  dev.spectrum_iceberg_schema.store_sales a5,
-       dev.spectrum_iceberg_schema.household_demographics b5,
-       dev.spectrum_iceberg_schema.time_dim c5,
-       dev.spectrum_iceberg_schema.store d5
+ from  dev.%s.store_sales a5,
+       dev.%s.household_demographics b5,
+       dev.%s.time_dim c5,
+       dev.%s.store d5
  where ss_sold_time_sk = c5.t_time_sk
      and ss_hdemo_sk = b5.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -101,10 +101,10 @@
           (b5.hd_dep_count = 0 and b5.hd_vehicle_count<=0+2))
      and d5.s_store_name = 'ese') s7 cross join
  (select count(*) h12_to_12_30
- from  dev.spectrum_iceberg_schema.store_sales a6,
-       dev.spectrum_iceberg_schema.household_demographics b6,
-       dev.spectrum_iceberg_schema.time_dim c6,
-       dev.spectrum_iceberg_schema.store  d6
+ from  dev.%s.store_sales a6,
+       dev.%s.household_demographics b6,
+       dev.%s.time_dim c6,
+       dev.%s.store  d6
  where ss_sold_time_sk = c6.t_time_sk
      and ss_hdemo_sk = b6.hd_demo_sk
      and ss_store_sk = s_store_sk

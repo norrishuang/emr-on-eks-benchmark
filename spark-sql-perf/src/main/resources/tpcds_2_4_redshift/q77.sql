@@ -2,9 +2,9 @@
 
  with ss as
  (select s_store_sk, sum(ss_ext_sales_price) as sales, sum(ss_net_profit) as profit
-  from  dev.spectrum_iceberg_schema.store_sales,
-        dev.spectrum_iceberg_schema.date_dim,
-        dev.spectrum_iceberg_schema.store
+  from  dev.%s.store_sales,
+        dev.%s.date_dim,
+        dev.%s.store
   where ss_sold_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)
@@ -12,9 +12,9 @@
   group by s_store_sk),
  sr as
  (select s_store_sk, sum(sr_return_amt) as returns, sum(sr_net_loss) as profit_loss
- from dev.spectrum_iceberg_schema.store_returns,
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.store
+ from dev.%s.store_returns,
+      dev.%s.date_dim,
+      dev.%s.store
  where sr_returned_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)
@@ -22,24 +22,24 @@
  group by s_store_sk),
  cs as
  (select cs_call_center_sk, sum(cs_ext_sales_price) as sales, sum(cs_net_profit) as profit
- from dev.spectrum_iceberg_schema.catalog_sales,
-      dev.spectrum_iceberg_schema.date_dim
+ from dev.%s.catalog_sales,
+      dev.%s.date_dim
  where cs_sold_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)
  group by cs_call_center_sk),
  cr as
  (select cr_call_center_sk, sum(cr_return_amount) as returns, sum(cr_net_loss) as profit_loss
- from dev.spectrum_iceberg_schema.catalog_returns, dev.spectrum_iceberg_schema.date_dim
+ from dev.%s.catalog_returns, dev.%s.date_dim
  where cr_returned_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)
 	group by cr_call_center_sk),
  ws as
  (select wp_web_page_sk, sum(ws_ext_sales_price) as sales, sum(ws_net_profit) as profit
- from  dev.spectrum_iceberg_schema.web_sales,
-       dev.spectrum_iceberg_schema.date_dim,
-       dev.spectrum_iceberg_schema.web_page
+ from  dev.%s.web_sales,
+       dev.%s.date_dim,
+       dev.%s.web_page
  where ws_sold_date_sk = d_date_sk
     and d_date between cast('2000-08-23' as date) and
                        (cast('2000-08-23' as date) + interval '30' day)
@@ -47,9 +47,9 @@
  group by wp_web_page_sk),
  wr as
  (select wp_web_page_sk, sum(wr_return_amt) as returns, sum(wr_net_loss) as profit_loss
- from dev.spectrum_iceberg_schema.web_returns,
-      dev.spectrum_iceberg_schema.date_dim,
-      dev.spectrum_iceberg_schema.web_page
+ from dev.%s.web_returns,
+      dev.%s.date_dim,
+      dev.%s.web_page
  where wr_returned_date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date) and
                           (cast('2000-08-23' as date) + interval '30' day)

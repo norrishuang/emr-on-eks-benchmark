@@ -7,9 +7,9 @@ select i_item_id, i_item_desc
        ,sum(cs_ext_sales_price) as itemrevenue
        ,sum(cs_ext_sales_price)*100/sum(sum(cs_ext_sales_price)) over
            (partition by i_class) as revenueratio
- from dev.spectrum_iceberg_schema.catalog_sales,
-      dev.spectrum_iceberg_schema.item,
-      dev.spectrum_iceberg_schema.date_dim
+ from dev.%s.catalog_sales,
+      dev.%s.item,
+      dev.%s.date_dim
  where cs_item_sk = i_item_sk
    and i_category in ('Sports', 'Books', 'Home')
    and cs_sold_date_sk = d_date_sk
