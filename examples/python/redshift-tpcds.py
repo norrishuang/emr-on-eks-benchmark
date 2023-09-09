@@ -43,7 +43,7 @@ if len(sys.argv) > 1:
             OUTPUT = opt_value
             print("OUTPUT:" + OUTPUT)
         elif opt_name in ('-s', '--schema'):
-            OUTPUT = opt_value
+            SCHEMA = opt_value
             print("SCHEMA:" + SCHEMA)
         else:
             print("need parameters [sqlfiles,region,database etc.]")
@@ -98,7 +98,8 @@ def executeSQL(filename, sqltext):
     starttime = int(round(time.time()*1000))
     cursor = conn.cursor()
     try:
-        cursor.execute(sqltext, SCHEMA)
+        # print(sqltext.format(SCHEMA))
+        cursor.execute(sqltext.format(SCHEMA))
         rows = cursor.fetchall()
         rowcount = len(rows)
         cursor.close()

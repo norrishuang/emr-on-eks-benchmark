@@ -5,11 +5,11 @@
         avg(cs_list_price) agg2,
         avg(cs_coupon_amt) agg3,
         avg(cs_sales_price) agg4
- from dev.%s.catalog_sales,
-      dev.%s.customer_demographics,
-      dev.%s.date_dim,
-      dev.%s.item,
-      dev.%s.promotion
+ from dev.{0}.catalog_sales,
+      dev.{0}.customer_demographics,
+      dev.{0}.date_dim,
+      dev.{0}.item,
+      dev.{0}.promotion
  where cs_sold_date_sk = d_date_sk and
        cs_item_sk = i_item_sk and
        cs_bill_cdemo_sk = cd_demo_sk and

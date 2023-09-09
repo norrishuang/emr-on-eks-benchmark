@@ -12,11 +12,11 @@
                   (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days`
    ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days`
  from
-     dev.%s.store_sales,
-     dev.%s.store_returns,
-     dev.%s.store,
-     dev.%s.date_dim d1,
-     dev.%s.date_dim d2
+     dev.{0}.store_sales,
+     dev.{0}.store_returns,
+     dev.{0}.store,
+     dev.{0}.date_dim d1,
+     dev.{0}.date_dim d2
  where
      d2.d_year = 2001
  and d2.d_moy  = 8

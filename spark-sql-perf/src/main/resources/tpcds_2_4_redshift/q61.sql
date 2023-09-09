@@ -3,13 +3,13 @@
  select promotions,total,cast(promotions as decimal(15,4))/cast(total as decimal(15,4))*100
  from
    (select sum(ss_ext_sales_price) promotions
-     from   dev.%s.store_sales,
-            dev.%s.store,
-            dev.%s.promotion,
-            dev.%s.date_dim,
-            dev.%s.customer,
-            dev.%s.customer_address,
-            dev.%s.item
+     from   dev.{0}.store_sales,
+            dev.{0}.store,
+            dev.{0}.promotion,
+            dev.{0}.date_dim,
+            dev.{0}.customer,
+            dev.{0}.customer_address,
+            dev.{0}.item
      where ss_sold_date_sk = d_date_sk
      and   ss_store_sk = s_store_sk
      and   ss_promo_sk = p_promo_sk
@@ -23,12 +23,12 @@
      and   d_year = 1998
      and   d_moy  = 11) promotional_sales cross join
    (select sum(ss_ext_sales_price) total
-     from   dev.%s.store_sales,
-            dev.%s.store,
-            dev.%s.date_dim,
-            dev.%s.customer,
-            dev.%s.customer_address,
-            dev.%s.item
+     from   dev.{0}.store_sales,
+            dev.{0}.store,
+            dev.{0}.date_dim,
+            dev.{0}.customer,
+            dev.{0}.customer_address,
+            dev.{0}.item
      where ss_sold_date_sk = d_date_sk
      and   ss_store_sk = s_store_sk
      and   ss_customer_sk= c_customer_sk

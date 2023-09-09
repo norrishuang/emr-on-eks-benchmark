@@ -1,12 +1,12 @@
 --q8.sql--
 
  select s_store_name, sum(ss_net_profit)
- from dev.%s.store_sales,
-      dev.%s.date_dim,
-      dev.%s.store,
+ from dev.{0}.store_sales,
+      dev.{0}.date_dim,
+      dev.{0}.store,
      (SELECT ca_zip
        from (
-       (SELECT substring(ca_zip,1,5) ca_zip FROM dev.%s.customer_address
+       (SELECT substring(ca_zip,1,5) ca_zip FROM dev.{0}.customer_address
           WHERE substring(ca_zip,1,5) IN (
                '24128','76232','65084','87816','83926','77556','20548',
                '26231','43848','15126','91137','61265','98294','25782',
@@ -70,8 +70,8 @@
        (select ca_zip
           FROM
             (SELECT substring(ca_zip,1,5) ca_zip,count(*) cnt
-              FROM dev.%s.customer_address,
-                   dev.%s.customer
+              FROM dev.{0}.customer_address,
+                   dev.{0}.customer
               WHERE ca_address_sk = c_current_addr_sk and
                     c_preferred_cust_flag='Y'
               group by ca_zip

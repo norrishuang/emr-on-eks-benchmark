@@ -9,10 +9,10 @@
             d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
             cs_quantity - COALESCE(cr_return_quantity,0) AS sales_cnt,
             cs_ext_sales_price - COALESCE(cr_return_amount,0.0) AS sales_amt
-        FROM dev.%s.catalog_sales
-        JOIN dev.%s.item ON i_item_sk=cs_item_sk
-        JOIN  dev.%s.date_dim ON d_date_sk=cs_sold_date_sk
-        LEFT JOIN dev.%s.catalog_returns ON (cs_order_number=cr_order_number
+        FROM dev.{0}.catalog_sales
+        JOIN dev.{0}.item ON i_item_sk=cs_item_sk
+        JOIN  dev.{0}.date_dim ON d_date_sk=cs_sold_date_sk
+        LEFT JOIN dev.{0}.catalog_returns ON (cs_order_number=cr_order_number
                                       AND cs_item_sk=cr_item_sk)
         WHERE i_category='Books'
         UNION
@@ -20,10 +20,10 @@
             d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
              ss_quantity - COALESCE(sr_return_quantity,0) AS sales_cnt,
              ss_ext_sales_price - COALESCE(sr_return_amt,0.0) AS sales_amt
-        FROM dev.%s.store_sales
-        JOIN dev.%s.item ON i_item_sk=ss_item_sk
-        JOIN  dev.%s.date_dim ON d_date_sk=ss_sold_date_sk
-        LEFT JOIN dev.%s.store_returns ON (ss_ticket_number=sr_ticket_number
+        FROM dev.{0}.store_sales
+        JOIN dev.{0}.item ON i_item_sk=ss_item_sk
+        JOIN  dev.{0}.date_dim ON d_date_sk=ss_sold_date_sk
+        LEFT JOIN dev.{0}.store_returns ON (ss_ticket_number=sr_ticket_number
                                     AND ss_item_sk=sr_item_sk)
         WHERE i_category='Books'
         UNION
@@ -31,10 +31,10 @@
             d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id,
             ws_quantity - COALESCE(wr_return_quantity,0) AS sales_cnt,
             ws_ext_sales_price - COALESCE(wr_return_amt,0.0) AS sales_amt
-        FROM  dev.%s.web_sales
-        JOIN  dev.%s.item ON i_item_sk=ws_item_sk
-        JOIN  dev.%s.date_dim ON d_date_sk=ws_sold_date_sk
-        LEFT JOIN dev.%s.web_returns ON (ws_order_number=wr_order_number
+        FROM  dev.{0}.web_sales
+        JOIN  dev.{0}.item ON i_item_sk=ws_item_sk
+        JOIN  dev.{0}.date_dim ON d_date_sk=ws_sold_date_sk
+        LEFT JOIN dev.{0}.web_returns ON (ws_order_number=wr_order_number
                                   AND ws_item_sk=wr_item_sk)
         WHERE i_category='Books') sales_detail
     GROUP BY d_year, i_brand_id, i_class_id, i_category_id, i_manufact_id)

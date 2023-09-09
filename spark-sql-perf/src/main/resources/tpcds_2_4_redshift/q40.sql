@@ -8,12 +8,12 @@
   ,sum(case when (cast(d_date as date) >= cast('2000-03-11' as date))
  		then cs_sales_price - coalesce(cr_refunded_cash,0) else 0 end) as sales_after
  from
-     dev.%s.catalog_sales left outer join dev.%s.catalog_returns on
+     dev.{0}.catalog_sales left outer join dev.{0}.catalog_returns on
        (cs_order_number = cr_order_number
         and cs_item_sk = cr_item_sk)
-  , dev.%s.warehouse,
-    dev.%s.item,
-    dev.%s.date_dim
+  , dev.{0}.warehouse,
+    dev.{0}.item,
+    dev.{0}.date_dim
  where
      i_current_price between 0.99 and 1.49
  and i_item_sk          = cs_item_sk

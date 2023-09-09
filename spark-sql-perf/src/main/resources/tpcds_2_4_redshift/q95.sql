@@ -2,8 +2,8 @@
 
  with ws_wh as
  (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2
-  from  dev.%s.web_sales ws1,
-        dev.%s.web_sales ws2
+  from  dev.{0}.web_sales ws1,
+        dev.{0}.web_sales ws2
   where ws1.ws_order_number = ws2.ws_order_number
     and ws1.ws_warehouse_sk <> ws2.ws_warehouse_sk)
  select
@@ -11,10 +11,10 @@
    ,sum(ws_ext_ship_cost) as `total shipping cost`
    ,sum(ws_net_profit) as `total net profit`
  from
-     dev.%s.web_sales ws1,
-     dev.%s.date_dim,
-     dev.%s.customer_address,
-     dev.%s.web_site
+     dev.{0}.web_sales ws1,
+     dev.{0}.date_dim,
+     dev.{0}.customer_address,
+     dev.{0}.web_site
  where
      d_date between cast ('1999-02-01' as date) and
             (cast('1999-02-01' as date) + interval '60' day)
@@ -26,7 +26,7 @@
  and ws1.ws_order_number in (select ws_order_number
                              from ws_wh)
  and ws1.ws_order_number in (select wr_order_number
-                             from dev.%s.web_returns,ws_wh
+                             from dev.{0}.web_returns,ws_wh
                              where wr_order_number = ws_wh.ws_order_number)
  order by count(distinct ws_order_number)
  limit 100

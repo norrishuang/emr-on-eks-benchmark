@@ -4,9 +4,9 @@
  (select
     cr_returning_customer_sk as ctr_customer_sk, ca_state as ctr_state,
         sum(cr_return_amt_inc_tax) as ctr_total_return
- from dev.%s.catalog_returns,
-      dev.%s.date_dim,
-      dev.%s.customer_address
+ from dev.{0}.catalog_returns,
+      dev.{0}.date_dim,
+      dev.{0}.customer_address
  where cr_returned_date_sk = d_date_sk
    and d_year = 2000
    and cr_returning_addr_sk = ca_address_sk
@@ -16,8 +16,8 @@
     ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,
     ca_gmt_offset,ca_location_type,ctr_total_return
  from customer_total_return ctr1,
-      dev.%s.customer_address,
-      dev.%s.customer
+      dev.{0}.customer_address,
+      dev.{0}.customer
  where ctr1.ctr_total_return > (select avg(ctr_total_return)*1.2
  			  from customer_total_return ctr2
                   	  where ctr1.ctr_state = ctr2.ctr_state)

@@ -9,14 +9,14 @@
     ,sum(sr_return_quantity) as store_returns_quantity
     ,sum(cs_quantity)        as catalog_sales_quantity
  from
-     dev.%s.store_sales,
-     dev.%s.store_returns,
-     dev.%s.catalog_sales,
-     dev.%s.date_dim d1,
-     dev.%s.date_dim d2,
-     dev.%s.date_dim d3,
-     dev.%s.store,
-     dev.%s.item
+     dev.{0}.store_sales,
+     dev.{0}.store_returns,
+     dev.{0}.catalog_sales,
+     dev.{0}.date_dim d1,
+     dev.{0}.date_dim d2,
+     dev.{0}.date_dim d3,
+     dev.{0}.store,
+     dev.{0}.item
  where
      d1.d_moy               = 9
  and d1.d_year              = 1999

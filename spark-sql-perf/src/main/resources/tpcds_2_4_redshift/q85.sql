@@ -2,14 +2,14 @@
 
  select
     substring(r_reason_desc,1,20), avg(ws_quantity), avg(wr_refunded_cash), avg(wr_fee)
- from  dev.%s.web_sales,
-       dev.%s.web_returns,
-       dev.%s.web_page,
-       dev.%s.customer_demographics cd1,
-       dev.%s.customer_demographics cd2,
-       dev.%s.customer_address,
-       dev.%s.date_dim,
-       dev.%s.reason
+ from  dev.{0}.web_sales,
+       dev.{0}.web_returns,
+       dev.{0}.web_page,
+       dev.{0}.customer_demographics cd1,
+       dev.{0}.customer_demographics cd2,
+       dev.{0}.customer_address,
+       dev.{0}.date_dim,
+       dev.{0}.reason
  where ws_web_page_sk = wp_web_page_sk
    and ws_item_sk = wr_item_sk
    and ws_order_number = wr_order_number

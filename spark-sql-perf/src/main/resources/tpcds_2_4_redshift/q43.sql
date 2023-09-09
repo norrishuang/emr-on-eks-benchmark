@@ -8,9 +8,9 @@
         sum(case when (d_day_name='Thursday') then ss_sales_price else null end) thu_sales,
         sum(case when (d_day_name='Friday') then ss_sales_price else null end) fri_sales,
         sum(case when (d_day_name='Saturday') then ss_sales_price else null end) sat_sales
- from dev.%s.date_dim,
-      dev.%s.store_sales,
-      dev.%s.store
+ from dev.{0}.date_dim,
+      dev.{0}.store_sales,
+      dev.{0}.store
  where d_date_sk = ss_sold_date_sk and
        s_store_sk = ss_store_sk and
        s_gmt_offset = -5 and

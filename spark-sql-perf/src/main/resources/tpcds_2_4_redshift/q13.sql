@@ -4,12 +4,12 @@
        ,avg(ss_ext_sales_price)
        ,avg(ss_ext_wholesale_cost)
        ,sum(ss_ext_wholesale_cost)
- from dev.%s.store_sales
-     ,dev.%s.store
-     ,dev.%s.customer_demographics
-     ,dev.%s.household_demographics
-     ,dev.%s.customer_address
-     ,dev.%s.date_dim
+ from dev.{0}.store_sales
+     ,dev.{0}.store
+     ,dev.{0}.customer_demographics
+     ,dev.{0}.household_demographics
+     ,dev.{0}.customer_address
+     ,dev.{0}.date_dim
  where s_store_sk = ss_store_sk
  and  ss_sold_date_sk = d_date_sk and d_year = 2001
  and((ss_hdemo_sk=hd_demo_sk

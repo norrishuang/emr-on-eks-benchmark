@@ -8,9 +8,9 @@
  	    case when grouping(s_county) = 0 then s_state end
  	    order by sum(ss_net_profit) desc) as rank_within_parent
  from
-     dev.%s.store_sales,
-     dev.%s.date_dim d1,
-     dev.%s.store
+     dev.{0}.store_sales,
+     dev.{0}.date_dim d1,
+     dev.{0}.store
  where
     d1.d_month_seq between 1200 and 1200+11
  and d1.d_date_sk = ss_sold_date_sk
@@ -19,9 +19,9 @@
     (select s_state from
         (select s_state as s_state,
  			      rank() over ( partition by s_state order by sum(ss_net_profit) desc) as ranking
-         from  dev.%s.store_sales,
-               dev.%s.store,
-               dev.%s.date_dim
+         from  dev.{0}.store_sales,
+               dev.{0}.store,
+               dev.{0}.date_dim
          where  d_month_seq between 1200 and 1200+11
  			   and d_date_sk = ss_sold_date_sk
  			   and s_store_sk  = ss_store_sk

@@ -6,9 +6,9 @@
     c_last_name customer_last_name, d_year as year,
     sum(ss_net_paid) year_total, 's' sale_type
  from
-     dev.%s.customer,
-     dev.%s.store_sales,
-     dev.%s.date_dim
+     dev.{0}.customer,
+     dev.{0}.store_sales,
+     dev.{0}.date_dim
  where c_customer_sk = ss_customer_sk
     and ss_sold_date_sk = d_date_sk
     and d_year in (2001,2001+1)
@@ -20,9 +20,9 @@
     c_last_name customer_last_name, d_year as year,
     sum(ws_net_paid) year_total, 'w' sale_type
  from
-     dev.%s.customer,
-     dev.%s.web_sales,
-     dev.%s.date_dim
+     dev.{0}.customer,
+     dev.{0}.web_sales,
+     dev.{0}.date_dim
  where c_customer_sk = ws_bill_customer_sk
     and ws_sold_date_sk = d_date_sk
     and d_year in (2001,2001+1)

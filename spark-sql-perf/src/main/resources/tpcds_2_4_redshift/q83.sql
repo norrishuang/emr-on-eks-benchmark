@@ -2,32 +2,32 @@
 
  with sr_items as
   (select i_item_id item_id, sum(sr_return_quantity) sr_item_qty
-   from dev.%s.store_returns,
-        dev.%s.item,
-        dev.%s.date_dim
+   from dev.{0}.store_returns,
+        dev.{0}.item,
+        dev.{0}.date_dim
    where sr_item_sk = i_item_sk
-      and  d_date in (select d_date from dev.%s.date_dim where d_week_seq in
-		      (select d_week_seq from dev.%s.date_dim where d_date in (cast('2000-06-30' as date),cast('2000-09-27' as date),cast('2000-11-17' as date))))
+      and  d_date in (select d_date from dev.{0}.date_dim where d_week_seq in
+		      (select d_week_seq from dev.{0}.date_dim where d_date in (cast('2000-06-30' as date),cast('2000-09-27' as date),cast('2000-11-17' as date))))
       and sr_returned_date_sk   = d_date_sk
    group by i_item_id),
  cr_items as
   (select i_item_id item_id, sum(cr_return_quantity) cr_item_qty
-  from dev.%s.catalog_returns,
-       dev.%s.item,
-       dev.%s.date_dim
+  from dev.{0}.catalog_returns,
+       dev.{0}.item,
+       dev.{0}.date_dim
   where cr_item_sk = i_item_sk
-      and d_date in (select d_date from dev.%s.date_dim where d_week_seq in
-		      (select d_week_seq from dev.%s.date_dim where d_date in (cast('2000-06-30' as date),cast('2000-09-27' as date),cast('2000-11-17' as date))))
+      and d_date in (select d_date from dev.{0}.date_dim where d_week_seq in
+		      (select d_week_seq from dev.{0}.date_dim where d_date in (cast('2000-06-30' as date),cast('2000-09-27' as date),cast('2000-11-17' as date))))
       and cr_returned_date_sk  = d_date_sk
       group by i_item_id),
  wr_items as
   (select i_item_id item_id, sum(wr_return_quantity) wr_item_qty
-  from dev.%s.web_returns,
-       dev.%s.item,
-       dev.%s.date_dim
+  from dev.{0}.web_returns,
+       dev.{0}.item,
+       dev.{0}.date_dim
   where wr_item_sk = i_item_sk and d_date in
-      (select d_date from dev.%s.date_dim where d_week_seq in
-		      (select d_week_seq from dev.%s.date_dim
+      (select d_date from dev.{0}.date_dim where d_week_seq in
+		      (select d_week_seq from dev.{0}.date_dim
 		                         where d_date in (cast('2000-06-30' as date),cast('2000-09-27' as date),cast('2000-11-17' as date))))
     and wr_returned_date_sk = d_date_sk
   group by i_item_id)

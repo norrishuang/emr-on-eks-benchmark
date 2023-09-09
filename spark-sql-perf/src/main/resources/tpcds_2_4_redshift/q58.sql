@@ -2,41 +2,41 @@
 
  with ss_items as
  (select i_item_id item_id, sum(ss_ext_sales_price) ss_item_rev
- from  dev.%s.store_sales,
-       dev.%s.item,
-       dev.%s.date_dim
+ from  dev.{0}.store_sales,
+       dev.{0}.item,
+       dev.{0}.date_dim
  where ss_item_sk = i_item_sk
    and d_date in (select d_date
-                  from dev.%s.date_dim
+                  from dev.{0}.date_dim
                   where d_week_seq = (select d_week_seq
-                                      from dev.%s.date_dim
+                                      from dev.{0}.date_dim
                                       where d_date = cast('2000-01-03' as date)))
    and ss_sold_date_sk   = d_date_sk
  group by i_item_id),
  cs_items as
  (select i_item_id item_id
         ,sum(cs_ext_sales_price) cs_item_rev
-  from dev.%s.catalog_sales,
-       dev.%s.item,
-       dev.%s.date_dim
+  from dev.{0}.catalog_sales,
+       dev.{0}.item,
+       dev.{0}.date_dim
  where cs_item_sk = i_item_sk
   and  d_date in (select d_date
-                  from dev.%s.date_dim
+                  from dev.{0}.date_dim
                   where d_week_seq = (select d_week_seq
-                                      from dev.%s.date_dim
+                                      from dev.{0}.date_dim
                                       where d_date = cast('2000-01-03' as date)))
   and  cs_sold_date_sk = d_date_sk
  group by i_item_id),
  ws_items as
  (select i_item_id item_id, sum(ws_ext_sales_price) ws_item_rev
-  from  dev.%s.web_sales,
-        dev.%s.item,
-        dev.%s.date_dim
+  from  dev.{0}.web_sales,
+        dev.{0}.item,
+        dev.{0}.date_dim
  where ws_item_sk = i_item_sk
   and  d_date in (select d_date
-                  from dev.%s.date_dim
+                  from dev.{0}.date_dim
                   where d_week_seq =(select d_week_seq
-                                     from dev.%s.date_dim
+                                     from dev.{0}.date_dim
                                      where d_date = cast('2000-01-03' as date)))
   and ws_sold_date_sk   = d_date_sk
  group by i_item_id)

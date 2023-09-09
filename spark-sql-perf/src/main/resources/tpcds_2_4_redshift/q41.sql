@@ -1,10 +1,10 @@
 --q41.sql--
 
  select distinct(i_product_name)
- from dev.%s.item i1
+ from dev.{0}.item i1
  where i_manufact_id between 738 and 738+40
    and (select count(*) as item_cnt
-        from dev.%s.item
+        from dev.{0}.item
         where (i_manufact = i1.i_manufact and
         ((i_category = 'Women' and 
         (i_color = 'powder' or i_color = 'khaki') and

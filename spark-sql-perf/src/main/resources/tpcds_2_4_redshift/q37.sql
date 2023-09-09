@@ -1,10 +1,10 @@
 --q37.sql--
 
  select i_item_id, i_item_desc, i_current_price
- from  dev.%s.item,
-       dev.%s.inventory,
-       dev.%s.date_dim,
-       dev.%s.catalog_sales
+ from  dev.{0}.item,
+       dev.{0}.inventory,
+       dev.{0}.date_dim,
+       dev.{0}.catalog_sales
  where i_current_price between 68 and 68 + 30
    and inv_item_sk = i_item_sk
    and d_date_sk=inv_date_sk

@@ -13,7 +13,7 @@
             ss_net_profit as profit,
             cast(0 as decimal(7,2)) as return_amt,
             cast(0 as decimal(7,2)) as net_loss
-    FROM dev.%s.store_sales
+    FROM dev.{0}.store_sales
     UNION ALL
     SELECT sr_store_sk as store_sk,
            sr_returned_date_sk as date_sk,
@@ -21,9 +21,9 @@
            cast(0 as decimal(7,2)) as profit,
            sr_return_amt as return_amt,
            sr_net_loss as net_loss
-    FROM dev.%s.store_returns)
-    salesreturns, dev.%s.date_dim,
-                  dev.%s.store
+    FROM dev.{0}.store_returns)
+    salesreturns, dev.{0}.date_dim,
+                  dev.{0}.store
   WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))
@@ -42,7 +42,7 @@
            cs_net_profit as profit,
            cast(0 as decimal(7,2)) as return_amt,
            cast(0 as decimal(7,2)) as net_loss
-    FROM dev.%s.catalog_sales
+    FROM dev.{0}.catalog_sales
     UNION ALL
     SELECT cr_catalog_page_sk as page_sk,
            cr_returned_date_sk as date_sk,
@@ -50,9 +50,9 @@
            cast(0 as decimal(7,2)) as profit,
            cr_return_amount as return_amt,
            cr_net_loss as net_loss
-    from dev.%s.catalog_returns
-   ) salesreturns, dev.%s.date_dim,
-                   dev.%s.catalog_page
+    from dev.{0}.catalog_returns
+   ) salesreturns, dev.{0}.date_dim,
+                   dev.{0}.catalog_page
  WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))
@@ -72,7 +72,7 @@
             ws_net_profit as profit,
             cast(0 as decimal(7,2)) as return_amt,
             cast(0 as decimal(7,2)) as net_loss
-    from dev.%s.web_sales
+    from dev.{0}.web_sales
     union all
     select ws_web_site_sk as wsr_web_site_sk,
            wr_returned_date_sk as date_sk,
@@ -80,11 +80,11 @@
            cast(0 as decimal(7,2)) as profit,
            wr_return_amt as return_amt,
            wr_net_loss as net_loss
-    FROM dev.%s.web_returns LEFT  OUTER JOIN dev.%s.web_sales on
+    FROM dev.{0}.web_returns LEFT  OUTER JOIN dev.{0}.web_sales on
          ( wr_item_sk = ws_item_sk
            and wr_order_number = ws_order_number)
-   ) salesreturns, dev.%s.date_dim,
-                   dev.%s.web_site
+   ) salesreturns, dev.{0}.date_dim,
+                   dev.{0}.web_site
  WHERE date_sk = d_date_sk
        and d_date between cast('2000-08-23' as date)
                   and ((cast('2000-08-23' as date) + interval '14' day))

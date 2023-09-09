@@ -2,15 +2,15 @@
 
  with ssci as (
  select ss_customer_sk customer_sk, ss_item_sk item_sk
- from  dev.%s.store_sales,
-       dev.%s.date_dim
+ from  dev.{0}.store_sales,
+       dev.{0}.date_dim
  where ss_sold_date_sk = d_date_sk
    and d_month_seq between 1200 and 1200 + 11
  group by ss_customer_sk, ss_item_sk),
  csci as(
   select cs_bill_customer_sk customer_sk, cs_item_sk item_sk
- from dev.%s.catalog_sales,
-      dev.%s.date_dim
+ from dev.{0}.catalog_sales,
+      dev.{0}.date_dim
  where cs_sold_date_sk = d_date_sk
    and d_month_seq between 1200 and 1200 + 11
  group by cs_bill_customer_sk, cs_item_sk)

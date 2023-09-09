@@ -6,11 +6,11 @@
         avg(ss_list_price) agg2,
         avg(ss_coupon_amt) agg3,
         avg(ss_sales_price) agg4
- from  dev.%s.store_sales,
-       dev.%s.customer_demographics,
-       dev.%s.date_dim,
-       dev.%s.store,
-       dev.%s.item
+ from  dev.{0}.store_sales,
+       dev.{0}.customer_demographics,
+       dev.{0}.date_dim,
+       dev.{0}.store,
+       dev.{0}.item
  where ss_sold_date_sk = d_date_sk and
        ss_item_sk = i_item_sk and
        ss_store_sk = s_store_sk and

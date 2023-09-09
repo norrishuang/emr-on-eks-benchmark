@@ -7,16 +7,16 @@
         ( select cs_sold_date_sk sold_date_sk,
                  cs_bill_customer_sk customer_sk,
                  cs_item_sk item_sk
-          from   dev.%s.catalog_sales
+          from   dev.{0}.catalog_sales
           union all
           select ws_sold_date_sk sold_date_sk,
                  ws_bill_customer_sk customer_sk,
                  ws_item_sk item_sk
-          from    dev.%s.web_sales
+          from    dev.{0}.web_sales
          ) cs_or_ws_sales,
-         dev.%s.item,
-         dev.%s.date_dim,
-         dev.%s.customer
+         dev.{0}.item,
+         dev.{0}.date_dim,
+         dev.{0}.customer
  where   sold_date_sk = d_date_sk
          and item_sk = i_item_sk
          and i_category = 'Women'
@@ -29,19 +29,19 @@
  select c_customer_sk,
         sum(ss_ext_sales_price) as revenue
  from   my_customers,
-        dev.%s.store_sales,
-        dev.%s.customer_address,
-        dev.%s.store,
-        dev.%s.date_dim
+        dev.{0}.store_sales,
+        dev.{0}.customer_address,
+        dev.{0}.store,
+        dev.{0}.date_dim
  where  c_current_addr_sk = ca_address_sk
         and ca_county = s_county
         and ca_state = s_state
         and ss_sold_date_sk = d_date_sk
         and c_customer_sk = ss_customer_sk
         and d_month_seq between (select distinct d_month_seq+1
-                                 from   dev.%s.date_dim where d_year = 1998 and d_moy = 12)
+                                 from   dev.{0}.date_dim where d_year = 1998 and d_moy = 12)
                            and  (select distinct d_month_seq+3
-                                 from   dev.%s.date_dim where d_year = 1998 and d_moy = 12)
+                                 from   dev.{0}.date_dim where d_year = 1998 and d_moy = 12)
  group by c_customer_sk
  )
  , segments as

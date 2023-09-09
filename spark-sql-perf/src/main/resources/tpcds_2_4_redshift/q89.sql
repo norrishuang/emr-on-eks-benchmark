@@ -9,10 +9,10 @@
        avg(sum(ss_sales_price)) over
          (partition by i_category, i_brand, s_store_name, s_company_name)
          avg_monthly_sales
- from  dev.%s.item,
-       dev.%s.store_sales,
-       dev.%s.date_dim,
-       dev.%s.store
+ from  dev.{0}.item,
+       dev.{0}.store_sales,
+       dev.{0}.date_dim,
+       dev.{0}.store
  where ss_item_sk = i_item_sk and
       ss_sold_date_sk = d_date_sk and
       ss_store_sk = s_store_sk and
