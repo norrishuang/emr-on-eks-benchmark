@@ -5,6 +5,8 @@ import sys
 import getopt
 import os
 
+from botocore.config import Config
+
 SQLFILES = ''
 REGION = ''
 DATABASE = 'tpcds'
@@ -53,8 +55,7 @@ writeresultfile = "{:s}/result_{:s}.csv".format(OUTPUT, DATABASE)
 def load_sql_file(sqlpath):
     ##写结果集的表头 覆盖原来的文件
     with open(writeresultfile, "w", newline='') as csvfile:
-        fieldnames = ['SQL', 'QueryQueueTimeInMillis', 'EngineExecutionTimeInMillis', 'ServiceProcessingTimeInMillis',
-                      'TotalExecutionTimeInMillis']
+        fieldnames = ['SQL', 'DataScannedInBytes', 'TotalExecutionTimeInMillis']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -70,11 +71,21 @@ def load_sql_file(sqlpath):
             executeSQL(file, sqltext)
             i = i + 1
             print("process:[{:d}/105]".format(i))
+            time.sleep(10)
 
 
 def executeSQL(filename, sqltext):
-    client = boto3.client('athena')
-    response = client.start_query_execution(
+
+    my_config = Config(
+        region_name = 'us-east-1',
+        signature_version = 'v4',
+        retries = {
+            'max_attempts': 10,
+            'mode': 'standard'
+        }
+    )
+    client = boto3.client('athena', config=my_config)
+    responseQuery = client.start_query_execution(
         QueryString=sqltext,
         QueryExecutionContext={
             'Database': DATABASE
@@ -85,41 +96,47 @@ def executeSQL(filename, sqltext):
         WorkGroup=WORKGROUP
     )
 
-    print(response)
+    DataScannedInBytes = 0.0
+    TotalExecutionTimeInMillis = 0.0
     while True:
         try:
-            query_results = client.get_query_runtime_statistics(
-                QueryExecutionId=response['QueryExecutionId']
+            responseStatus = client.get_query_execution(
+                QueryExecutionId=responseQuery['QueryExecutionId']
             )
-            print(query_results)
-            break
+            # get runing status from query execution of athena
+            query_results = responseStatus['QueryExecution']['Status']['State']
+            # get a status from query execution of athena
+            if query_results == 'SUCCEEDED':
+                query_results = client.get_query_execution(
+                    QueryExecutionId=responseQuery['QueryExecutionId']
+                )
+                DataScannedInBytes = round(float(int(query_results['QueryExecution']['Statistics']['DataScannedInBytes'])/1024/1024/1024),3)
+                TotalExecutionTimeInMillis = float(int(query_results['QueryExecution']['Statistics']['TotalExecutionTimeInMillis'])/1000)
+                break
+            elif query_results == 'FAILED':
+                DataScannedInBytes = -999
+                TotalExecutionTimeInMillis = -999
+                print('Execute Failure.')
+                print(query_results['QueryExecution']['Status']['AthenaError'])
+                break
+            time.sleep(5)
+
         except Exception as err:
-            responseerr = err.response
-            code = responseerr['Error']['Code']
-            message = responseerr['Error']['Message']
-
-            if 'Query has not yet finished' in message:
-                time.sleep(5)
-            else:
-                raise err
-
-    # print(json.dumps(query_results['QueryRuntimeStatistics']['Timeline'], indent=10, sort_keys=False))
-    # print(int(query_results['QueryRuntimeStatistics']['Timeline']['QueryQueueTimeInMillis']))
+            # responseerr = err.response
+            # code = responseerr['Error']['Code']
+            # message = responseerr['Error']['Message']
+            DataScannedInBytes = -999
+            TotalExecutionTimeInMillis = -999
+            print(err)
+            break
 
     with open(writeresultfile, "a+", newline='') as csvfile:
-        fieldnames = ['SQL', 'QueryQueueTimeInMillis', 'EngineExecutionTimeInMillis', 'ServiceProcessingTimeInMillis',
-                      'TotalExecutionTimeInMillis']
+        fieldnames = ['SQL', 'DataScannedInBytes', 'TotalExecutionTimeInMillis']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #
         writer.writerow({'SQL': filename,
-                         'QueryQueueTimeInMillis': int(
-                             query_results['QueryRuntimeStatistics']['Timeline']['QueryQueueTimeInMillis']),
-                         'EngineExecutionTimeInMillis': int(
-                             query_results['QueryRuntimeStatistics']['Timeline']['EngineExecutionTimeInMillis']),
-                         'ServiceProcessingTimeInMillis': int(
-                             query_results['QueryRuntimeStatistics']['Timeline']['ServiceProcessingTimeInMillis']),
-                         'TotalExecutionTimeInMillis': int(
-                             query_results['QueryRuntimeStatistics']['Timeline']['TotalExecutionTimeInMillis'])})
+                         'DataScannedInBytes': DataScannedInBytes,
+                         'TotalExecutionTimeInMillis': TotalExecutionTimeInMillis})
 
 
 load_sql_file(SQLFILES)

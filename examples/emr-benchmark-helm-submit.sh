@@ -14,10 +14,12 @@ export ECR_URL="$ACCOUNTID.dkr.ecr.$AWS_REGION.amazonaws.com"
 export RESPO_NAME=eks-emr-spark
 export EMR_IMAGE_VERSION_TAG="emr6.14"
 
-export IMAGE=$ECR_URL/eks-emr-spark:emr6.13
-export JAR_PATH=local:///opt/spark/examples/jars/eks-spark-benchmark-assembly-1.0.jar
-export SERVICE_ACCOUNTNAME=emr-containers-sa-flink
-export NAMESPACE=emr-eks-flink
+# export IMAGE=$ECR_URL/$RESPO_NAME:$EMR_IMAGE_VERSION_TAG
+# 使用EMR原生的IMAGE
+export IMAGE="755674844232.dkr.ecr.us-east-1.amazonaws.com/spark/emr-6.14.0:latest"
+export JAR_PATH=s3://emr-hive-us-east-1-812046859005/jars/eks-spark-benchmark-assembly-1.0.jar
+export SERVICE_ACCOUNTNAME=emr-job-execution-sa
+export NAMESPACE=emr-karpenter
 
 
 cat <<EOF >emr-spark-operator-example.yaml
@@ -25,7 +27,7 @@ cat <<EOF >emr-spark-operator-example.yaml
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: taxi-example
+  name: tpcds-example
   namespace: $NAMESPACE
 spec:
   type: Scala
@@ -36,8 +38,8 @@ spec:
   mainClass: com.amazonaws.eks.tpcds.BenchmarkSQL
   mainApplicationFile: $JAR_PATH
   arguments:
-    - "s3://'$S3BUCKET'/banchmark/BLOG_TPCDS-TEST-3T-partitioned"
-    - "s3://'$S3BUCKET'/banchmark/JDK_EMRONEKS_TPCDS-TEST-3T-RESULT"
+    - "s3://$S3BUCKET/banchmark/BLOG_TPCDS-TEST-3T-partitioned"
+    - "s3://$S3BUCKET/banchmark/JDK_EMRONEKS_TPCDS-TEST-3T-RESULT"
     - "/opt/tpcds-kit/tools"
     - "parquet"
     - "3000"
@@ -56,7 +58,7 @@ spec:
     mapreduce.fileoutputcommitter.cleanup-failures.ignored.emr_internal_use_only.EmrFileSystem: "true"
   sparkConf:
     spark.eventLog.enabled: "true"
-    spark.eventLog.dir: "s3://$S3_BUCKET/"
+    spark.eventLog.dir: "s3://$S3BUCKET/"
     spark.kubernetes.driver.pod.name: driver-spark-tpcds
     # Required for EMR Runtime and Glue Catalogue
     spark.driver.extraClassPath: /usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/*:/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/home/hadoop/extrajars/*
@@ -69,8 +71,17 @@ spec:
     spark.sql.emr.internal.extensions: com.amazonaws.emr.spark.EmrSparkSessionExtensions
     spark.executor.defaultJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70 -XX:OnOutOfMemoryError='kill -9 %p'
     spark.driver.defaultJavaOptions:  -XX:OnOutOfMemoryError='kill -9 %p' -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70
-    spark.kubernetes.driver.podTemplateFile: s3://'$S3BUCKET'/app_code/pod-template/karpenter-driver-pod-template.yaml
-    spark.kubernetes.executor.podTemplateFile: s3://'$S3BUCKET'/app_code/pod-template/karpenter-executor-pod-template.yaml
+    spark.kubernetes.driver.podTemplateFile: "s3://$S3BUCKET/app_code/pod-template/karpenter-driver-pod-template.yaml"
+    spark.kubernetes.executor.podTemplateFile: "s3://$S3BUCKET/app_code/pod-template/karpenter-executor-pod-template.yaml"
+    # 如果通过 pod template,下面这两个参数必须
+    spark.kubernetes.driver.podTemplateContainerName: spark-kubernetes-driver
+    spark.kubernetes.executor.podTemplateContainerName: spark-kubernetes-executor
+    # node decommission
+    spark.decommission.enabled: "true"
+    spark.storage.decommission.rddBlocks.enabled": "true"
+    spark.storage.decommission.shuffleBlocks.enabled" : "true"
+    spark.storage.decommission.enabled": "true"
+    spark.storage.decommission.fallbackStorage.path": "s3://$S3BUCKET/banchmark/decommission/"
   sparkVersion: "3.3.1"
   restartPolicy:
     type: Never
@@ -82,6 +93,7 @@ spec:
     cores: 4
     memory: "6g"
     instances: 47
-    memory: "4g"
     serviceAccount: $SERVICE_ACCOUNTNAME
 EOF
+
+kubectl apply -f emr-spark-operator-example.yaml

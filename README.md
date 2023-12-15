@@ -5,6 +5,9 @@
 ## Prerequisite
 
 
+## EMR on EMS
+如需了解 EMR on EKS 相关，请点击连接 [emr on eks](./README-EMRonEKS.md)
+
 ## EMR Serverless
 
 ### 打包测试镜像
