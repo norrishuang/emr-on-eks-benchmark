@@ -5,7 +5,7 @@ with customer_total_return as
                   ,ca_state as ctr_state,
                  sum(wr_return_amt) as ctr_total_return
           from web_returns, date_dim, customer_address
-          where wr_returned_date_sk = cast(d_date_sk as varchar)
+          where wr_returned_date_sk = d_date_sk
             and d_year = 2002
             and wr_returning_addr_sk = ca_address_sk
           group by wr_returning_customer_sk,ca_state)

@@ -6,7 +6,7 @@ SELECT i_item_id,
        avg(ss_coupon_amt) agg3,
        avg(ss_sales_price) agg4
 FROM store_sales, customer_demographics, date_dim, item, promotion
-WHERE ss_sold_date_sk = cast(d_date_sk as varchar) AND
+WHERE ss_sold_date_sk = d_date_sk AND
         ss_item_sk = i_item_sk AND
         ss_cdemo_sk = cd_demo_sk AND
         ss_promo_sk = p_promo_sk AND

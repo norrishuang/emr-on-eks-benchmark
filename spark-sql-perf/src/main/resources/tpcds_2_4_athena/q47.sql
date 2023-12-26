@@ -15,7 +15,7 @@ with v1 as(
                order by d_year, d_moy) rn
     from item, store_sales, date_dim, store
     where ss_item_sk = i_item_sk and
-            ss_sold_date_sk = cast(d_date_sk as varchar) and
+            ss_sold_date_sk = d_date_sk and
             ss_store_sk = s_store_sk and
         (
                     d_year = 1999 or

@@ -13,7 +13,7 @@ with year_total as (
          ,'s' sale_type
     from customer, store_sales, date_dim
     where c_customer_sk = ss_customer_sk
-      and ss_sold_date_sk = cast(d_date_sk as varchar)
+      and ss_sold_date_sk = d_date_sk
     group by c_customer_id
            ,c_first_name
            ,c_last_name
@@ -35,7 +35,7 @@ with year_total as (
          ,'w' sale_type
     from customer, web_sales, date_dim
     where c_customer_sk = ws_bill_customer_sk
-      and ws_sold_date_sk = cast(d_date_sk as varchar)
+      and ws_sold_date_sk = d_date_sk
     group by
         c_customer_id, c_first_name, c_last_name, c_preferred_cust_flag, c_birth_country,
         c_login, c_email_address, d_year)

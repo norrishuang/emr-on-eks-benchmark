@@ -11,7 +11,7 @@ with wss as
                  sum(case when (d_day_name='Friday') then ss_sales_price else null end) fri_sales,
                  sum(case when (d_day_name='Saturday') then ss_sales_price else null end) sat_sales
           from store_sales,date_dim
-          where cast(d_date_sk as varchar) = ss_sold_date_sk
+          where d_date_sk = ss_sold_date_sk
           group by d_week_seq,ss_store_sk
          )
 select  s_store_name1,s_store_id1,d_week_seq1

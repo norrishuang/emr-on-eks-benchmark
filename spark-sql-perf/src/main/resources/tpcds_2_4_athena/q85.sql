@@ -7,7 +7,7 @@ from web_sales, web_returns, web_page, customer_demographics cd1,
 where ws_web_page_sk = wp_web_page_sk
   and ws_item_sk = wr_item_sk
   and ws_order_number = wr_order_number
-  and ws_sold_date_sk = cast(d_date_sk as varchar) and d_year = 2000
+  and ws_sold_date_sk = d_date_sk and d_year = 2000
   and cd1.cd_demo_sk = wr_refunded_cdemo_sk
   and cd2.cd_demo_sk = wr_returning_cdemo_sk
   and ca_address_sk = wr_refunded_addr_sk

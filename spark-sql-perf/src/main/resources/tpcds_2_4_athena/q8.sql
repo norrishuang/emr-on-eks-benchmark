@@ -76,7 +76,7 @@ from store_sales, date_dim, store,
            ) A2
      ) V1
 where ss_store_sk = s_store_sk
-  and ss_sold_date_sk = cast(d_date_sk as varchar)
+  and ss_sold_date_sk = d_date_sk
   and d_qoy = 2 and d_year = 1998
   and (substr(s_zip,1,2) = substr(V1.ca_zip,1,2))
 group by s_store_name

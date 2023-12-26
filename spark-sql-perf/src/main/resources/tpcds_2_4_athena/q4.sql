@@ -12,7 +12,7 @@ WITH year_total AS (
            sum(((ss_ext_list_price-ss_ext_wholesale_cost-ss_ext_discount_amt)+ss_ext_sales_price)/2) year_total,
            's' sale_type
     FROM customer, store_sales, date_dim
-    WHERE c_customer_sk = ss_customer_sk AND ss_sold_date_sk = cast(d_date_sk as varchar)
+    WHERE c_customer_sk = ss_customer_sk AND ss_sold_date_sk = d_date_sk
     GROUP BY c_customer_id,
              c_first_name,
              c_last_name,
@@ -33,7 +33,7 @@ WITH year_total AS (
            sum((((cs_ext_list_price-cs_ext_wholesale_cost-cs_ext_discount_amt)+cs_ext_sales_price)/2) ) year_total,
            'c' sale_type
     FROM customer, catalog_sales, date_dim
-    WHERE c_customer_sk = cs_bill_customer_sk AND cs_sold_date_sk = cast(d_date_sk as varchar)
+    WHERE c_customer_sk = cs_bill_customer_sk AND cs_sold_date_sk = d_date_sk
     GROUP BY c_customer_id,
              c_first_name,
              c_last_name,
@@ -54,7 +54,7 @@ WITH year_total AS (
          ,sum((((ws_ext_list_price-ws_ext_wholesale_cost-ws_ext_discount_amt)+ws_ext_sales_price)/2) ) year_total
          ,'w' sale_type
     FROM customer, web_sales, date_dim
-    WHERE c_customer_sk = ws_bill_customer_sk AND ws_sold_date_sk = cast(d_date_sk as varchar)
+    WHERE c_customer_sk = ws_bill_customer_sk AND ws_sold_date_sk = d_date_sk
     GROUP BY c_customer_id,
              c_first_name,
              c_last_name,

@@ -20,7 +20,7 @@ with cs_ui as
                promotion, household_demographics hd1, household_demographics hd2,
                customer_address ad1, customer_address ad2, income_band ib1, income_band ib2, item
           WHERE  ss_store_sk = s_store_sk AND
-                  ss_sold_date_sk = cast(d1.d_date_sk as varchar) AND
+                  ss_sold_date_sk = d1.d_date_sk AND
                   ss_customer_sk = c_customer_sk AND
                   ss_cdemo_sk= cd1.cd_demo_sk AND
                   ss_hdemo_sk = hd1.hd_demo_sk AND

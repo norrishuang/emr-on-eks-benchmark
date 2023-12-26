@@ -9,7 +9,7 @@ with ss_items as
                            where d_week_seq = (select d_week_seq
                                                from date_dim
                                                where d_date = cast('2000-01-03' as date)))
-            and ss_sold_date_sk   = cast(d_date_sk as varchar)
+            and ss_sold_date_sk   = d_date_sk
           group by i_item_id),
      cs_items as
          (select i_item_id item_id
@@ -21,7 +21,7 @@ with ss_items as
                             where d_week_seq = (select d_week_seq
                                                 from date_dim
                                                 where d_date = cast('2000-01-03' as date)))
-            and  cs_sold_date_sk = cast(d_date_sk as varchar)
+            and  cs_sold_date_sk = d_date_sk
           group by i_item_id),
      ws_items as
          (select i_item_id item_id, sum(ws_ext_sales_price) ws_item_rev
@@ -32,7 +32,7 @@ with ss_items as
                             where d_week_seq =(select d_week_seq
                                                from date_dim
                                                where d_date = cast('2000-01-03' as date)))
-            and ws_sold_date_sk   = cast(d_date_sk as varchar)
+            and ws_sold_date_sk   = d_date_sk
           group by i_item_id)
 select ss_items.item_id
      ,ss_item_rev

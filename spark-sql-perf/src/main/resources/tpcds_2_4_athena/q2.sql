@@ -17,7 +17,7 @@ WITH wscs as
                  sum(case when (d_day_name='Friday') then sales_price else null end) fri_sales,
                  sum(case when (d_day_name='Saturday') then sales_price else null end) sat_sales
           FROM wscs, date_dim
-          WHERE cast(d_date_sk as varchar) = sold_date_sk
+          WHERE d_date_sk = sold_date_sk
           GROUP BY d_week_seq)
 SELECT d_week_seq1
      ,round(sun_sales1/sun_sales2,2)

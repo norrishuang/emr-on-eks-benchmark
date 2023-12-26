@@ -8,7 +8,7 @@ with year_total as (
     from
         customer, store_sales, date_dim
     where c_customer_sk = ss_customer_sk
-      and ss_sold_date_sk = cast(d_date_sk as varchar)
+      and ss_sold_date_sk = d_date_sk
       and d_year in (2001,2001+1)
     group by
         c_customer_id, c_first_name, c_last_name, d_year
@@ -20,7 +20,7 @@ with year_total as (
     from
         customer, web_sales, date_dim
     where c_customer_sk = ws_bill_customer_sk
-      and ws_sold_date_sk = cast(d_date_sk as varchar)
+      and ws_sold_date_sk = d_date_sk
       and d_year in (2001,2001+1)
     group by
         c_customer_id, c_first_name, c_last_name, d_year)

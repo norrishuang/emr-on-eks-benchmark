@@ -9,7 +9,7 @@ from item,
           ws_item_sk as sold_item_sk,
           ws_sold_time_sk as time_sk
       from web_sales, date_dim
-      where cast(d_date_sk as varchar) = ws_sold_date_sk
+      where d_date_sk = ws_sold_date_sk
         and d_moy=11
         and d_year=1999
       union all
@@ -19,7 +19,7 @@ from item,
           cs_item_sk as sold_item_sk,
           cs_sold_time_sk as time_sk
       from catalog_sales, date_dim
-      where cast(d_date_sk as varchar) = cs_sold_date_sk
+      where d_date_sk = cs_sold_date_sk
         and d_moy=11
         and d_year=1999
       union all
@@ -29,7 +29,7 @@ from item,
           ss_item_sk as sold_item_sk,
           ss_sold_time_sk as time_sk
       from store_sales,date_dim
-      where cast(d_date_sk as varchar) = ss_sold_date_sk
+      where d_date_sk = ss_sold_date_sk
         and d_moy=11
         and d_year=1999
      ) tmp, time_dim

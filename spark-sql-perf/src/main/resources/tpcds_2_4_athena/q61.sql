@@ -4,7 +4,7 @@ select promotions,total,cast(promotions as decimal(15,4))/cast(total as decimal(
 from
     (select sum(ss_ext_sales_price) promotions
      from  store_sales, store, promotion, date_dim, customer, customer_address, item
-     where ss_sold_date_sk = cast(d_date_sk as varchar)
+     where ss_sold_date_sk = d_date_sk
        and   ss_store_sk = s_store_sk
        and   ss_promo_sk = p_promo_sk
        and   ss_customer_sk= c_customer_sk
@@ -18,7 +18,7 @@ from
        and   d_moy  = 11) promotional_sales cross join
     (select sum(ss_ext_sales_price) total
      from  store_sales, store, date_dim, customer, customer_address, item
-     where ss_sold_date_sk = cast(d_date_sk as varchar)
+     where ss_sold_date_sk = d_date_sk
        and   ss_store_sk = s_store_sk
        and   ss_customer_sk= c_customer_sk
        and   ca_address_sk = c_current_addr_sk

@@ -7,7 +7,7 @@ with ss as (
     where
             i_item_id in (select i_item_id from item where i_color in ('slate','blanched','burnished'))
       and     ss_item_sk              = i_item_sk
-      and     ss_sold_date_sk         = cast(d_date_sk as varchar)
+      and     ss_sold_date_sk         = d_date_sk
       and     d_year                  = 2001
       and     d_moy                   = 2
       and     ss_addr_sk              = ca_address_sk
@@ -20,7 +20,7 @@ with ss as (
          where
                  i_item_id in (select i_item_id from item where i_color in ('slate','blanched','burnished'))
            and     cs_item_sk              = i_item_sk
-           and     cs_sold_date_sk         = cast(d_date_sk as varchar)
+           and     cs_sold_date_sk         = d_date_sk
            and     d_year                  = 2001
            and     d_moy                   = 2
            and     cs_bill_addr_sk         = ca_address_sk
@@ -33,7 +33,7 @@ with ss as (
          where
                  i_item_id in (select i_item_id from item where i_color in ('slate','blanched','burnished'))
            and     ws_item_sk              = i_item_sk
-           and     ws_sold_date_sk         = cast(d_date_sk as varchar)
+           and     ws_sold_date_sk         = d_date_sk
            and     d_year                  = 2001
            and     d_moy                   = 2
            and     ws_bill_addr_sk         = ca_address_sk

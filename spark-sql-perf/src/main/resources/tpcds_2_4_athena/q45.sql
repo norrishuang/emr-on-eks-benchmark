@@ -12,7 +12,7 @@ where ws_bill_customer_sk = c_customer_sk
                       where i_item_sk in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29)
         )
     )
-  and ws_sold_date_sk = cast(d_date_sk as varchar)
+  and ws_sold_date_sk = d_date_sk
   and d_qoy = 2 and d_year = 2001
 group by ca_zip, ca_city
 order by ca_zip, ca_city

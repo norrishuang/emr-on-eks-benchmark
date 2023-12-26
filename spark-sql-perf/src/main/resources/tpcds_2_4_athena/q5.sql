@@ -23,7 +23,7 @@ WITH ssr AS
                       sr_net_loss as net_loss
                FROM store_returns)
                   salesreturns, date_dim, store
-          WHERE date_sk = cast(d_date_sk as varchar)
+          WHERE date_sk = d_date_sk
             and d_date between cast('2000-08-23' as date)
               and ((cast('2000-08-23' as date) + interval '14' day))
             and store_sk = s_store_sk
@@ -51,7 +51,7 @@ WITH ssr AS
                       cr_net_loss as net_loss
                from catalog_returns
               ) salesreturns, date_dim, catalog_page
-          WHERE date_sk = cast(d_date_sk as varchar)
+          WHERE date_sk = d_date_sk
             and d_date between cast('2000-08-23' as date)
               and ((cast('2000-08-23' as date) + interval '14' day))
             and page_sk = cp_catalog_page_sk
@@ -82,7 +82,7 @@ WITH ssr AS
                    ( wr_item_sk = ws_item_sk
                        and wr_order_number = ws_order_number)
               ) salesreturns, date_dim, web_site
-          WHERE date_sk = cast(d_date_sk as varchar)
+          WHERE date_sk = d_date_sk
             and d_date between cast('2000-08-23' as date)
               and ((cast('2000-08-23' as date) + interval '14' day))
             and wsr_web_site_sk = web_site_sk

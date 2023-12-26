@@ -6,7 +6,7 @@ WITH web_v1 as (
         sum(sum(ws_sales_price))
             over (partition by ws_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
     from web_sales, date_dim
-    where ws_sold_date_sk=cast(d_date_sk as varchar)
+    where ws_sold_date_sk=d_date_sk
       and d_month_seq between 1200 and 1200+11
       and ws_item_sk is not NULL
     group by ws_item_sk, d_date),
@@ -16,7 +16,7 @@ WITH web_v1 as (
              sum(sum(ss_sales_price))
                  over (partition by ss_item_sk order by d_date rows between unbounded preceding and current row) cume_sales
          from store_sales, date_dim
-         where ss_sold_date_sk=cast(d_date_sk as varchar)
+         where ss_sold_date_sk=d_date_sk
            and d_month_seq between 1200 and 1200+11
            and ss_item_sk is not NULL
          group by ss_item_sk, d_date)
