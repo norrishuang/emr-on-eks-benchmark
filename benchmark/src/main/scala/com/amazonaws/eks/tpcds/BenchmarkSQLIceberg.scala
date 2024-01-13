@@ -37,8 +37,6 @@ object BenchmarkSQLIceberg {
       .config("spark.sql.catalog.glue_catalog.warehouse", warehouse)
       .config("spark.sql.catalog.glue_catalog.catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog")
       .config("spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
-      .config("spark.sql.ansi.enabled", "false")
-      .config("spark.sql.iceberg.handle-timestamp-without-timezone", "true")
       .getOrCreate()
 
     if (onlyWarn) {
@@ -60,7 +58,7 @@ object BenchmarkSQLIceberg {
 //      }
 //      tables.createExternalTables(tpcdsDataDir, format, databaseName, overwrite = true, discoverPartitions = true)
 //      tables.analyzeTables(databaseName, analyzeColumns = true)
-      spark.conf.set("spark.sql.cbo.enabled", "true")
+        spark.conf.set("spark.sql.cbo.enabled", "true")
     } else {
 //      tables.createTemporaryTables(tpcdsDataDir, format)
     }

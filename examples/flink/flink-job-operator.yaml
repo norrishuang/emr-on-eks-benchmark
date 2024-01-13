@@ -1,0 +1,39 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: emr-on-eks-example-01
+spec:
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    state.checkpoints.dir: s3://emr-hive-us-east-1-812046859005/flink-eks/checkpoints/
+    state.savepoints.dir: s3://emr-hive-us-east-1-812046859005/flink-eks/savepoints/
+    kubernetes.operator.job.autoscaler.enabled: true
+    kubernetes.operator.job.autoscaler.stabilization.interval: 1m
+    kubernetes.operator.job.autoscaler.metrics.window: 5m
+    kubernetes.operator.job.autoscaler.target.utilization: 0.6
+    kubernetes.operator.job.autoscaler.target.utilization.boundary: 0.2
+    kubernetes.operator.job.autoscaler.restart.time: 2m
+    kubernetes.operator.job.autoscaler.catch-up.duration: 5m
+    kubernetes.pod-template-file.jobmanager: s3://tpcds-bemchmark-bucket-812046859005/app_code/pod-template/flink-job-pod-template.yaml
+    kubernetes.pod-template-file.taskmanager: s3://tpcds-bemchmark-bucket-812046859005/app_code/pod-template/flink-task-pod-template.yaml
+  flinkVersion: v1_17
+  executionRoleArn: arn:aws:iam::812046859005:role/EMR_EKS_Job_Execution_Role
+  emrReleaseLabel: "emr-6.14.0-flink-latest"
+  jobManager:
+    storageDir: s3://emr-hive-us-east-1-812046859005/flink-eks/ha/
+    resource:
+      memory: "2048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  job:
+    # if you have your job jar in S3 bucket you can use that path as well
+    jarURI: local:///opt/flink/examples/streaming/StateMachineExample.jar
+    parallelism: 2
+    upgradeMode: savepoint
+    savepointTriggerNonce: 0
+  monitoringConfiguration:
+    cloudWatchMonitoringConfiguration:
+      logGroupName: /aws/eks/flink-eks-cluster/cluster

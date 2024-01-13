@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: taskmanager-pod-template
+spec:
+  nodeSelector:
+    app: taskmanager
+    karpenter.sh/provisioner-name: mixed
+  containers:
+    # Do not change the main container name
+    - name: flink-main-container
+      resources:
+        requests:
+          ephemeral-storage: 2048Mi
+        limits:
+          ephemeral-storage: 2048Mi
+      volumeMounts:
+        - mountPath: /opt/flink/volumes/hostpath
+          name: flink-volume-hostpath
+        - mountPath: /opt/flink/artifacts
+          name: flink-artifact
+        - mountPath: /opt/flink/log
+          name: flink-logs
+      # Use sidecar container to push logs to remote storage or do some other debugging things
+  volumes:
+    - name: flink-volume-hostpath
+      hostPath:
+        path: /tmp
+        type: Directory
+    - name: flink-artifact
+      emptyDir: { }
+    - name: flink-logs
+      emptyDir: { }
