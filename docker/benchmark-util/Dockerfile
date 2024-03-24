@@ -17,7 +17,7 @@ FROM mozilla/sbt:8u292_1.5.4 as sbt
 # Build the Databricks SQL perf library
 RUN git clone https://github.com/norrishuang/emr-on-eks-benchmark.git /tmp/emr-on-eks-benchmark && \
     cd /tmp/emr-on-eks-benchmark/spark-sql-perf/ && \
-    sbt +package   
+    sbt +package   a
      
 # Use the compiled Databricks SQL perf library to build benchmark utility
 RUN cd /tmp/emr-on-eks-benchmark/ && mkdir /tmp/emr-on-eks-benchmark/benchmark/libs \
