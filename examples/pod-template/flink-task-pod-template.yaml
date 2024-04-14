@@ -14,6 +14,7 @@ spec:
           ephemeral-storage: 2048Mi
         limits:
           ephemeral-storage: 2048Mi
+      command: ['sh', '-c', 'mkdir /mnt/s3; chown -R 999:1000 /mnt/s3'] 
       volumeMounts:
         - mountPath: /opt/flink/volumes/hostpath
           name: flink-volume-hostpath
@@ -21,6 +22,8 @@ spec:
           name: flink-artifact
         - mountPath: /opt/flink/log
           name: flink-logs
+        - mountPath: /mnt/s3
+          name: flink-hudi
       # Use sidecar container to push logs to remote storage or do some other debugging things
   volumes:
     - name: flink-volume-hostpath
