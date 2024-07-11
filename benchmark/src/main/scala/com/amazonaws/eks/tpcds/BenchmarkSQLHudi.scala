@@ -44,21 +44,21 @@ object BenchmarkSQLHudi {
     }
 
     spark.sql(s"show databases").show()
-//    val tables = new TPCDSTables(spark.sqlContext,
-//      dsdgenDir = dsdgenDir,
-//      scaleFactor = scaleFactor,
-//      useDoubleForDecimal = false,
-//      useStringForDate = false)
-//
+    val tables = new TPCDSTables(spark.sqlContext,
+      dsdgenDir = dsdgenDir,
+      scaleFactor = scaleFactor,
+      useDoubleForDecimal = false,
+      useStringForDate = false)
+
     if (optimizeQueries) {
-//      Try {
-//        spark.sql(s"create database $databaseName")
-//      }
-//      tables.createExternalTables(tpcdsDataDir, format, databaseName, overwrite = true, discoverPartitions = true)
-//      tables.analyzeTables(databaseName, analyzeColumns = true)
+      Try {
+        spark.sql(s"create database $databaseName")
+      }
+      tables.createExternalTables(tpcdsDataDir, format, databaseName, overwrite = true, discoverPartitions = true)
+      tables.analyzeTables(databaseName, analyzeColumns = true)
       spark.conf.set("spark.sql.cbo.enabled", "true")
     } else {
-//      tables.createTemporaryTables(tpcdsDataDir, format)
+      tables.createTemporaryTables(tpcdsDataDir, format)
     }
 
     spark.sql(s"use $databaseName")
