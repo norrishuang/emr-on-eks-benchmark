@@ -30,5 +30,9 @@ USER root
 COPY --from=tpc-toolkit /tmp/tpcds-kit/tools /opt/tpcds-kit/tools
 COPY --from=sbt /tmp/emr-on-eks-benchmark/benchmark/target/scala-2.12/*jar ${SPARK_HOME}/examples/jars/
 
+# Downlad Blaze    
+RUN aws s3 cp s3://myemr-bucket-01/work/blaze-engine-spark333-release-3.0.1-SNAPSHOT.jar ./ \
+    && mv ./blaze-engine-spark333-release-3.0.1-SNAPSHOT.jar ${SPARK_HOME}/jars/
+
 # # Use hadoop user and group 
 USER root:root

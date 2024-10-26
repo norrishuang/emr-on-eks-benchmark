@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"monitoring.coreos.com/v1","kind":"PodMonitor","metadata":{"annotations":{},"labels":{"app.kubernetes.io/name":"prometheus","app.kubernetes.io/part-of":"kube-prometheus","prometheus":"k8s"},"name":"spark-driver-metrics","namespace":"emr-eks-spark"},"spec":{"namespaceSelector":{"matchNames":["emr-eks-spark"]},"podMetricsEndpoints":[{"interval":"10s","path":"/metrics/driver/prometheus/","port":"spark-ui"}],"selector":{"matchLabels":{"spark-role":"driver"}}}}
+  creationTimestamp: "2024-09-18T06:45:54Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+  name: spark-driver-metrics
+  namespace: emr-eks-spark
+  resourceVersion: "10900072"
+  uid: 64c89891-f9c0-4f1b-848a-dfbb3d49beec
+spec:
+  namespaceSelector:
+    matchNames:
+    - emr-eks-spark
+  podMetricsEndpoints:
+  - interval: 10s
+    path: /metrics/driver/prometheus/
+    port: spark-ui
+  selector:
+    matchLabels:
+      spark-role: driver

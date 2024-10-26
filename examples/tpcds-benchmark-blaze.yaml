@@ -3,7 +3,7 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: tpcds-benchmark-oss
+  name: tpcds-benchmark-oss-blaze
   namespace: emr-eks-spark
 spec:
   type: Scala
@@ -17,7 +17,7 @@ spec:
   # TPC-DS data localtion
     - "s3://tpcds-bemchmark-bucket-812046859005/BLOG_TPCDS-TEST-3T-partitioned/"
   # results location
-    - "s3://emr-hive-us-east-1-812046859005/benchmark/SPARK_OSS_TPCDS-TEST-3T-RESULT"
+    - "s3://emr-hive-us-east-1-812046859005/benchmark/SPARK_BLAZE_TPCDS-TEST-3T-RESULT/"
   # Path to kit in the docker image
     - "/opt/tpcds-kit/tools"
   # Data Format
@@ -34,6 +34,7 @@ spec:
   # Logging set to WARN
     - "true"
   sparkConf:
+    "spark.master": "k8s://https://01FFADF8D87ED652A507EC76A79C9675.gr7.us-east-1.eks.amazonaws.com"
     "spark.network.timeout": "2000s"
     "spark.executor.heartbeatInterval": "300s"
     # "spark.eventLog.enabled": "true"
@@ -45,17 +46,19 @@ spec:
     # "spark.sql.adaptive.skewJoin.enabled": "true"
     # "spark.sql.adaptive.logLevel": "WARN"      
     # IRSA for S3 connection
-    "spark.kubernetes.executor.podNamePrefix": "oss-spark-tpcds"
+    "spark.kubernetes.executor.podNamePrefix": "oss-blaze-spark-tpcds"
     "spark.hadoop.fs.s3a.aws.credentials.provider": "com.amazonaws.auth.WebIdentityTokenCredentialsProvider"
     "spark.hadoop.fs.s3.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem"
     "spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version": "2" 
     "spark.executor.defaultJavaOptions": "-verbose:gc -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70"
+    # blaze
+    "spark.blaze.enable": "true"
+    "spark.sql.extensions": "org.apache.spark.sql.blaze.BlazeSparkSessionExtension"
+    "spark.memory.offHeap.enabled": "false"
     # "spark.io.compression.codec": "zstd"
+    # "spark.sql.readSideCharPadding": "false"
+    "spark.shuffle.manager": "org.apache.spark.sql.execution.blaze.shuffle.BlazeShuffleManager"
     # "spark.sql.parquet.compression.codec": "zstd"
-    
-    # selector
-    "spark.kubernetes.driver.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
-    "spark.kubernetes.executor.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
     
     # prometheus
     "spark.ui.prometheus.enabled": "true"
@@ -70,12 +73,19 @@ spec:
     "spark.metrics.conf.*.sink.prometheusServlet.path": "/metrics/driver/prometheus/"
     "spark.metrics.conf.master.sink.prometheusServlet.path": "/metrics/master/prometheus/"
     "spark.metrics.conf.applications.sink.prometheusServlet.path": "/metrics/applications/prometheus/"
+    
+    # selector
+    "spark.kubernetes.driver.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
+    "spark.kubernetes.executor.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
+    
+    # pod template
+    # spark.kubernetes.driver.podTemplateFile: s3://emr-hive-us-east-1-812046859005/app_code/pod-template/driver-pod-template-blaze.yaml
+    # spark.kubernetes.executor.podTemplateFile: s3://emr-hive-us-east-1-812046859005/app_code/pod-template/executor-pod-template-blaze.yaml
+    
+    
     # Keep pods in a single AZ 
     # "spark.kubernetes.node.selector.topology.kubernetes.io/zone": "us-east-1b"
     # "spark.kubernetes.node.selector.eks.amazonaws.com/capacityType": "ON_DEMAND"
-  # deps:
-  #   jars:
-  #   - local:///opt/spark/examples/jars/blaze-engine-spark333-release-3.0.1-SNAPSHOT.jar
   volumes:
     - name: spark-local-dir-1
       hostPath:
@@ -114,6 +124,10 @@ spec:
         #   mountPath: /data3
         # - name: spark-local-dir-4
         #   mountPath: /data4
+      # ports:
+      # - containerPort: 7337
+      #   protocol: TCP
+      #   name: spark_shuffle
     volumeMounts:
       - name: spark-local-dir-1
         mountPath: /data1
@@ -143,7 +157,11 @@ spec:
         # - name: spark-local-dir-3
         #   mountPath: /data3
         # - name: spark-local-dir-4
-        #   mountPath: /data4     
+        #   mountPath: /data4  
+      # ports:
+      # - containerPort: 7337
+      #   protocol: TCP
+      #   name: spark_shuffle
     volumeMounts:
       - name: spark-local-dir-1
         mountPath: /data1

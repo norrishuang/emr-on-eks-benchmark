@@ -1,6 +1,6 @@
 # // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # // SPDX-License-Identifier: MIT-0
-ARG SPARK_BASE_IMAGE=public.ecr.aws/emr-serverless/spark/emr-6.10.0:latest
+ARG SPARK_BASE_IMAGE=public.ecr.aws/emr-serverless/spark/emr-7.1.0:latest
 
 FROM amazonlinux:2 as tpc-toolkit
 

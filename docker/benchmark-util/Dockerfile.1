@@ -45,4 +45,4 @@ COPY --from=sbtenv /tmp/emr-on-eks-benchmark/delta-perf/target/scala-2.12/*jar $
 # COPY --from=sbtenv /tmp/emr-on-eks-benchmark/delta-perf/run-benchmark.py ${SPARK_HOME}/examples/delta/
 # RUN chown -R hadoop:hadoop ${SPARK_HOME}/examples/delta
 # # Use hadoop user and group 
-USER root:root
+USER hadoop:hadoop

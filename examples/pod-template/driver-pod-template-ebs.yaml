@@ -8,7 +8,7 @@ spec:
   volumes:
     - name: spark-local-dir-1
       hostPath:
-        path: /local1 
+        path: /local1
     - name: spark-local-dir-2
       hostPath:
         path: /local2

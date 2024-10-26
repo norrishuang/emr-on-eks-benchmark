@@ -18,6 +18,7 @@ RUN tar -xvzf hadoop-${HADOOP_VERSION}.tar.gz && \
     mv hadoop-${HADOOP_VERSION} hadoop && \
     rm -rf hadoop/share/doc
 
+
 # Delete old aws-java-sdk and replace with newer version that supports IRSA
 WORKDIR /hadoop/share/hadoop/tools/lib
 
@@ -35,6 +36,8 @@ COPY --from=builder /spark /opt/spark
 COPY --from=builder /spark/kubernetes/dockerfiles/spark/entrypoint.sh /opt
 COPY --from=builder /hadoop /opt/hadoop
 
+
+
 RUN set -ex && \
     sed -i 's/http:\/\/deb.\(.*\)/https:\/\/deb.\1/g' /etc/apt/sources.list && \
     apt-get update -y && \
@@ -48,6 +51,8 @@ RUN set -ex && \
     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
     chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
     rm -rf /var/cache/apt/*
+    
+
 
 # Configure environment variables for spark
 ENV SPARK_HOME /opt/spark
@@ -65,4 +70,5 @@ ENV SPARK_USER hadoop
 
 # Set spark workdir
 WORKDIR /opt/spark/work-dir
+
 ENTRYPOINT [ "/opt/entrypoint.sh" ]

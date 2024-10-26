@@ -4,7 +4,8 @@ apiVersion: v1
 kind: Pod
 spec:
   nodeSelector:
-    app: sparktest
+    app: sparktest1
+    alpha.eksctl.io/nodegroup-name: mng-benchmark-i3-4xl-spark
     # eks.amazonaws.com/capacityType: ON_DEMAND
   volumes:
     - name: spark-local-dir-1
@@ -12,7 +13,7 @@ spec:
         path: /local1  
   initContainers:  
   - name: volume-permission
-    image: public.ecr.aws/y4g4v0z7/busybox
+    image: public.ecr.aws/docker/library/busybox
     # grant volume access to hadoop user  
     command: ['sh', '-c', 'mkdir /data1; chown -R 999:1000 /data1'] 
     volumeMounts:
