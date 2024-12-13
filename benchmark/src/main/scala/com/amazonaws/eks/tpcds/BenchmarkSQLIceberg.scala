@@ -60,9 +60,8 @@ object BenchmarkSQLIceberg {
 //      tables.analyzeTables(databaseName, analyzeColumns = true)
         spark.conf.set("spark.sql.cbo.enabled", "true")
     } else {
-//      tables.createTemporaryTables(tpcdsDataDir, format)
+      //      tables.createTemporaryTables(tpcdsDataDir, format)
     }
-
     val tpcds = new TPCDS_Iceberg(spark.sqlContext, "glue_catalog", databaseName)
 
     var query_filter : Seq[String] = Seq()

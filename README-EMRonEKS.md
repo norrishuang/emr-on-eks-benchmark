@@ -157,3 +157,11 @@ export EKSCLUSTER_NAME=eks-nvme
 export AWS_REGION=us-east-1
 ./deprovision.sh
 ```
+
+
+## Build in Local
+```shell
+cd spark-sql-perf
+sbt +package -Djava.security.manager=allo
+
+```

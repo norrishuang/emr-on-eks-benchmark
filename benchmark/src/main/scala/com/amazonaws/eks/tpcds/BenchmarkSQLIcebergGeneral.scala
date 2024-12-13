@@ -63,7 +63,7 @@ object BenchmarkSQLIcebergGeneral {
     } else {
 //      tables.createTemporaryTables(tpcdsDataDir, format)
     }
-
+    spark.sql("use " + databaseName)
     val tpcds = new TPCDS_Iceberg_General(spark.sqlContext, "glue_catalog", databaseName)
 
     var query_filter : Seq[String] = Seq()

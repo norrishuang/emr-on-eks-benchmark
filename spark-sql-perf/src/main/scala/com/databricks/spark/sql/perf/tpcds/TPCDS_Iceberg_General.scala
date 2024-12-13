@@ -61,7 +61,6 @@ class TPCDS_Iceberg_General(@transient sqlContext: SQLContext,catalog: String, d
       println(s"Query: ${q.name}")
       try {
         println(s"Query SQL: ${q.sqlText}")
-        var dfdb = sqlContext.sql("USE " + database)
         val df = sqlContext.sql(q.sqlText.get)
         if (showPlan) {
           df.explain()
@@ -84,7 +83,6 @@ class TPCDS_Iceberg_General(@transient sqlContext: SQLContext,catalog: String, d
       println(s"Query: ${q.name}")
       println(s"Query SQL: ${q.sqlText}")
       val start = System.currentTimeMillis()
-      var dfdb = sqlContext.sql("USE " + database)
       val df = sqlContext.sql(q.sqlText.get)
       var failed = false
       val jobgroup = s"benchmark ${q.name}"
