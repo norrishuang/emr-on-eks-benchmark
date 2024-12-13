@@ -1,80 +1,85 @@
 --q77.sql--
 
- with ss as
- (select s_store_sk, sum(ss_ext_sales_price) as sales, sum(ss_net_profit) as profit
-  from  dev.{0}.store_sales,
-        dev.{0}.date_dim,
-        dev.{0}.store
-  where ss_sold_date_sk = d_date_sk
-    and d_date between cast('2000-08-23' as date) and
-                       (cast('2000-08-23' as date) + interval '30' day)
-    and ss_store_sk = s_store_sk
-  group by s_store_sk),
- sr as
- (select s_store_sk, sum(sr_return_amt) as returns, sum(sr_net_loss) as profit_loss
- from dev.{0}.store_returns,
-      dev.{0}.date_dim,
-      dev.{0}.store
- where sr_returned_date_sk = d_date_sk
-    and d_date between cast('2000-08-23' as date) and
-                       (cast('2000-08-23' as date) + interval '30' day)
-    and sr_store_sk = s_store_sk
- group by s_store_sk),
- cs as
- (select cs_call_center_sk, sum(cs_ext_sales_price) as sales, sum(cs_net_profit) as profit
- from dev.{0}.catalog_sales,
-      dev.{0}.date_dim
- where cs_sold_date_sk = d_date_sk
-    and d_date between cast('2000-08-23' as date) and
-                       (cast('2000-08-23' as date) + interval '30' day)
- group by cs_call_center_sk),
- cr as
- (select cr_call_center_sk, sum(cr_return_amount) as returns, sum(cr_net_loss) as profit_loss
- from dev.{0}.catalog_returns, dev.{0}.date_dim
- where cr_returned_date_sk = d_date_sk
-    and d_date between cast('2000-08-23' as date) and
-                       (cast('2000-08-23' as date) + interval '30' day)
-	group by cr_call_center_sk),
- ws as
- (select wp_web_page_sk, sum(ws_ext_sales_price) as sales, sum(ws_net_profit) as profit
- from  dev.{0}.web_sales,
-       dev.{0}.date_dim,
-       dev.{0}.web_page
- where ws_sold_date_sk = d_date_sk
-    and d_date between cast('2000-08-23' as date) and
-                       (cast('2000-08-23' as date) + interval '30' day)
-    and ws_web_page_sk = wp_web_page_sk
- group by wp_web_page_sk),
- wr as
- (select wp_web_page_sk, sum(wr_return_amt) as returns, sum(wr_net_loss) as profit_loss
- from dev.{0}.web_returns,
-      dev.{0}.date_dim,
-      dev.{0}.web_page
- where wr_returned_date_sk = d_date_sk
-       and d_date between cast('2000-08-23' as date) and
-                          (cast('2000-08-23' as date) + interval '30' day)
-       and wr_web_page_sk = wp_web_page_sk
- group by wp_web_page_sk)
- select channel, id, sum(sales) as sales, sum(returns) as returns, sum(profit) as profit
- from
- (select
-    'store channel' as channel, ss.s_store_sk as id, sales,
-    coalesce(returns, 0) as returns, (profit - coalesce(profit_loss,0)) as profit
- from ss left join sr
-      on  ss.s_store_sk = sr.s_store_sk
- union all
- select
-    'catalog channel' as channel, cs_call_center_sk as id, sales,
-    returns, (profit - profit_loss) as profit
- from cs cross join cr
- union all
- select
-    'web channel' as channel, ws.wp_web_page_sk as id, sales,
-    coalesce(returns, 0) returns, (profit - coalesce(profit_loss,0)) as profit
- from   ws left join wr
-        on  ws.wp_web_page_sk = wr.wp_web_page_sk
- ) x
- group by rollup(channel, id)
- order by channel, id
- limit 100
-            
+ WITH ss AS (
+  SELECT s_store_sk, SUM(ss_ext_sales_price) AS sales, SUM(ss_net_profit) AS profit
+  FROM dev.{0}.store_sales
+  JOIN dev.{0}.date_dim ON ss_sold_date_sk = d_date_sk
+  JOIN dev.{0}.store ON ss_store_sk = s_store_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY s_store_sk
+),
+sr AS (
+  SELECT s_store_sk, SUM(sr_return_amt) AS return_amt, SUM(sr_net_loss) AS profit_loss
+  FROM dev.{0}.store_returns
+  JOIN dev.{0}.date_dim ON sr_returned_date_sk = d_date_sk
+  JOIN dev.{0}.store ON sr_store_sk = s_store_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY s_store_sk
+),
+cs AS (
+  SELECT cs_call_center_sk, SUM(cs_ext_sales_price) AS sales, SUM(cs_net_profit) AS profit
+  FROM dev.{0}.catalog_sales
+  JOIN dev.{0}.date_dim ON cs_sold_date_sk = d_date_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY cs_call_center_sk
+),
+cr AS (
+  SELECT cr_call_center_sk, SUM(cr_return_amount) AS return_amt, SUM(cr_net_loss) AS profit_loss
+  FROM dev.{0}.catalog_returns
+  JOIN dev.{0}.date_dim ON cr_returned_date_sk = d_date_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY cr_call_center_sk
+),
+ws AS (
+  SELECT wp_web_page_sk, SUM(ws_ext_sales_price) AS sales, SUM(ws_net_profit) AS profit
+  FROM dev.{0}.web_sales
+  JOIN dev.{0}.date_dim ON ws_sold_date_sk = d_date_sk
+  JOIN dev.{0}.web_page ON ws_web_page_sk = wp_web_page_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY wp_web_page_sk
+),
+wr AS (
+  SELECT wp_web_page_sk, SUM(wr_return_amt) AS return_amt, SUM(wr_net_loss) AS profit_loss
+  FROM dev.{0}.web_returns
+  JOIN dev.{0}.date_dim ON wr_returned_date_sk = d_date_sk
+  JOIN dev.{0}.web_page ON wr_web_page_sk = wp_web_page_sk
+  WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
+  GROUP BY wp_web_page_sk
+)
+SELECT
+  channel,
+  id,
+  SUM(sales) AS sales,
+  SUM(return_amt) AS returns,
+  SUM(profit) AS profit
+FROM (
+  SELECT
+    'store channel' AS channel,
+    ss.s_store_sk AS id,
+    sales,
+    COALESCE(sr.return_amt, 0) AS return_amt,
+    (profit - COALESCE(sr.profit_loss, 0)) AS profit
+  FROM ss
+  LEFT JOIN sr ON ss.s_store_sk = sr.s_store_sk
+  UNION ALL
+  SELECT
+    'catalog channel' AS channel,
+    cs.cs_call_center_sk AS id,
+    sales,
+    cr.return_amt,
+    (profit - cr.profit_loss) AS profit
+  FROM cs
+  CROSS JOIN cr
+  UNION ALL
+  SELECT
+    'web channel' AS channel,
+    ws.wp_web_page_sk AS id,
+    sales,
+    COALESCE(wr.return_amt, 0) AS return_amt,
+    (profit - COALESCE(wr.profit_loss, 0)) AS profit
+  FROM ws
+  LEFT JOIN wr ON ws.wp_web_page_sk = wr.wp_web_page_sk
+) x
+GROUP BY ROLLUP(channel, id)
+ORDER BY channel, id
+LIMIT 100;

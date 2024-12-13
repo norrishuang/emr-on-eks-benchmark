@@ -1,0 +1,149 @@
+---
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: tpdds-3tb-benchmark-emr-spark-blaze
+  namespace: emr-eks-spark
+spec:
+  type: Scala
+  mode: cluster
+  # EMR optimized runtime image
+  image: 812046859005.dkr.ecr.us-east-1.amazonaws.com/eks-emr-spark:emr-blaze-6.11.0
+  imagePullPolicy: Always
+  mainClass: com.amazonaws.eks.tpcds.BenchmarkSQL
+  mainApplicationFile: local:///usr/lib/spark/examples/jars/eks-spark-benchmark-assembly-1.0.jar
+  arguments:
+    - s3://tpcds-bemchmark-bucket-812046859005/BLOG_TPCDS-TEST-3T-partitioned/
+    - s3://tpcds-bemchmark-bucket-812046859005/JDK_EMRONEKS_BLAZE_TPCDS-TEST-3T-RESULT/
+    - /opt/tpcds-kit/tools
+    - parquet
+    - "3000"
+    - "1"
+    - "false"
+    - "q1-v2.4,q2-v2.4,q3-v2.4,q4-v2.4,q5-v2.4,q6-v2.4,q7-v2.4,q8-v2.4,q9-v2.4,q10-v2.4,q11-v2.4,q12-v2.4,q13-v2.4,q14a-v2.4,q14b-v2.4,q15-v2.4,q16-v2.4,q17-v2.4,q18-v2.4,q19-v2.4,q20-v2.4,q21-v2.4,q22-v2.4,q23a-v2.4,q23b-v2.4,q24a-v2.4,q24b-v2.4,q25-v2.4,q26-v2.4,q27-v2.4,q28-v2.4,q29-v2.4,q30-v2.4,q31-v2.4,q32-v2.4,q33-v2.4,q34-v2.4,q35-v2.4,q36-v2.4,q37-v2.4,q38-v2.4,q39a-v2.4,q39b-v2.4,q40-v2.4,q41-v2.4,q42-v2.4,q43-v2.4,q44-v2.4,q45-v2.4,q46-v2.4,q47-v2.4,q48-v2.4,q49-v2.4,q50-v2.4,q51-v2.4,q52-v2.4,q53-v2.4,q54-v2.4,q55-v2.4,q56-v2.4,q57-v2.4,q58-v2.4,q59-v2.4,q60-v2.4,q61-v2.4,q62-v2.4,q63-v2.4,q64-v2.4,q65-v2.4,q66-v2.4,q67-v2.4,q68-v2.4,q69-v2.4,q70-v2.4,q71-v2.4,q72-v2.4,q73-v2.4,q74-v2.4,q75-v2.4,q76-v2.4,q77-v2.4,q78-v2.4,q79-v2.4,q80-v2.4,q81-v2.4,q82-v2.4,q83-v2.4,q84-v2.4,q85-v2.4,q86-v2.4,q87-v2.4,q88-v2.4,q89-v2.4,q90-v2.4,q91-v2.4,q92-v2.4,q93-v2.4,q94-v2.4,q95-v2.4,q96-v2.4,q97-v2.4,q98-v2.4,q99-v2.4,ss_max-v2.4"
+    - "ture"
+  hadoopConf:
+    # EMRFS filesystem config
+    fs.s3.customAWSCredentialsProvider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
+    fs.s3.impl: com.amazon.ws.emr.hadoop.fs.EmrFileSystem
+    fs.AbstractFileSystem.s3.impl: org.apache.hadoop.fs.s3.EMRFSDelegate
+    fs.s3.buffer.dir: /mnt/s3
+    fs.s3.getObject.initialSocketTimeoutMilliseconds: "2000"
+    mapreduce.fileoutputcommitter.algorithm.version.emr_internal_use_only.EmrFileSystem: "2"
+    mapreduce.fileoutputcommitter.cleanup-failures.ignored.emr_internal_use_only.EmrFileSystem: "true"
+  sparkConf:
+    spark.eventLog.enabled: "true"
+    spark.eventLog.dir: "s3://tpcds-bemchmark-bucket-812046859005/event-log/"
+    spark.kubernetes.driver.pod.name: driver-emr-spark-tpcds
+    
+    # AQE
+    # spark.sql.adaptive.enabled: "true"
+    # spark.sql.adaptive.localShuffleReader.enabled": "true"
+    # spark.sql.adaptive.coalescePartitions.enabled": "true"
+    # spark.sql.adaptive.skewJoin.enabled: "true"
+    
+    spark.ui.prometheus.enabled: "true"
+    spark.executor.processTreeMetrics.enabled: "true"
+    spark.kubernetes.driver.annotation.prometheus.io/scrape: "true"
+    spark.kubernetes.driver.annotation.prometheus.io/path: /metrics/executors/prometheus/
+    spark.kubernetes.driver.annotation.prometheus.io/port: "4040"
+    spark.kubernetes.driver.service.annotation.prometheus.io/scrape: "true"
+    spark.kubernetes.driver.service.annotation.prometheus.io/path: /metrics/driver/prometheus/
+    spark.kubernetes.driver.service.annotation.prometheus.io/port: "4040"
+    spark.metrics.conf.*.sink.prometheusServlet.class: org.apache.spark.metrics.sink.PrometheusServlet
+    spark.metrics.conf.*.sink.prometheusServlet.path: /metrics/driver/prometheus/
+    spark.metrics.conf.master.sink.prometheusServlet.path: /metrics/master/prometheus/
+    spark.metrics.conf.applications.sink.prometheusServlet.path: /metrics/applications/prometheus/
+    # Required for EMR Runtime and Glue Catalogue
+    spark.driver.extraClassPath: /usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/*:/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/home/hadoop/extrajars/*
+    spark.driver.extraLibraryPath: /usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native:/docker/usr/lib/hadoop/lib/native:/docker/usr/lib/hadoop-lzo/lib/native
+    spark.executor.extraClassPath: /usr/lib/hadoop-lzo/lib/*:/usr/lib/hadoop/hadoop-aws.jar:/usr/share/aws/aws-java-sdk/*:/usr/share/aws/emr/emrfs/conf:/usr/share/aws/emr/emrfs/lib/*:/usr/share/aws/emr/emrfs/auxlib/*:/usr/share/aws/emr/security/conf:/usr/share/aws/emr/security/lib/*:/usr/share/aws/hmclient/lib/aws-glue-datacatalog-spark-client.jar:/usr/share/java/Hive-JSON-Serde/hive-openx-serde.jar:/usr/share/aws/sagemaker-spark-sdk/lib/sagemaker-spark-sdk.jar:/home/hadoop/extrajars/*
+    spark.executor.extraLibraryPath: /usr/lib/hadoop/lib/native:/usr/lib/hadoop-lzo/lib/native:/docker/usr/lib/hadoop/lib/native:/docker/usr/lib/hadoop-lzo/lib/native
+    # EMRFS commiter
+    spark.sql.parquet.output.committer.class: com.amazon.emr.committer.EmrOptimizedSparkSqlParquetOutputCommitter
+    spark.sql.parquet.fs.optimized.committer.optimization-enabled: "true"
+    spark.sql.emr.internal.extensions: com.amazonaws.emr.spark.EmrSparkSessionExtensions
+    spark.executor.defaultJavaOptions: -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70 -XX:OnOutOfMemoryError='kill -9 %p'
+    spark.driver.defaultJavaOptions:  -XX:OnOutOfMemoryError='kill -9 %p' -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70
+    
+    # selector
+    "spark.kubernetes.driver.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
+    "spark.kubernetes.executor.node.selector.alpha.eksctl.io/nodegroup-name": "mng-benchmark-c5d-9xl-spark"
+    
+    # blaze
+    "spark.blaze.enable": "true"
+    "spark.sql.extensions": "org.apache.spark.sql.blaze.BlazeSparkSessionExtension"
+    "spark.memory.offHeap.enabled": "false"
+    # "spark.io.compression.codec": "zstd"
+    # "spark.sql.readSideCharPadding": "false"
+    "spark.shuffle.manager": "org.apache.spark.sql.execution.blaze.shuffle.BlazeShuffleManager"
+  sparkVersion: "3.3.2"
+  restartPolicy:
+    type: Never
+  
+  volumes:
+    - name: spark-local-dir-1
+      hostPath:
+        path: /local1
+  driver:
+    cores: 4
+    coreLimit: "4.1"
+    memory: "20g"
+    memoryOverhead: "4096"
+    serviceAccount: emr-job-execution-sa
+    initContainers:
+      - name: volume-permission
+        image: public.ecr.aws/y4g4v0z7/busybox
+        command: ['sh', '-c', 'mkdir -p /data1; chown -R 999:1000 /data1'] # grant volume access to hadoop user
+        volumeMounts:
+          - name: spark-local-dir-1
+            mountPath: /data1
+          # - name: spark-local-dir-2
+          #   mountPath: /data2
+          # - name: spark-local-dir-3
+          #   mountPath: /data3
+          # - name: spark-local-dir-4
+          #   mountPath: /data4
+    volumeMounts:
+      - name: spark-local-dir-1
+        mountPath: /data1
+      # - name: spark-local-dir-2
+      #   mountPath: /data2
+      # - name: spark-local-dir-3
+      #   mountPath: /data3
+      # - name: spark-local-dir-4
+      #   mountPath: /data4       
+  executor:
+    cores: 4
+    coreLimit: "4.3"
+    memory: "6g"
+    memoryOverhead: "4096"
+    # 8 executors per node  
+    instances: 47
+    serviceAccount: emr-job-execution-sa
+    initContainers:
+      - name: volume-permission
+        image: public.ecr.aws/y4g4v0z7/busybox
+        command: ['sh', '-c', 'mkdir -p /data1; chown -R 999:1000 /data1'] # grant volume access to hadoop user
+        volumeMounts:
+          - name: spark-local-dir-1
+            mountPath: /data1
+          # - name: spark-local-dir-2
+          #   mountPath: /data2
+          # - name: spark-local-dir-3
+          #   mountPath: /data3
+          # - name: spark-local-dir-4
+          #   mountPath: /data4
+        # ports:
+        # - containerPort: 7337
+        #   protocol: TCP
+        #   name: spark_shuffle
+    volumeMounts:
+      - name: spark-local-dir-1
+        mountPath: /data1
+      # - name: spark-local-dir-2
+      #   mountPath: /data2
+      # - name: spark-local-dir-3
+      #   mountPath: /data3
+      # - name: spark-local-dir-4
+      #   mountPath: /data4       

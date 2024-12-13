@@ -1,11 +1,11 @@
-## Data Lake component TPC-DS Test on AWS
+# Data Lake component TPC-DS Test on AWS
 
 本项目使用AWS EMR Serverless 测试 Data lake 组件（包括Iceberg/Hudi/Deltalake）的TPC-DS benchmark的表现。
 
 ## Prerequisite
 
 
-## EMR on EMS
+## EMR on EKS
 如需了解 EMR on EKS 相关，请点击连接 [emr on eks](./README-EMRonEKS.md)
 
 ## EMR Serverless
@@ -14,7 +14,7 @@
 
 使用与 EMR on EKS 相同的程序，用EMR Serverless 对数据湖组件做TPC DS性能测试。以下打包方案，使用了EMR Serverless 6.10版本作为基础镜像。
 
-```
+``` shell
 # stay in the project root directory
 cd emr-on-eks-benchmark
 
@@ -85,8 +85,8 @@ aws emr-serverless start-job-run \
 
 对应不同的数据格式使用不同的类替换
 
-| 类                                            |                             |
-| --------------------------------------------- |-----------------------------|
+| 类                                             |                             |
+|-----------------------------------------------|-----------------------------|
 | com.amazonaws.eks.tpcds.BenchmarkSQL          | Parquet, Hudi, Paimon |
 | com.amazonaws.eks.tpcds.BenchmarkSQLIceberg   | Iceberg                     |
 | com.amazonaws.eks.tpcds.BenchmarkSQLDeltalake | Delta Lake                  |

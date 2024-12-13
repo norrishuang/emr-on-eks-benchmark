@@ -1,6 +1,6 @@
 --q92.sql--
 
- select sum(ws_ext_discount_amt) as `Excess Discount Amount`
+ select sum(ws_ext_discount_amt) as "Excess Discount Amount"
  from  dev.{0}.web_sales,
        dev.{0}.item,
        dev.{0}.date_dim

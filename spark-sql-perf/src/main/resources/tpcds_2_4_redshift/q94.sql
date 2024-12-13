@@ -1,9 +1,9 @@
 --q94.sql--
 
  select
-    count(distinct ws_order_number) as `order count`
-   ,sum(ws_ext_ship_cost) as `total shipping cost`
-   ,sum(ws_net_profit) as `total net profit`
+    count(distinct ws_order_number) as "order count"
+   ,sum(ws_ext_ship_cost) as "total shipping cost"
+   ,sum(ws_net_profit) as "total net profit"
  from
      dev.{0}.web_sales ws1,
      dev.{0}.date_dim,
