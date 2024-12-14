@@ -10,16 +10,18 @@ from botocore.config import Config
 SQLFILES = ''
 REGION = ''
 DATABASE = 'tpcds'
+CATALOG = 'AwsDataCatalog'
 OUTPUT = './'
 WORKGROUP = 'primary'
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "f:r:d:o:w:",
+                               "f:r:d:o:w:c:",
                                ["sqlfiles=",
                                 "region=",
                                 "database=",
                                 "output=",
-                                "workgroup="])
+                                "workgroup=",
+                                "catalog="])
     for opt_name, opt_value in opts:
         if opt_name in ('-f', '--sqlfiles'):
             SQLFILES = opt_value
@@ -36,6 +38,9 @@ if len(sys.argv) > 1:
         elif opt_name in ('-w', '--workgroup'):
             WORKGROUP = opt_value
             print("WORKGROUP:" + WORKGROUP)
+        elif opt_name in ('-c', '--catalog'):
+            CATALOG = opt_value
+            print("CATALOG:" + CATALOG)
         else:
             print("need parameters [sqlfiles,region,database etc.]")
             exit()
@@ -88,7 +93,8 @@ def executeSQL(filename, sqltext):
     responseQuery = client.start_query_execution(
         QueryString=sqltext,
         QueryExecutionContext={
-            'Database': DATABASE
+            'Database': DATABASE,
+            'Catalog': CATALOG
         },
         ResultConfiguration={
             'OutputLocation': 's3://aws-athena-query-results-us-east-1-812046859005/',
