@@ -124,3 +124,15 @@ aws emr-serverless start-job-run \
 
 ## Athena
 
+```shell
+SQLPATH=./emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_athena/
+DATABASE=<database-of-glue-data-catalog>
+OUTPUT=/home/ec2-user/environment/
+python3 ./emr-on-eks-benchmark/examples/python/athena-tpcds.py -f $SQLPATH -d $DATABASE -o $OUTPUT
+```
+
+| 参数                                           | 说明              |
+|----------------------------------------------|-----------------|
+|-f/—filename   | sql 文件所在目录      |
+| -d/—database | 对应到Athena的数据库名称 |
+| -o/—output | 测试结果输出的目录       |
