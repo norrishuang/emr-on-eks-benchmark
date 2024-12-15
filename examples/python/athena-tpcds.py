@@ -137,7 +137,7 @@ def executeSQL(filename, sqltext):
             break
 
     with open(writeresultfile, "a+", newline='') as csvfile:
-        fieldnames = ['SQL', 'DataScannedInBytes', 'TotalExecutionTimeInMillis']
+        fieldnames = ['SQL', 'DataScannedInBytes', 'TotalExecutionTimeInSec']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #
         writer.writerow({'SQL': filename,
