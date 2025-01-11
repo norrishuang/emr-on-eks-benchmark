@@ -93,7 +93,7 @@ def executeSQL(filename, sqltext):
 
     conn = redshift_connector.connect(
         host=HOST,
-        database='dev',
+        database=DATABASE,
         port=5439,
         user=USERNAME,
         password=PASSWORD
