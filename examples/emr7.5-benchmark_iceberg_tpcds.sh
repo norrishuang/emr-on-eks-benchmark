@@ -26,7 +26,7 @@ aws emr-containers start-job-run \
   --virtual-cluster-id $VIRTUAL_CLUSTER_ID \
   --name emr740-iceberg \
   --execution-role-arn $EMR_ROLE_ARN \
-  --release-label emr-7.4.0-latest \
+  --release-label emr-7.5.0-latest \
   --retry-policy-configuration '{"maxAttempts": 1}' \
   --job-driver '{
   "sparkSubmitJobDriver": {
