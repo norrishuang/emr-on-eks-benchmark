@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 SQLFILES = ''
 HOST = ''
 OUTPUT = './'
+DATABASE = 'dev'
 SCHEMA = 'iceberg'
 USERNAME = 'awsuser'
 PASSWORD = 'awsuser'
@@ -23,7 +24,7 @@ python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spar
 '''
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "f:h:o:u:p:s:",
+                               "f:h:o:u:p:s:d:",
                                ["sqlfiles=",
                                 "host=",
                                 "output="])
@@ -42,6 +43,9 @@ if len(sys.argv) > 1:
         elif opt_name in ('-o', '--output'):
             OUTPUT = opt_value
             print("OUTPUT:" + OUTPUT)
+        elif opt_name in ('-d', '--database'):
+            DATABASE = opt_value
+            print("DATABASE:" + DATABASE)
         elif opt_name in ('-s', '--schema'):
             SCHEMA = opt_value
             print("SCHEMA:" + SCHEMA)
@@ -99,7 +103,7 @@ def executeSQL(filename, sqltext):
     cursor = conn.cursor()
     try:
         # print(sqltext.format(SCHEMA))
-        cursor.execute(sqltext.format(SCHEMA))
+        cursor.execute(sqltext.format(DATABASE, SCHEMA))
         rows = cursor.fetchall()
         rowcount = len(rows)
         cursor.close()

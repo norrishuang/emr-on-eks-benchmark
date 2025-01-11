@@ -2,47 +2,47 @@
 
  WITH ss AS (
   SELECT s_store_sk, SUM(ss_ext_sales_price) AS sales, SUM(ss_net_profit) AS profit
-  FROM dev.{0}.store_sales
-  JOIN dev.{0}.date_dim ON ss_sold_date_sk = d_date_sk
-  JOIN dev.{0}.store ON ss_store_sk = s_store_sk
+  FROM {0}.{1}.store_sales
+  JOIN {0}.{1}.date_dim ON ss_sold_date_sk = d_date_sk
+  JOIN {0}.{1}.store ON ss_store_sk = s_store_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY s_store_sk
 ),
 sr AS (
   SELECT s_store_sk, SUM(sr_return_amt) AS return_amt, SUM(sr_net_loss) AS profit_loss
-  FROM dev.{0}.store_returns
-  JOIN dev.{0}.date_dim ON sr_returned_date_sk = d_date_sk
-  JOIN dev.{0}.store ON sr_store_sk = s_store_sk
+  FROM {0}.{1}.store_returns
+  JOIN {0}.{1}.date_dim ON sr_returned_date_sk = d_date_sk
+  JOIN {0}.{1}.store ON sr_store_sk = s_store_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY s_store_sk
 ),
 cs AS (
   SELECT cs_call_center_sk, SUM(cs_ext_sales_price) AS sales, SUM(cs_net_profit) AS profit
-  FROM dev.{0}.catalog_sales
-  JOIN dev.{0}.date_dim ON cs_sold_date_sk = d_date_sk
+  FROM {0}.{1}.catalog_sales
+  JOIN {0}.{1}.date_dim ON cs_sold_date_sk = d_date_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY cs_call_center_sk
 ),
 cr AS (
   SELECT cr_call_center_sk, SUM(cr_return_amount) AS return_amt, SUM(cr_net_loss) AS profit_loss
-  FROM dev.{0}.catalog_returns
-  JOIN dev.{0}.date_dim ON cr_returned_date_sk = d_date_sk
+  FROM {0}.{1}.catalog_returns
+  JOIN {0}.{1}.date_dim ON cr_returned_date_sk = d_date_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY cr_call_center_sk
 ),
 ws AS (
   SELECT wp_web_page_sk, SUM(ws_ext_sales_price) AS sales, SUM(ws_net_profit) AS profit
-  FROM dev.{0}.web_sales
-  JOIN dev.{0}.date_dim ON ws_sold_date_sk = d_date_sk
-  JOIN dev.{0}.web_page ON ws_web_page_sk = wp_web_page_sk
+  FROM {0}.{1}.web_sales
+  JOIN {0}.{1}.date_dim ON ws_sold_date_sk = d_date_sk
+  JOIN {0}.{1}.web_page ON ws_web_page_sk = wp_web_page_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY wp_web_page_sk
 ),
 wr AS (
   SELECT wp_web_page_sk, SUM(wr_return_amt) AS return_amt, SUM(wr_net_loss) AS profit_loss
-  FROM dev.{0}.web_returns
-  JOIN dev.{0}.date_dim ON wr_returned_date_sk = d_date_sk
-  JOIN dev.{0}.web_page ON wr_web_page_sk = wp_web_page_sk
+  FROM {0}.{1}.web_returns
+  JOIN {0}.{1}.date_dim ON wr_returned_date_sk = d_date_sk
+  JOIN {0}.{1}.web_page ON wr_web_page_sk = wp_web_page_sk
   WHERE d_date BETWEEN CAST('2000-08-23' AS DATE) AND (CAST('2000-08-23' AS DATE) + INTERVAL '30' DAY)
   GROUP BY wp_web_page_sk
 )

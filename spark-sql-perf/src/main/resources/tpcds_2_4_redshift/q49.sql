@@ -13,10 +13,10 @@
  		,(cast(sum(coalesce(wr.wr_return_amt,0)) as decimal(15,4))/
  		cast(sum(coalesce(ws.ws_net_paid,0)) as decimal(15,4) )) as currency_ratio
  		from
- 		  dev.{0}.web_sales ws left outer join dev.{0}.web_returns wr
+ 		  {0}.{1}.web_sales ws left outer join {0}.{1}.web_returns wr
  			on (ws.ws_order_number = wr.wr_order_number and
  			ws.ws_item_sk = wr.wr_item_sk)
-        ,dev.{0}.date_dim
+        ,{0}.{1}.date_dim
  		where
  			wr.wr_return_amt > 10000
  			and ws.ws_net_profit > 1
@@ -46,10 +46,10 @@
  		,(cast(sum(coalesce(cr.cr_return_amount,0)) as decimal(15,4))/
  		cast(sum(coalesce(cs.cs_net_paid,0)) as decimal(15,4) )) as currency_ratio
  		from
-            dev.{0}.catalog_sales cs left outer join dev.{0}.catalog_returns cr
+            {0}.{1}.catalog_sales cs left outer join {0}.{1}.catalog_returns cr
  			on (cs.cs_order_number = cr.cr_order_number and
  			cs.cs_item_sk = cr.cr_item_sk)
-                ,dev.{0}.date_dim
+                ,{0}.{1}.date_dim
  		where
  			cr.cr_return_amount > 10000
  			and cs.cs_net_profit > 1
@@ -78,9 +78,9 @@
  		,(cast(sum(coalesce(sr.sr_return_amt,0)) as decimal(15,4))/
                cast(sum(coalesce(sts.ss_net_paid,0)) as decimal(15,4) )) as currency_ratio
  		from
-            dev.{0}.store_sales sts left outer join dev.{0}.store_returns sr
+            {0}.{1}.store_sales sts left outer join {0}.{1}.store_returns sr
  			on (sts.ss_ticket_number = sr.sr_ticket_number and sts.ss_item_sk = sr.sr_item_sk)
-                ,dev.{0}.date_dim
+                ,{0}.{1}.date_dim
  		where
  			sr.sr_return_amt > 10000
  			and sts.ss_net_profit > 1

@@ -8,7 +8,7 @@
           sum(case when (cast(d_date as date) >= cast ('2000-03-11' as date))
                    then inv_quantity_on_hand
                    else 0 end) as inv_after
-   from dev.{0}.inventory, dev.{0}.warehouse,  dev.{0}.item, dev.{0}.date_dim
+   from {0}.{1}.inventory, {0}.{1}.warehouse,  {0}.{1}.item, {0}.{1}.date_dim
    where i_current_price between 0.99 and 1.49
      and i_item_sk          = inv_item_sk
      and inv_warehouse_sk   = w_warehouse_sk

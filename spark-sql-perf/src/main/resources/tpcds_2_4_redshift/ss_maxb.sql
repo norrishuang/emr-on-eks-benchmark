@@ -11,4 +11,4 @@ select
   max(ss_addr_sk) as max_ss_addr_sk,
   max(ss_store_sk) as max_ss_store_sk,
   max(ss_promo_sk) as max_ss_promo_sk
-from dev.{0}.store_sales
+from {0}.{1}.store_sales

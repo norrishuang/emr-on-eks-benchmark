@@ -4,13 +4,13 @@ with ss as (
     select
         i_manufact_id,sum(ss_ext_sales_price) total_sales
     from
-        dev.{0}.store_sales,
-        dev.{0}.date_dim,
-        dev.{0}.customer_address,
-        dev.{0}.item
+        {0}.{1}.store_sales,
+        {0}.{1}.date_dim,
+        {0}.{1}.customer_address,
+        {0}.{1}.item
     where
             i_manufact_id in (select i_manufact_id
-                              from dev.{0}.item
+                              from {0}.{1}.item
                               where i_category in ('Electronics'))
       and ss_item_sk = i_item_sk
       and ss_sold_date_sk = d_date_sk
@@ -20,13 +20,13 @@ with ss as (
       and ca_gmt_offset = -5
     group by i_manufact_id), cs as
          (select i_manufact_id, sum(cs_ext_sales_price) total_sales
-          from dev.{0}.catalog_sales,
-               dev.{0}.date_dim,
-               dev.{0}.customer_address,
-               dev.{0}.item
+          from {0}.{1}.catalog_sales,
+               {0}.{1}.date_dim,
+               {0}.{1}.customer_address,
+               {0}.{1}.item
           where
                   i_manufact_id in (
-                  select i_manufact_id from dev.{0}.item
+                  select i_manufact_id from {0}.{1}.item
                   where
                           i_category in ('Electronics'))
             and cs_item_sk = i_item_sk
@@ -39,12 +39,12 @@ with ss as (
      ws as (
          select i_manufact_id,sum(ws_ext_sales_price) total_sales
          from
-             dev.{0}.web_sales,
-             dev.{0}.date_dim,
-             dev.{0}.customer_address,
-             dev.{0}.item
+             {0}.{1}.web_sales,
+             {0}.{1}.date_dim,
+             {0}.{1}.customer_address,
+             {0}.{1}.item
          where
-                 i_manufact_id in (select i_manufact_id from dev.{0}.item
+                 i_manufact_id in (select i_manufact_id from {0}.{1}.item
                                    where i_category in ('Electronics'))
            and ws_item_sk = i_item_sk
            and ws_sold_date_sk = d_date_sk

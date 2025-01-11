@@ -1,11 +1,11 @@
 --q48.sql--
 
  select sum (ss_quantity)
- from  dev.{0}.store_sales,
-       dev.{0}.store,
-       dev.{0}.customer_demographics,
-       dev.{0}.customer_address,
-       dev.{0}.date_dim
+ from  {0}.{1}.store_sales,
+       {0}.{1}.store,
+       {0}.{1}.customer_demographics,
+       {0}.{1}.customer_address,
+       {0}.{1}.date_dim
  where s_store_sk = ss_store_sk
  and  ss_sold_date_sk = d_date_sk and d_year = 2000
  and

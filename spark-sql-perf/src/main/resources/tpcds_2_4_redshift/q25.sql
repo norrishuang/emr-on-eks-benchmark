@@ -5,8 +5,8 @@
     sum(sr_net_loss) as store_returns_loss,
     sum(cs_net_profit) as catalog_sales_profit
  from
-     dev.{0}.store_sales, dev.{0}.store_returns, dev.{0}.catalog_sales, dev.{0}.date_dim d1, dev.{0}.date_dim d2, dev.{0}.date_dim d3,
-    dev.{0}.store, dev.{0}.item
+     {0}.{1}.store_sales, {0}.{1}.store_returns, {0}.{1}.catalog_sales, {0}.{1}.date_dim d1, {0}.{1}.date_dim d2, {0}.{1}.date_dim d3,
+    {0}.{1}.store, {0}.{1}.item
  where
     d1.d_moy = 4
     and d1.d_year = 2001

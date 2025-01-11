@@ -4,10 +4,10 @@
  from (select i_manager_id
               ,sum(ss_sales_price) sum_sales
               ,avg(sum(ss_sales_price)) over (partition by i_manager_id) avg_monthly_sales
-       from dev.{0}.item
-           ,dev.{0}.store_sales
-           ,dev.{0}.date_dim
-           ,dev.{0}.store
+       from {0}.{1}.item
+           ,{0}.{1}.store_sales
+           ,{0}.{1}.date_dim
+           ,{0}.{1}.store
        where ss_item_sk = i_item_sk
          and ss_sold_date_sk = d_date_sk
          and ss_store_sk = s_store_sk

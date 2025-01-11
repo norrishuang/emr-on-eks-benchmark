@@ -6,9 +6,9 @@
   sum(ws_ext_sales_price)*100/sum(sum(ws_ext_sales_price)) over
           (partition by i_class) as revenueratio
  from
-     dev.{0}.web_sales,
-     dev.{0}.item,
-     dev.{0}.date_dim
+     {0}.{1}.web_sales,
+     {0}.{1}.item,
+     {0}.{1}.date_dim
  where
 	ws_item_sk = i_item_sk
   	and i_category in ('Sports', 'Books', 'Home')

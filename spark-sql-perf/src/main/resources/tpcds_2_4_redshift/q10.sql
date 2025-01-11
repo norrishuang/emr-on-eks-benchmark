@@ -6,28 +6,28 @@
   cd_dep_count, count(*) cnt4, cd_dep_employed_count,  count(*) cnt5,
   cd_dep_college_count, count(*) cnt6
  from
-     dev.{0}.customer c,
-     dev.{0}.customer_address ca,
-     dev.{0}.customer_demographics
+     {0}.{1}.customer c,
+     {0}.{1}.customer_address ca,
+     {0}.{1}.customer_demographics
  where
   c.c_current_addr_sk = ca.ca_address_sk and
   ca_county in ('Rush County','Toole County','Jefferson County',
                 'Dona Ana County','La Porte County') and
   cd_demo_sk = c.c_current_cdemo_sk AND
-  exists (select * from dev.{0}.store_sales,
-                        dev.{0}.date_dim
+  exists (select * from {0}.{1}.store_sales,
+                        {0}.{1}.date_dim
           where c.c_customer_sk = ss_customer_sk AND
                 ss_sold_date_sk = d_date_sk AND
                 d_year = 2002 AND
                 d_moy between 1 AND 1+3) AND
-   (exists (select * from  dev.{0}.web_sales,
-                           dev.{0}.date_dim
+   (exists (select * from  {0}.{1}.web_sales,
+                           {0}.{1}.date_dim
             where c.c_customer_sk = ws_bill_customer_sk AND
                   ws_sold_date_sk = d_date_sk AND
                   d_year = 2002 AND
                   d_moy between 1 AND 1+3) or
-    exists (select * from dev.{0}.catalog_sales,
-                          dev.{0}.date_dim
+    exists (select * from {0}.{1}.catalog_sales,
+                          {0}.{1}.date_dim
             where c.c_customer_sk = cs_ship_customer_sk AND
                   cs_sold_date_sk = d_date_sk AND
                   d_year = 2002 AND

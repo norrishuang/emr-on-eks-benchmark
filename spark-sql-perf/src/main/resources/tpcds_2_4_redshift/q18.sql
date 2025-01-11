@@ -11,13 +11,13 @@
         avg( cast(cs_net_profit as decimal(12,2))) agg5,
         avg( cast(c_birth_year as decimal(12,2))) agg6,
         avg( cast(cd1.cd_dep_count as decimal(12,2))) agg7
- from dev.{0}.catalog_sales,
-      dev.{0}.customer_demographics cd1,
-      dev.{0}.customer_demographics cd2,
-      dev.{0}.customer,
-      dev.{0}.customer_address,
-      dev.{0}.date_dim,
-      dev.{0}.item
+ from {0}.{1}.catalog_sales,
+      {0}.{1}.customer_demographics cd1,
+      {0}.{1}.customer_demographics cd2,
+      {0}.{1}.customer,
+      {0}.{1}.customer_address,
+      {0}.{1}.date_dim,
+      {0}.{1}.item
  where cs_sold_date_sk = d_date_sk and
        cs_item_sk = i_item_sk and
        cs_bill_cdemo_sk = cd1.cd_demo_sk and

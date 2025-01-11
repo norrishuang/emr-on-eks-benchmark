@@ -1,10 +1,10 @@
 --q82.sql--
 
  select i_item_id, i_item_desc, i_current_price
- from  dev.{0}.item,
-       dev.{0}.inventory,
-       dev.{0}.date_dim,
-       dev.{0}.store_sales
+ from  {0}.{1}.item,
+       {0}.{1}.inventory,
+       {0}.{1}.date_dim,
+       {0}.{1}.store_sales
  where i_current_price between 62 and 62+30
    and inv_item_sk = i_item_sk
    and d_date_sk=inv_date_sk

@@ -3,7 +3,7 @@
  with ssales as
  (select c_last_name, c_first_name, s_store_name, ca_state, s_state, i_color,
          i_current_price, i_manager_id, i_units, i_size, sum(ss_net_paid) netpaid
- from  dev.{0}.store_sales, dev.{0}.store_returns, dev.{0}.store,  dev.{0}.item,  dev.{0}.customer, dev.{0}.customer_address
+ from  {0}.{1}.store_sales, {0}.{1}.store_returns, {0}.{1}.store,  {0}.{1}.item,  {0}.{1}.customer, {0}.{1}.customer_address
  where ss_ticket_number = sr_ticket_number
    and ss_item_sk = sr_item_sk
    and ss_customer_sk = c_customer_sk

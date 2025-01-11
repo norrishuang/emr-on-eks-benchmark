@@ -4,13 +4,13 @@
         cc_call_center_id Call_Center, cc_name Call_Center_Name, cc_manager Manager,
         sum(cr_net_loss) Returns_Loss
  from
-     dev.{0}.call_center,
-     dev.{0}.catalog_returns,
-     dev.{0}.date_dim,
-     dev.{0}.customer,
-     dev.{0}.customer_address,
-     dev.{0}.customer_demographics,
-     dev.{0}.household_demographics
+     {0}.{1}.call_center,
+     {0}.{1}.catalog_returns,
+     {0}.{1}.date_dim,
+     {0}.{1}.customer,
+     {0}.{1}.customer_address,
+     {0}.{1}.customer_demographics,
+     {0}.{1}.household_demographics
  where
         cr_call_center_sk        = cc_call_center_sk
  and    cr_returned_date_sk      = d_date_sk

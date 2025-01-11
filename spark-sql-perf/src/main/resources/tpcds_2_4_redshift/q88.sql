@@ -3,10 +3,10 @@
  select  *
  from
    (select count(*) h8_30_to_9
-    from  dev.{0}.store_sales a,
-          dev.{0}.household_demographics b,
-          dev.{0}.time_dim c,
-          dev.{0}.store d
+    from  {0}.{1}.store_sales a,
+          {0}.{1}.household_demographics b,
+          {0}.{1}.time_dim c,
+          {0}.{1}.store d
     where ss_sold_time_sk = c.t_time_sk
      and ss_hdemo_sk = b.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -17,10 +17,10 @@
           (b.hd_dep_count = 0 and b.hd_vehicle_count<=0+2))
      and d.s_store_name = 'ese') s1 cross join
    (select count(*) h9_to_9_30
-    from  dev.{0}.store_sales a,
-          dev.{0}.household_demographics b,
-          dev.{0}.time_dim c,
-          dev.{0}.store d
+    from  {0}.{1}.store_sales a,
+          {0}.{1}.household_demographics b,
+          {0}.{1}.time_dim c,
+          {0}.{1}.store d
     where ss_sold_time_sk = c.t_time_sk
       and ss_hdemo_sk = b.hd_demo_sk
       and ss_store_sk = s_store_sk
@@ -31,10 +31,10 @@
           (b.hd_dep_count = 0 and b.hd_vehicle_count<=0+2))
       and d.s_store_name = 'ese') s2 cross join
  (select count(*) h9_30_to_10
- from  dev.{0}.store_sales a1,
-       dev.{0}.household_demographics b1,
-       dev.{0}.time_dim c1,
-       dev.{0}.store d1
+ from  {0}.{1}.store_sales a1,
+       {0}.{1}.household_demographics b1,
+       {0}.{1}.time_dim c1,
+       {0}.{1}.store d1
  where ss_sold_time_sk = c1.t_time_sk
      and ss_hdemo_sk = b1.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -45,10 +45,10 @@
           (b1.hd_dep_count = 0 and b1.hd_vehicle_count<=0+2))
      and d1.s_store_name = 'ese') s3 cross join
  (select count(*) h10_to_10_30
- from  dev.{0}.store_sales a2,
-       dev.{0}.household_demographics b2,
-       dev.{0}.time_dim c2,
-       dev.{0}.store d2
+ from  {0}.{1}.store_sales a2,
+       {0}.{1}.household_demographics b2,
+       {0}.{1}.time_dim c2,
+       {0}.{1}.store d2
  where ss_sold_time_sk = c2.t_time_sk
      and ss_hdemo_sk = b2.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -59,10 +59,10 @@
           (b2.hd_dep_count = 0 and b2.hd_vehicle_count<=0+2))
      and d2.s_store_name = 'ese') s4 cross join
  (select count(*) h10_30_to_11
- from  dev.{0}.store_sales a3,
-       dev.{0}.household_demographics b3,
-       dev.{0}.time_dim c3,
-       dev.{0}.store d3
+ from  {0}.{1}.store_sales a3,
+       {0}.{1}.household_demographics b3,
+       {0}.{1}.time_dim c3,
+       {0}.{1}.store d3
  where ss_sold_time_sk = c3.t_time_sk
      and ss_hdemo_sk = b3.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -73,10 +73,10 @@
           (b3.hd_dep_count = 0 and b3.hd_vehicle_count<=0+2))
      and d3.s_store_name = 'ese') s5 cross join
  (select count(*) h11_to_11_30
- from  dev.{0}.store_sales a4,
-       dev.{0}.household_demographics b4,
-       dev.{0}.time_dim c4,
-       dev.{0}.store d4
+ from  {0}.{1}.store_sales a4,
+       {0}.{1}.household_demographics b4,
+       {0}.{1}.time_dim c4,
+       {0}.{1}.store d4
  where ss_sold_time_sk = c4.t_time_sk
      and ss_hdemo_sk = b4.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -87,10 +87,10 @@
           (b4.hd_dep_count = 0 and b4.hd_vehicle_count<=0+2))
      and d4.s_store_name = 'ese') s6 cross join
  (select count(*) h11_30_to_12
- from  dev.{0}.store_sales a5,
-       dev.{0}.household_demographics b5,
-       dev.{0}.time_dim c5,
-       dev.{0}.store d5
+ from  {0}.{1}.store_sales a5,
+       {0}.{1}.household_demographics b5,
+       {0}.{1}.time_dim c5,
+       {0}.{1}.store d5
  where ss_sold_time_sk = c5.t_time_sk
      and ss_hdemo_sk = b5.hd_demo_sk
      and ss_store_sk = s_store_sk
@@ -101,10 +101,10 @@
           (b5.hd_dep_count = 0 and b5.hd_vehicle_count<=0+2))
      and d5.s_store_name = 'ese') s7 cross join
  (select count(*) h12_to_12_30
- from  dev.{0}.store_sales a6,
-       dev.{0}.household_demographics b6,
-       dev.{0}.time_dim c6,
-       dev.{0}.store  d6
+ from  {0}.{1}.store_sales a6,
+       {0}.{1}.household_demographics b6,
+       {0}.{1}.time_dim c6,
+       {0}.{1}.store  d6
  where ss_sold_time_sk = c6.t_time_sk
      and ss_hdemo_sk = b6.hd_demo_sk
      and ss_store_sk = s_store_sk

@@ -11,10 +11,10 @@
         rank() over
           (partition by i_category, i_brand, cc_name
            order by d_year, d_moy) rn
- from  dev.{0}.item,
-       dev.{0}.catalog_sales,
-       dev.{0}.date_dim,
-       dev.{0}.call_center
+ from  {0}.{1}.item,
+       {0}.{1}.catalog_sales,
+       {0}.{1}.date_dim,
+       {0}.{1}.call_center
  where cs_item_sk = i_item_sk and
        cs_sold_date_sk = d_date_sk and
        cc_call_center_sk= cs_call_center_sk and

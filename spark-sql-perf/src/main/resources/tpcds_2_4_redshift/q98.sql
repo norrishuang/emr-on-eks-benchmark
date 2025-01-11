@@ -5,9 +5,9 @@ select i_item_desc, i_category, i_class, i_current_price
       ,sum(ss_ext_sales_price)*100/sum(sum(ss_ext_sales_price)) over
           (partition by i_class) as revenueratio
 from
-	  dev.{0}.store_sales,
-	  dev.{0}.item,
-	  dev.{0}.date_dim
+	  {0}.{1}.store_sales,
+	  {0}.{1}.item,
+	  {0}.{1}.date_dim
 where
 	ss_item_sk = i_item_sk
   	and i_category in ('Sports', 'Books', 'Home')

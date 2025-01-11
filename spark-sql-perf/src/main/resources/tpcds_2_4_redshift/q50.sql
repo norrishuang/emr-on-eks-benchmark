@@ -12,11 +12,11 @@ select
                   (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days"
    ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days"
  from
-     dev.{0}.store_sales,
-     dev.{0}.store_returns,
-     dev.{0}.store,
-     dev.{0}.date_dim d1,
-     dev.{0}.date_dim d2
+     {0}.{1}.store_sales,
+     {0}.{1}.store_returns,
+     {0}.{1}.store,
+     {0}.{1}.date_dim d1,
+     {0}.{1}.date_dim d2
  where
      d2.d_year = 2001
  and d2.d_moy  = 8

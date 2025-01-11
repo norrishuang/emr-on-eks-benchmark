@@ -14,10 +14,10 @@
        ,count(cs_quantity) as catalog_sales_quantitycount ,avg(cs_quantity) as catalog_sales_quantityave
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitystdev
        ,stddev_samp(cs_quantity)/avg(cs_quantity) as catalog_sales_quantitycov
- from  dev.{0}.store_sales,
-       dev.{0}.store_returns,
-       dev.{0}.catalog_sales,
-       dev.{0}.date_dim d1, dev.{0}.date_dim d2, dev.{0}.date_dim d3, dev.{0}.store, dev.{0}.item
+ from  {0}.{1}.store_sales,
+       {0}.{1}.store_returns,
+       {0}.{1}.catalog_sales,
+       {0}.{1}.date_dim d1, {0}.{1}.date_dim d2, {0}.{1}.date_dim d3, {0}.{1}.store, {0}.{1}.item
  where d1.d_quarter_name = '2001Q1'
    and d1.d_date_sk = ss_sold_date_sk
    and i_item_sk = ss_item_sk

@@ -11,10 +11,10 @@ select
         order by sum(ss_net_profit)/sum(ss_ext_sales_price) asc
     ) as rank_within_parent
 from
-    dev.{0}.store_sales,
-    dev.{0}.date_dim d1,
-    dev.{0}.item,
-    dev.{0}.store
+    {0}.{1}.store_sales,
+    {0}.{1}.date_dim d1,
+    {0}.{1}.item,
+    {0}.{1}.store
 where
     d1.d_year = 2001
     and d1.d_date_sk = ss_sold_date_sk

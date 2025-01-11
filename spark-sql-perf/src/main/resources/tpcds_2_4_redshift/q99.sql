@@ -11,11 +11,11 @@
                   (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as "91-120 days"
    ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as ">120 days"
  from
-    dev.{0}.catalog_sales,
-    dev.{0}.warehouse,
-    dev.{0}.ship_mode,
-    dev.{0}.call_center,
-    dev.{0}.date_dim
+    {0}.{1}.catalog_sales,
+    {0}.{1}.warehouse,
+    {0}.{1}.ship_mode,
+    {0}.{1}.call_center,
+    {0}.{1}.date_dim
  where
      d_month_seq between 1200 and 1200 + 11
  and cs_ship_date_sk   = d_date_sk

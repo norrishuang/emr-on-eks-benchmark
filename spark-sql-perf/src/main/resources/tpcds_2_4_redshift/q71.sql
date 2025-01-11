@@ -2,14 +2,14 @@
 
  select i_brand_id brand_id, i_brand brand,t_hour,t_minute,
  	  sum(ext_price) ext_price
- from  dev.{0}.item,
+ from  {0}.{1}.item,
     (select
         ws_ext_sales_price as ext_price,
         ws_sold_date_sk as sold_date_sk,
         ws_item_sk as sold_item_sk,
         ws_sold_time_sk as time_sk
-     from  dev.{0}.web_sales,
-           dev.{0}.date_dim
+     from  {0}.{1}.web_sales,
+           {0}.{1}.date_dim
      where d_date_sk = ws_sold_date_sk
         and d_moy=11
         and d_year=1999
@@ -19,8 +19,8 @@
         cs_sold_date_sk as sold_date_sk,
         cs_item_sk as sold_item_sk,
         cs_sold_time_sk as time_sk
-      from dev.{0}.catalog_sales,
-           dev.{0}.date_dim
+      from {0}.{1}.catalog_sales,
+           {0}.{1}.date_dim
       where d_date_sk = cs_sold_date_sk
           and d_moy=11
           and d_year=1999
@@ -30,12 +30,12 @@
         ss_sold_date_sk as sold_date_sk,
         ss_item_sk as sold_item_sk,
         ss_sold_time_sk as time_sk
-     from  dev.{0}.store_sales,
-           dev.{0}.date_dim
+     from  {0}.{1}.store_sales,
+           {0}.{1}.date_dim
      where d_date_sk = ss_sold_date_sk
         and d_moy=11
         and d_year=1999
-     ) tmp, dev.{0}.time_dim
+     ) tmp, {0}.{1}.time_dim
  where
    sold_item_sk = i_item_sk
    and i_manager_id=1

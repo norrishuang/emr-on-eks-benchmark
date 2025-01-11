@@ -4,9 +4,9 @@
  	,item.i_brand_id brand_id
  	,item.i_brand brand
  	,sum(ss_ext_sales_price) ext_price
- from dev.{0}.date_dim dt,
-      dev.{0}.store_sales,
-      dev.{0}.item
+ from {0}.{1}.date_dim dt,
+      {0}.{1}.store_sales,
+      {0}.{1}.item
  where dt.d_date_sk = store_sales.ss_sold_date_sk
     and store_sales.ss_item_sk = item.i_item_sk
     and item.i_manager_id = 1

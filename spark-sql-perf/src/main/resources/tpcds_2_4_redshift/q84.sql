@@ -2,12 +2,12 @@
 
  select c_customer_id as customer_id
        ,coalesce(c_last_name,'') + ', ' + coalesce(c_first_name,'') as customername
- from dev.{0}.customer
-     ,dev.{0}.customer_address
-     ,dev.{0}.customer_demographics
-     ,dev.{0}.household_demographics
-     ,dev.{0}.income_band
-     ,dev.{0}.store_returns
+ from {0}.{1}.customer
+     ,{0}.{1}.customer_address
+     ,{0}.{1}.customer_demographics
+     ,{0}.{1}.household_demographics
+     ,{0}.{1}.income_band
+     ,{0}.{1}.store_returns
  where ca_city	        =  'Edgewood'
    and c_current_addr_sk = ca_address_sk
    and ib_lower_bound   >=  38128

@@ -3,8 +3,8 @@
  with cs_ui as
   (select cs_item_sk
          ,sum(cs_ext_list_price) as sale,sum(cr_refunded_cash+cr_reversed_charge+cr_store_credit) as refund
-   from dev.{0}.catalog_sales,
-        dev.{0}.catalog_returns
+   from {0}.{1}.catalog_sales,
+        {0}.{1}.catalog_returns
    where cs_item_sk = cr_item_sk
      and cs_order_number = cr_order_number
    group by cs_item_sk
@@ -15,23 +15,23 @@
           ad1.ca_zip b_zip, ad2.ca_street_number c_street_number, ad2.ca_street_name c_street_name,
           ad2.ca_city c_city, ad2.ca_zip c_zip, d1.d_year as syear, d2.d_year as fsyear, d3.d_year s2year,
           count(*) cnt, sum(ss_wholesale_cost) s1, sum(ss_list_price) s2, sum(ss_coupon_amt) s3
-   FROM  dev.{0}.store_sales,
-         dev.{0}.store_returns,
+   FROM  {0}.{1}.store_sales,
+         {0}.{1}.store_returns,
          cs_ui,
-         dev.{0}.date_dim d1,
-         dev.{0}.date_dim d2,
-         dev.{0}.date_dim d3,
-         dev.{0}.store,
-         dev.{0}.customer,
-         dev.{0}.customer_demographics cd1,
-         dev.{0}.customer_demographics cd2,
-            dev.{0}.promotion,
-            dev.{0}.household_demographics hd1,
-            dev.{0}.household_demographics hd2,
-            dev.{0}.customer_address ad1,
-            dev.{0}.customer_address ad2,
-            dev.{0}.income_band ib1,dev.{0}.income_band ib2,
-            dev.{0}.item
+         {0}.{1}.date_dim d1,
+         {0}.{1}.date_dim d2,
+         {0}.{1}.date_dim d3,
+         {0}.{1}.store,
+         {0}.{1}.customer,
+         {0}.{1}.customer_demographics cd1,
+         {0}.{1}.customer_demographics cd2,
+            {0}.{1}.promotion,
+            {0}.{1}.household_demographics hd1,
+            {0}.{1}.household_demographics hd2,
+            {0}.{1}.customer_address ad1,
+            {0}.{1}.customer_address ad2,
+            {0}.{1}.income_band ib1,{0}.{1}.income_band ib2,
+            {0}.{1}.item
    WHERE  ss_store_sk = s_store_sk AND
           ss_sold_date_sk = d1.d_date_sk AND
           ss_customer_sk = c_customer_sk AND

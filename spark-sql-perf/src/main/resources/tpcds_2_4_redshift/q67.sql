@@ -6,10 +6,10 @@
       from
          (select i_category, i_class, i_brand, i_product_name, d_year, d_qoy, d_moy,
                  s_store_id, sum(coalesce(ss_sales_price*ss_quantity,0)) sumsales
-          from  dev.{0}.store_sales,
-                dev.{0}.date_dim,
-                dev.{0}.store,
-                dev.{0}.item
+          from  {0}.{1}.store_sales,
+                {0}.{1}.date_dim,
+                {0}.{1}.store,
+                {0}.{1}.item
         where  ss_sold_date_sk=d_date_sk
            and ss_item_sk=i_item_sk
            and ss_store_sk = s_store_sk

@@ -6,17 +6,17 @@
        ,sum(case when p_promo_sk is null then 1 else 0 end) no_promo
        ,sum(case when p_promo_sk is not null then 1 else 0 end) promo
        ,count(*) total_cnt
- from dev.{0}.catalog_sales
- join dev.{0}.inventory on (cs_item_sk = inv_item_sk)
- join dev.{0}.warehouse on (w_warehouse_sk=inv_warehouse_sk)
- join dev.{0}.item on (i_item_sk = cs_item_sk)
- join dev.{0}.customer_demographics on (cs_bill_cdemo_sk = cd_demo_sk)
- join dev.{0}.household_demographics on (cs_bill_hdemo_sk = hd_demo_sk)
- join dev.{0}.date_dim d1 on (cs_sold_date_sk = d1.d_date_sk)
- join dev.{0}.date_dim d2 on (inv_date_sk = d2.d_date_sk)
- join dev.{0}.date_dim d3 on (cs_ship_date_sk = d3.d_date_sk)
- left outer join dev.{0}.promotion on (cs_promo_sk=p_promo_sk)
- left outer join dev.{0}.catalog_returns on (cr_item_sk = cs_item_sk and cr_order_number = cs_order_number)
+ from {0}.{1}.catalog_sales
+ join {0}.{1}.inventory on (cs_item_sk = inv_item_sk)
+ join {0}.{1}.warehouse on (w_warehouse_sk=inv_warehouse_sk)
+ join {0}.{1}.item on (i_item_sk = cs_item_sk)
+ join {0}.{1}.customer_demographics on (cs_bill_cdemo_sk = cd_demo_sk)
+ join {0}.{1}.household_demographics on (cs_bill_hdemo_sk = hd_demo_sk)
+ join {0}.{1}.date_dim d1 on (cs_sold_date_sk = d1.d_date_sk)
+ join {0}.{1}.date_dim d2 on (inv_date_sk = d2.d_date_sk)
+ join {0}.{1}.date_dim d3 on (cs_ship_date_sk = d3.d_date_sk)
+ left outer join {0}.{1}.promotion on (cs_promo_sk=p_promo_sk)
+ left outer join {0}.{1}.catalog_returns on (cr_item_sk = cs_item_sk and cr_order_number = cs_order_number)
  where d1.d_week_seq = d2.d_week_seq
    and inv_quantity_on_hand < cs_quantity
    and d3.d_date > (cast(d1.d_date AS DATE) + interval '5' day)

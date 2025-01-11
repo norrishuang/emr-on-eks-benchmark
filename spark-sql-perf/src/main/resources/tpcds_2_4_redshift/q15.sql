@@ -1,10 +1,10 @@
 --q15.sql--
 
  select ca_zip, sum(cs_sales_price)
- from dev.{0}.catalog_sales,
-      dev.{0}.customer,
-      dev.{0}.customer_address,
-      dev.{0}.date_dim
+ from {0}.{1}.catalog_sales,
+      {0}.{1}.customer,
+      {0}.{1}.customer_address,
+      {0}.{1}.date_dim
  where cs_bill_customer_sk = c_customer_sk
  	and c_current_addr_sk = ca_address_sk
  	and ( substring(ca_zip,1,5) in ('85669', '86197','88274','83405','86475',

@@ -68,11 +68,11 @@
  	    ,sum(case when d_moy = 11 then ws_net_paid * ws_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then ws_net_paid * ws_quantity else 0 end) as dec_net
     from
-       dev.{0}.web_sales,
-       dev.{0}.warehouse,
-       dev.{0}.date_dim,
-       dev.{0}.time_dim,
-       dev.{0}.ship_mode
+       {0}.{1}.web_sales,
+       {0}.{1}.warehouse,
+       {0}.{1}.date_dim,
+       {0}.{1}.time_dim,
+       {0}.{1}.ship_mode
     where
       ws_warehouse_sk =  w_warehouse_sk
       and ws_sold_date_sk = d_date_sk
@@ -112,11 +112,11 @@
  	    ,sum(case when d_moy = 11 then cs_net_paid_inc_tax * cs_quantity else 0 end) as nov_net
  	    ,sum(case when d_moy = 12 then cs_net_paid_inc_tax * cs_quantity else 0 end) as dec_net
      from
-        dev.{0}.catalog_sales,
-        dev.{0}.warehouse,
-        dev.{0}.date_dim,
-        dev.{0}.time_dim,
-        dev.{0}.ship_mode
+        {0}.{1}.catalog_sales,
+        {0}.{1}.warehouse,
+        {0}.{1}.date_dim,
+        {0}.{1}.time_dim,
+        {0}.{1}.ship_mode
      where
         cs_warehouse_sk =  w_warehouse_sk
         and cs_sold_date_sk = d_date_sk
