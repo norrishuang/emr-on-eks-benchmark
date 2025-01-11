@@ -25,7 +25,8 @@ export REDSHIFT_SERVER=<redshift-endporint>
 export OUTPUT_PATH=<log-path>
 export USERNAME=<username>
 export PASSWORD=<password>
+export DATABASE=<database>
 export SCHEMA=spectrum_iceberg_schema
-python ./examples/python/redshift-tpcds.py -f $SQLFILE -h $REDSHIFT_SERVER -u $USERNAME -p $PASSWORD -o $OUTPUT_PATH -s $SCHEMA
+python ./examples/python/redshift-tpcds.py -f $SQLFILE -h $REDSHIFT_SERVER -u $USERNAME -p $PASSWORD -o $OUTPUT_PATH -d $DATABASE -s $SCHEMA
 ```
 

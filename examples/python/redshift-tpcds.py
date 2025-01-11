@@ -16,19 +16,25 @@ DATABASE = 'dev'
 SCHEMA = 'iceberg'
 USERNAME = 'awsuser'
 PASSWORD = 'awsuser'
+CLUSTER_IDENTIFIER = 'examplecluster'
 
 
 ###
-### Trino TPC DS 测试
+### Redshift TPC-DS Test
 ### python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift \
 ###    -h <redshift-endporint> -o /home/ec2-user/environment/redshift
 
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "f:h:o:u:p:s:d:",
+                               "f:h:o:u:p:s:d:c:",
                                ["sqlfiles=",
                                 "host=",
-                                "output="])
+                                "output=",
+                                "username=",
+                                "password=",
+                                "schema=",
+                                "database=",
+                                "cluster_identifier="])
     for opt_name, opt_value in opts:
         if opt_name in ('-f', '--sqlfiles'):
             SQLFILES = opt_value
@@ -36,6 +42,9 @@ if len(sys.argv) > 1:
         elif opt_name in ('-h', '--host'):
             HOST = opt_value
             print("HOST:" + HOST)
+        elif opt_name in ('-c', '--cluster_identifier'):
+            CLUSTER_IDENTIFIER = opt_value
+            print("CLUSTER_IDENTIFIER:" + CLUSTER_IDENTIFIER)
         elif opt_name in ('-u', '--username'):
             USERNAME = opt_value
             print("USERNAME:" + USERNAME)
@@ -67,7 +76,7 @@ else:
 writeresultfile = "{:s}/result_{:s}.csv".format(OUTPUT, SCHEMA)
 
 def load_sql_file(sqlpath):
-    ##写结果集的表头 覆盖原来的文件
+    ## write header of result file
     with open(writeresultfile, "w", newline='') as csvfile:
         fieldnames = ['SQL', 'ExecuteTime', 'Rows']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
