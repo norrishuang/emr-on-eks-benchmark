@@ -106,7 +106,8 @@ def executeSQL(filename, sqltext):
         database=DATABASE,
         port=5439,
         user=USERNAME,
-        password=PASSWORD
+        password=PASSWORD,
+        timeout=300
     )
     rowcount = 0
     starttime = int(round(time.time()*1000))
@@ -134,7 +135,7 @@ def executeSQL(filename, sqltext):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #
         writer.writerow({'SQL': filename,
-                         'ExecuteTime': int(endtime - starttime),
+                         'ExecuteTime': float(endtime - starttime)/1000,
                          'Rows': rowcount})
 
 
