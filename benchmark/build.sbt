@@ -6,7 +6,7 @@ scalaVersion := "2.12.10"
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
-unmanagedBase <<= baseDirectory { base => base / "libs" }
+Compile / unmanagedBase := baseDirectory.value / "libs"
 
 // Dependencies required for this project
 libraryDependencies ++= Seq(
@@ -19,23 +19,17 @@ libraryDependencies ++= Seq(
 )
 
 // Remove stub classes
-assemblyMergeStrategy in assembly := {
+assembly / assemblyMergeStrategy := {
   case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.discard
   case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(x)
 }
 
 // Exclude the Scala runtime jars
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+assembly / assemblyPackageScala / assembleArtifact := false
 
 resolvers ++= Seq(
-  "Spray Repository" at "http://repo.spray.cc/",
   "Cloudera Repository" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
-  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "Second Typesafe repo" at "http://repo.typesafe.com/typesafe/maven-releases/",
-  "Mesosphere Public Repository" at "http://downloads.mesosphere.io/maven",
   Resolver.sonatypeRepo("public")
 )
-
-resolvers += Resolver.url("bintray-sbt-plugins", url("http://dl.bintray.com/sbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)

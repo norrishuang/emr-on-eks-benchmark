@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fix-local-permissions
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: fix-local-permissions
+  template:
+    metadata:
+      labels:
+        app: fix-local-permissions
+    spec:
+      nodeSelector:
+        alpha.eksctl.io/nodegroup-name: spark-benchmark-8xl
+      hostPID: true
+      hostNetwork: true
+      containers:
+      - name: fix-permissions
+        image: public.ecr.aws/y4g4v0z7/busybox
+        command:
+        - sh
+        - -c
+        - |
+          chmod -R 777 /host/local* 2>/dev/null || true
+          echo "Permissions fixed, sleeping..."
+          sleep infinity
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
+        securityContext:
+          privileged: true
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
