@@ -17,12 +17,18 @@ SCHEMA = 'iceberg'
 USERNAME = 'awsuser'
 PASSWORD = 'awsuser'
 CLUSTER_IDENTIFIER = 'examplecluster'
+USE_IAM = False  # Set to True for S3 Tables with Federated user authentication
 
 
 ###
 ### Redshift TPC-DS Test
+### Traditional authentication:
 ### python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift \
-###    -h <redshift-endporint> -o /home/ec2-user/environment/redshift
+###    -h <redshift-endpoint> -o /home/ec2-user/environment/redshift -u awsuser -p password
+###
+### IAM/Federated authentication (for S3 Tables):
+### python redshift-tpcds.py -f /home/ec2-user/environment/emr-on-eks-benchmark/spark-sql-perf/src/main/resources/tpcds_2_4_redshift \
+###    -h <redshift-endpoint> -o /home/ec2-user/environment/redshift -c <cluster-identifier> --iam
 
 if len(sys.argv) > 1:
     opts, args = getopt.getopt(sys.argv[1:],
@@ -34,7 +40,8 @@ if len(sys.argv) > 1:
                                 "password=",
                                 "schema=",
                                 "database=",
-                                "cluster_identifier="])
+                                "cluster_identifier=",
+                                "iam"])
     for opt_name, opt_value in opts:
         if opt_name in ('-f', '--sqlfiles'):
             SQLFILES = opt_value
@@ -59,6 +66,9 @@ if len(sys.argv) > 1:
         elif opt_name in ('-s', '--schema'):
             SCHEMA = opt_value
             print("SCHEMA:" + SCHEMA)
+        elif opt_name == '--iam':
+            USE_IAM = True
+            print("USE_IAM: True (Federated user authentication)")
         else:
             print("need parameters [sqlfiles,region,database etc.]")
             exit()
@@ -100,21 +110,35 @@ def load_sql_file(sqlpath):
 
 
 def executeSQL(filename, sqltext):
-
-    conn = redshift_connector.connect(
-        host=HOST,
-        database=DATABASE,
-        port=5439,
-        user=USERNAME,
-        password=PASSWORD,
-        timeout=300
-    )
+    
+    # Connect using IAM authentication (for S3 Tables / Federated user)
+    if USE_IAM:
+        conn = redshift_connector.connect(
+            host=HOST,
+            database=DATABASE,
+            port=5439,
+            iam=True,
+            cluster_identifier=CLUSTER_IDENTIFIER,
+            timeout=600
+        )
+    # Connect using traditional username/password authentication
+    else:
+        conn = redshift_connector.connect(
+            host=HOST,
+            database=DATABASE,
+            port=5439,
+            user=USERNAME,
+            password=PASSWORD,
+            timeout=600
+        )
     rowcount = 0
     starttime = int(round(time.time()*1000))
     cursor = conn.cursor()
     try:
         # print(sqltext.format(SCHEMA))
-        cursor.execute(sqltext.format(DATABASE, SCHEMA))
+        quoted_db = f'"{DATABASE}"' if any(c in DATABASE for c in ['-', '@', ' ']) else DATABASE
+        quoted_schema = f'"{SCHEMA}"' if any(c in SCHEMA for c in ['-', '@', ' ']) else SCHEMA
+        cursor.execute(sqltext.format(quoted_db, quoted_schema))
         rows = cursor.fetchall()
         rowcount = len(rows)
         cursor.close()

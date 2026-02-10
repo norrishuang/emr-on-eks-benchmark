@@ -53,8 +53,8 @@ spec:
     "spark.executor.defaultJavaOptions": "-verbose:gc -XX:+UseParallelGC -XX:InitiatingHeapOccupancyPercent=70"
 
     # selector
-    "spark.kubernetes.driver.node.selector.alpha.eksctl.io/nodegroup-name": "spark-benchmark-x86-c8i-8xl"
-    "spark.kubernetes.executor.node.selector.alpha.eksctl.io/nodegroup-name": "spark-benchmark-x86-c8i-8xl"
+    "spark.kubernetes.driver.node.selector.alpha.eksctl.io/nodegroup-name": "mng-mytest-m7i-xl"
+    "spark.kubernetes.executor.node.selector.alpha.eksctl.io/nodegroup-name": "spark-benchmark-x86-8xl"
     # Keep pods in a single AZ 
     # "spark.kubernetes.node.selector.topology.kubernetes.io/zone": "us-east-1b"
     # "spark.kubernetes.node.selector.eks.amazonaws.com/capacityType": "ON_DEMAND"
@@ -74,7 +74,7 @@ spec:
   driver:
     cores: 4
     coreLimit: "4.1"
-    memory: "20g"
+    memory: "10g"
     memoryOverhead: "4096"
     serviceAccount: emr-job-execution-sa
     volumeMounts:
